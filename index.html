@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1f4e79">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="관세사 공부방">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>관세사 공부방</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@600;900&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: 세관 서류철 — 위쪽 고정 바(과목 탭, 1차·2차로 묶음) + 아래는 선택한 연습장이 꽉 차게. 홈은 과목 카드와 진도 */
+:root{
+  --bg:#eef1f4; --surface:#ffffff; --ink:#18212b; --muted:#5b6876; --line:#d5dbe2;
+  --accent:#1f4e79; --accent-soft:#dbe6f1; --stamp:#b3261e; --stamp-soft:#f6dedb; --ok:#1d6b45;
+  --f-display:"Noto Serif KR","Nanum Myeongjo",serif;
+  --f-body:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#11161c; --surface:#19212a; --ink:#e6ebf0; --muted:#97a3b0; --line:#2c3743;
+  --accent:#7fb0e0; --accent-soft:#1e3247; --stamp:#f08a80; --stamp-soft:#3e211f; --ok:#7fd1a4; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#11161c; --surface:#19212a; --ink:#e6ebf0; --muted:#97a3b0; --line:#2c3743;
+  --accent:#7fb0e0; --accent-soft:#1e3247; --stamp:#f08a80; --stamp-soft:#3e211f; --ok:#7fd1a4; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6;display:flex;flex-direction:column;overflow:hidden}
+.top{background:var(--surface);border-bottom:2px solid var(--ink);padding-block:10px 0;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));flex:none}
+.brand{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;max-width:1100px;margin:0 auto}
+.brand button{all:unset;cursor:pointer;font-family:var(--f-display);font-weight:900;font-size:1.35rem;letter-spacing:-.01em}
+.brand button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.brand .sub{font-family:var(--f-mono);font-size:.78rem;color:var(--muted)}
+nav{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;max-width:1100px;margin:8px auto 0;align-items:flex-end}
+nav::-webkit-scrollbar{display:none}
+.grp{font-family:var(--f-mono);font-size:.7rem;color:var(--stamp);font-weight:600;padding:0 4px 9px 10px;white-space:nowrap;letter-spacing:.05em}
+.grp:first-child{padding-left:0}
+nav a{white-space:nowrap;text-decoration:none;color:var(--muted);font-size:.9rem;font-weight:500;padding:6px 10px 8px;border-bottom:3px solid transparent}
+nav a:hover{color:var(--ink)}
+nav a[aria-current="page"]{color:var(--ink);border-bottom-color:var(--accent);font-weight:700}
+nav a:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+nav a .n{font-family:var(--f-mono);font-size:.75rem;color:var(--stamp);margin-left:3px}
+main{flex:1;min-height:0;position:relative}
+iframe{border:0;width:100%;height:100%;display:block;background:var(--bg)}
+#home{height:100%;overflow-y:auto}
+.wrap{max-width:1100px;margin:0 auto;padding-block:22px 48px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:22px}
+.hero{display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:flex-end}
+.hero h1{font-family:var(--f-display);font-weight:900;font-size:clamp(1.6rem,4vw,2.2rem);margin:0;text-wrap:balance;line-height:1.25}
+.hero p{margin:4px 0 0;color:var(--muted);max-width:60ch}
+.stamp{display:inline-block;border:3px solid var(--stamp);color:var(--stamp);font-family:var(--f-display);font-weight:900;padding:4px 14px;transform:rotate(-3deg);border-radius:4px;letter-spacing:.06em;white-space:nowrap}
+.tally{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.tally>div{background:var(--surface);padding:12px 14px}
+.tally .k{font-size:.75rem;color:var(--muted);letter-spacing:.04em}
+.tally .v{font-family:var(--f-mono);font-size:1.5rem;font-weight:600;font-variant-numeric:tabular-nums}
+.tally .v small{font-size:.8rem;color:var(--muted);font-weight:500}
+h2{font-family:var(--f-display);font-size:1.15rem;margin:0;display:flex;gap:10px;align-items:baseline}
+h2 .tag{font-family:var(--f-mono);font-size:.75rem;color:var(--stamp);border:1px solid var(--stamp);border-radius:3px;padding:0 6px}
+.sect{display:flex;flex-direction:column;gap:10px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
+.card{display:flex;flex-direction:column;gap:6px;text-decoration:none;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 16px;min-width:0}
+.card:hover{border-color:var(--accent)}
+.card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.card .t{font-weight:700;font-size:1.02rem}
+.card .d{color:var(--muted);font-size:.88rem}
+.card .p{font-family:var(--f-mono);font-size:.78rem;color:var(--accent);font-variant-numeric:tabular-nums;margin-top:auto}
+.card.wrong{border-color:var(--stamp);background:var(--stamp-soft)}
+.card.wrong .p{color:var(--stamp)}
+.note{font-size:.8rem;color:var(--muted)}
+</style>
+
+<header class="top">
+  <div class="brand">
+    <button id="homebtn" type="button">관세사 공부방</button>
+    <span class="sub">1차 2027.3 · 2차 2027.6</span>
+  </div>
+  <nav id="nav" aria-label="과목"></nav>
+</header>
+<main>
+  <section id="home">
+    <div class="wrap">
+      <div class="hero">
+        <div>
+          <h1>오늘은 어느 서류철부터 펼칠까요</h1>
+          <p>기출 3개년과 지금까지 만든 연습장을 한곳에 모았어요. 위 탭이나 아래 카드에서 과목을 고르면 바로 문제로 들어가요.</p>
+        </div>
+        <span class="stamp">수험번호 2027</span>
+      </div>
+      <div class="tally" id="tally"></div>
+      <div class="sect"><h2><span class="tag">기출</span>실제 시험 문제</h2><div class="cards" id="c0"></div></div>
+      <div class="sect"><h2><span class="tag">1차</span>객관식 대비</h2><div class="cards" id="c1"></div></div>
+      <div class="sect"><h2><span class="tag">2차</span>서술·암기 대비</h2><div class="cards" id="c2"></div></div>
+      <div class="sect"><h2><span class="tag">복습</span>틀린 문제</h2><div class="cards" id="c3"></div></div>
+      <p class="note">진도와 오답은 이 브라우저에만 저장돼요. 예전에 따로 쓰던 연습장 기록은 여기로 넘어오지 않아요. 법령 내용은 시험 전 최신 개정 기본서로 확인하세요.</p>
+    </div>
+  </section>
+  <iframe id="frame" title="연습장" hidden></iframe>
+</main>
+
+<script>
+const MODS=[
+ {id:"gc1",g:0,t:"1차 기출",src:"gichul.html#p1",d:"2024~2026 1차 4과목 480문제, 최종 정답 채점. 답안지 칸으로 진도 확인"},
+ {id:"gc2",g:0,t:"2차 기출",src:"gichul.html#p2",d:"2024~2026 2차 4과목 문제지와 80분 타이머, 문제별 답안 작성 칸"},
+ {id:"law",g:1,t:"관세법 OX",src:"amgi.html#law",d:"과세물건, 납세의무자, 제척기간, 탄력관세 등 조문 함정 OX"},
+ {id:"lawmap",g:1,t:"관세법 지도·카드",src:"lawmap.html",d:"13개 장 구조 지도와 조문 시트, 77장 간격반복 플래시카드"},
+ {id:"nk",g:1,t:"내국소비세",src:"nk.html",d:"부가세·개소세·주세 구조 지도, 돈 흐름, 수입 세금 계산, 왜? 카드, OX"},
+ {id:"trade",g:1,t:"무역영어",src:"amgi.html#inco",d:"인코텀즈 2020, UCP 600, CISG, 무역 용어"},
+ {id:"trademap",g:1,t:"무역영어 지도",src:"trademap.html",d:"인코텀즈 11개 규칙 항로, 규칙 맞히기, UCP·CISG·MIA 등 규범 카드"},
+ {id:"hs",g:2,t:"관세율표",src:"amgi.html#hs",d:"류 번호 ↔ 품목명 양방향, 부별 범위 선택, 전체 표 보기"},
+ {id:"tc",g:2,t:"통칙 타자",src:"tc.html",d:"표·미혼·구본마·유·케포·소 — 따라치기, 힌트, 백지 복원"},
+ {id:"val",g:2,t:"관세평가",src:"amgi.html#val",d:"제1~6방법, 가산·공제 요소 사례 문제"},
+ {id:"wrong",g:3,t:"오답노트",src:"amgi.html#wrong",d:"관세법·관세평가·무역영어·관세율표에서 틀린 문제만 다시"}
+];
+const $=s=>document.querySelector(s);
+const get=(k,d)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}};
+
+function stats(){
+  const a=get("cbStudy.v1",{}), wrongA=Object.keys(a.wrong||{});
+  const nk=get("nk-quiz",{wrong:[],done:[]}), tcb=get("tc-best",{});
+  const tcDone=Object.keys(tcb).filter(k=>k.startsWith("blank")&&tcb[k]>=90).length;
+  const gc=get("gc-v1",{}), gk=Object.keys(gc), gOk=gk.filter(k=>gc[k].ok).length;
+  const pre=p=>wrongA.filter(id=>id.startsWith(p)).length;
+  return {gDone:gk.length,gOk,gWrong:gk.length-gOk,solved:a.solved||0,correct:a.correct||0,wrongA:wrongA.length,nkDone:(nk.done||[]).length,nkWrong:(nk.wrong||[]).length,tcDone,
+    per:{law:pre("law-"),trade:pre("inco-"),hs:pre("hs-"),val:pre("val-")}};
+}
+function prog(m,s){
+  if(m.id==="gc1")return `푼 문제 ${s.gDone} / 480 · 맞힘 ${s.gOk}`;
+  if(m.id==="gc2")return "2024 · 2025 · 2026 · 과목별 4문제";
+  if(m.id==="lawmap"){const c=get("law-srs",{});return `플래시카드 학습 ${Object.keys(c).length} / 77장`}
+  if(m.id==="trademap"){const g=get("inco-score",{ok:0,n:0});return g.n?`규칙 맞히기 ${g.ok}/${g.n}`:"인코텀즈 11개 규칙"}
+  if(m.id==="nk")return `OX 푼 문제 ${s.nkDone} · 틀린 문제 ${s.nkWrong}`;
+  if(m.id==="tc")return `백지 복원 90% 이상 ${s.tcDone} / 10`;
+  if(m.id==="wrong")return `모인 오답 ${s.wrongA}개`;
+  return s.per[m.id]?`오답 ${s.per[m.id]}개`:"오답 없음";
+}
+function renderNav(){
+  const s=stats(), cur=current();
+  let h="",g=-1;
+  for(const m of MODS){
+    if(m.g!==g){g=m.g;h+=`<span class="grp">${g===3?"복습":g===0?"기출":g+"차"}</span>`}
+    const n=m.id==="wrong"&&s.wrongA?`<span class="n">${s.wrongA}</span>`:"";
+    h+=`<a href="#${m.id}" ${cur===m.id?'aria-current="page"':""}>${m.t}${n}</a>`;
+  }
+  $("#nav").innerHTML=h;
+}
+function renderHome(){
+  const s=stats(), pct=s.solved?Math.round(s.correct/s.solved*100):0;
+  $("#tally").innerHTML=
+   `<div><div class="k">1차 기출 푼 문제</div><div class="v">${s.gDone}<small> / 480</small></div></div>`+
+   `<div><div class="k">기출 정답률</div><div class="v">${s.gDone?Math.round(s.gOk/s.gDone*100):"–"}<small>${s.gDone?" %":""}</small></div></div>`+
+   `<div><div class="k">암기장 푼 문제</div><div class="v">${s.solved}</div></div>`+
+   `<div><div class="k">암기장 정답률</div><div class="v">${s.solved?pct:"–"}<small>${s.solved?" %":""}</small></div></div>`+
+   `<div><div class="k">내국소비세 OX</div><div class="v">${s.nkDone}<small> 문제</small></div></div>`+
+   `<div><div class="k">오답노트</div><div class="v">${s.wrongA}<small> 개</small></div></div>`;
+  for(const g of [0,1,2,3]){
+    $("#c"+g).innerHTML=MODS.filter(m=>m.g===g).map(m=>
+     `<a class="card${m.id==="wrong"?" wrong":""}" href="#${m.id}"><span class="t">${m.t}</span><span class="d">${m.d}</span><span class="p">${prog(m,s)}</span></a>`).join("");
+  }
+}
+const current=()=>{const h=location.hash.slice(1);return MODS.some(m=>m.id===h)?h:"home"};
+let loadedPage="";
+function route(){
+  const id=current(), f=$("#frame");
+  if(id==="home"){f.hidden=true;$("#home").hidden=false;renderHome();renderNav();return}
+  const m=MODS.find(x=>x.id===id), page=m.src.split("#")[0];
+  $("#home").hidden=true;f.hidden=false;
+  if(page===loadedPage&&f.contentWindow){f.contentWindow.location.hash=m.src.split("#")[1]||""}
+  else{loadedPage=page;f.src=m.src}
+  try{localStorage.setItem("hub-last",id)}catch(e){}
+  renderNav();
+}
+$("#frame").addEventListener("load",syncTheme);
+function syncTheme(){
+  try{const d=$("#frame").contentDocument.documentElement,t=document.documentElement.getAttribute("data-theme");
+    if(t)d.setAttribute("data-theme",t);else d.removeAttribute("data-theme")}catch(e){}
+}
+new MutationObserver(syncTheme).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+$("#homebtn").onclick=()=>{location.hash="home"};
+window.addEventListener("hashchange",route);
+window.addEventListener("focus",()=>{if(current()==="home")renderHome();renderNav()});
+setInterval(renderNav,5000);
+route();
+</script>
+
+<script>
+if("serviceWorker" in navigator){window.addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})})}
+</script>
+</body>
+</html>

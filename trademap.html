@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>무역영어 지도</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<script>(function(){if(window.self===window.top)return;var r=document.documentElement;try{var t=parent.document.documentElement.getAttribute("data-theme");if(t)r.setAttribute("data-theme",t)}catch(e){}})();</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@600;900&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: 화물이 매도인 공장에서 매수인 창고까지 내려가는 세로 항로. 규칙을 고르면 비용·위험 구간이 색으로 칠해진다. 두 번째 탭은 국제규범 카드 */
+:root{
+  color-scheme:light;
+  --bg:#eef1f4; --surface:#ffffff; --ink:#18212b; --muted:#5b6876; --line:#d5dbe2;
+  --accent:#1f4e79; --accent-soft:#dbe6f1; --seller:#b3261e; --seller-soft:#f6dedb; --buyer:#1d6b45; --buyer-soft:#d9eee2; --gold:#8a5a00; --gold-soft:#f6ead2;
+  --f-display:"Noto Serif KR","Nanum Myeongjo",serif;
+  --f-body:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#11161c; --surface:#19212a; --ink:#e6ebf0; --muted:#97a3b0; --line:#2c3743;
+  --accent:#7fb0e0; --accent-soft:#1e3247; --seller:#f08a80; --seller-soft:#3e211f; --buyer:#7fd1a4; --buyer-soft:#173226; --gold:#e8c070; --gold-soft:#3a2f17; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#11161c; --surface:#19212a; --ink:#e6ebf0; --muted:#97a3b0; --line:#2c3743;
+  --accent:#7fb0e0; --accent-soft:#1e3247; --seller:#f08a80; --seller-soft:#3e211f; --buyer:#7fd1a4; --buyer-soft:#173226; --gold:#e8c070; --gold-soft:#3a2f17; color-scheme:dark}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.6}
+[hidden]{display:none!important}
+button{font:inherit;color:inherit;touch-action:manipulation}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:820px;margin:0 auto;padding-block:14px 60px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;flex-direction:column;gap:14px}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:4px;gap:4px}
+.seg button{border:0;background:transparent;border-radius:9px;padding:10px 4px;font-weight:700;color:var(--muted);cursor:pointer;min-height:44px;font-size:.92rem}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.lead{color:var(--muted);font-size:.9rem;margin:0}
+.label{font-size:.72rem;letter-spacing:.06em;color:var(--muted);font-weight:700}
+
+/* rule picker */
+.rules{display:flex;flex-direction:column;gap:8px}
+.rgrp{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.rgrp .label{width:100%}
+.rule{border:1px solid var(--line);background:var(--surface);border-radius:10px;min-width:62px;min-height:46px;padding:6px 10px;font-family:var(--f-mono);font-weight:600;cursor:pointer;letter-spacing:.04em}
+.rule[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+.head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.head h2{font-family:var(--f-display);font-weight:900;font-size:1.5rem;margin:0}
+.head h2 small{font-family:var(--f-body);font-weight:500;font-size:.85rem;color:var(--muted);margin-left:6px}
+.keys{display:flex;gap:10px;font-size:.78rem;color:var(--muted);flex-wrap:wrap}
+.keys span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+.keys .s::before{background:var(--seller)} .keys .b::before{background:var(--buyer)}
+
+/* route */
+.route{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:6px 0}
+.stn{display:grid;grid-template-columns:28px 1fr 64px 64px;gap:8px;align-items:center;padding:8px 14px;position:relative}
+.stn+.stn{border-top:1px dashed var(--line)}
+.stn .ic{width:22px;height:22px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-size:.7rem;font-family:var(--f-mono);color:var(--muted);background:var(--surface)}
+.stn .nm{font-size:.92rem;line-height:1.35;min-width:0}
+.stn .nm small{display:block;color:var(--muted);font-size:.74rem}
+.pill{border-radius:999px;font-size:.72rem;font-weight:700;text-align:center;padding:3px 0}
+.pill.s{background:var(--seller-soft);color:var(--seller)} .pill.b{background:var(--buyer-soft);color:var(--buyer)} .pill.n{color:var(--muted)}
+.colh{display:grid;grid-template-columns:28px 1fr 64px 64px;gap:8px;padding:4px 14px 6px;font-size:.7rem;color:var(--muted);font-weight:700;letter-spacing:.04em}
+.colh span:nth-child(n+3){text-align:center}
+.transfer{position:relative}
+.transfer::after{content:"위험 이전";position:absolute;right:14px;bottom:-11px;z-index:2;font-size:.68rem;font-weight:700;background:var(--gold);color:var(--surface);border-radius:999px;padding:1px 8px}
+.transfer{border-bottom:2px solid var(--gold)!important}
+.stn.deliver .ic{border-color:var(--gold);background:var(--gold-soft);color:var(--gold)}
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.fact{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-width:0}
+.fact .k{font-size:.72rem;color:var(--muted);font-weight:700;letter-spacing:.04em}
+.fact .v{font-weight:600;font-size:.92rem;word-break:keep-all;overflow-wrap:anywhere}
+.fact .v.s{color:var(--seller)} .fact .v.b{color:var(--buyer)}
+.note{background:var(--gold-soft);border-radius:10px;padding:10px 12px;font-size:.9rem;word-break:keep-all}
+.note b{color:var(--gold)}
+@media (max-width:420px){.facts{grid-template-columns:1fr}.stn,.colh{grid-template-columns:24px 1fr 54px 54px;gap:6px;padding-left:10px;padding-right:10px}}
+
+/* quiz */
+.qz{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.qz ul{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:4px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.opt{border:1px solid var(--line);background:var(--bg);border-radius:10px;min-height:52px;font-family:var(--f-mono);font-weight:600;font-size:1.05rem;cursor:pointer}
+.opt.right{background:var(--buyer-soft);border-color:var(--buyer);color:var(--buyer)}
+.opt.wrong{background:var(--seller-soft);border-color:var(--seller);color:var(--seller)}
+.score{font-family:var(--f-mono);font-size:.85rem;color:var(--muted)}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:10px 14px;cursor:pointer;min-height:44px;font-weight:500}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--bg);font-weight:700}
+
+/* rules map */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.law{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:4px;min-height:110px}
+.law .abbr{font-family:var(--f-mono);font-weight:600;color:var(--accent);font-size:1.05rem}
+.law .t{font-weight:700;font-size:.92rem}
+.law .d{color:var(--muted);font-size:.82rem}
+.law .c{margin-top:auto;font-family:var(--f-mono);font-size:.72rem;color:var(--seller)}
+.tbl{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+table{border-collapse:collapse;width:100%;font-size:.86rem}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left}
+th{font-size:.75rem;color:var(--muted);letter-spacing:.04em}
+td.m{text-align:center;font-weight:700;width:3.2em}
+td.m.y{color:var(--buyer)} td.m.x{color:var(--seller)}
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:20}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;background:var(--surface);border-radius:18px 18px 0 0;max-height:80vh;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding:10px max(18px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-left,0px));box-shadow:0 -8px 30px rgba(0,0,0,.18)}
+@media (min-width:860px){.sheet{left:50%;transform:translateX(-50%);width:760px;bottom:24px;border-radius:18px}}
+.grab{width:40px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 10px}
+.sheet h2{font-family:var(--f-display);font-weight:900;font-size:1.25rem;margin:0}
+.sheet .sub{font-family:var(--f-mono);font-size:.8rem;color:var(--seller)}
+.sheet ul{margin:10px 0 0;padding-left:1.1em;display:flex;flex-direction:column;gap:6px}
+.sheet li{word-break:keep-all;overflow-wrap:anywhere}
+.sheet b{color:var(--accent)}
+.sheet .row{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="seg" role="group" aria-label="보기 선택">
+    <button type="button" data-view="inco" aria-pressed="true">인코텀즈 항로</button>
+    <button type="button" data-view="game" aria-pressed="false">규칙 맞히기</button>
+    <button type="button" data-view="laws" aria-pressed="false">국제규범 지도</button>
+  </div>
+
+  <section id="inco">
+    <div class="wrap" style="padding:0;gap:12px">
+      <div class="rules" id="rules"></div>
+      <div class="head"><h2 id="r-name"></h2><div class="keys"><span class="s">매도인</span><span class="b">매수인</span></div></div>
+      <div class="route" id="route"></div>
+      <div class="facts" id="facts"></div>
+      <div class="note" id="rnote"></div>
+    </div>
+  </section>
+
+  <section id="game" hidden>
+    <div class="qz" id="qz"></div>
+  </section>
+
+  <section id="laws" hidden>
+    <div class="wrap" style="padding:0;gap:12px">
+      <p class="lead">무역영어 1차에 나오는 국제규범을 한 장씩 모았어요. 카드를 누르면 자주 묻는 숫자와 조문이 올라오고, 관련 기출로 바로 갈 수 있어요.</p>
+      <div class="grid" id="lawgrid"></div>
+      <div class="label">협회적하약관(ICC 2009) 담보 비교</div>
+      <div class="tbl"><table id="icc"></table></div>
+    </div>
+  </section>
+</div>
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" hidden></div>
+
+<script src="gichul-data.js"></script>
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const get=(k,d)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}};
+const put=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+
+/* ---------- Incoterms 2020 ---------- */
+const ST=[
+ ["매도인 영업소","물품 준비·포장"],
+ ["수출통관","수출허가·수출세"],
+ ["인도 지점","운송인 인도 / 선적항 선측"],
+ ["본선 적재","선적항에서 본선에"],
+ ["주운송","해상·항공·육상 운송"],
+ ["목적지 도착","양하 전 상태"],
+ ["목적지 양하","운송수단에서 내림"],
+ ["수입통관","수입신고·관세"],
+ ["매수인 수령","매수인 창고"]
+];
+// cost: stations seller pays, risk: last station index where seller bears risk (delivery point), del: delivery station index
+const R={
+ EXW:{n:"Ex Works",ko:"공장인도",m:"all",cost:[0],del:0,ins:"없음",exp:"매수인",imp:"매수인",
+   note:"매도인 의무가 가장 적은 규칙. 매수인 운송수단에 <b>적재 의무도 없다</b>. 수출통관까지 매수인 몫이라 국제거래에서는 FCA가 더 적합할 때가 많다."},
+ FCA:{n:"Free Carrier",ko:"운송인인도",m:"all",cost:[0,1,2],del:2,ins:"없음",exp:"매도인",imp:"매수인",
+   note:"매도인 영업소에서 인도하면 매수인 운송수단에 <b>적재</b>까지, 그 밖의 장소면 도착 운송수단에 실린 채 처분 가능하게 두면 인도. 2020 개정으로 당사자가 합의하면 매수인이 운송인에게 <b>본선적재 B/L</b>을 매도인에게 발행하도록 지시할 수 있다."},
+ FAS:{n:"Free Alongside Ship",ko:"선측인도",m:"sea",cost:[0,1,2],del:2,ins:"없음",exp:"매도인",imp:"매수인",
+   note:"선적항에서 매수인이 지정한 <b>본선 선측</b>에 놓으면 인도. 해상·내수로 전용."},
+ FOB:{n:"Free On Board",ko:"본선인도",m:"sea",cost:[0,1,2,3],del:3,ins:"없음",exp:"매도인",imp:"매수인",
+   note:"선적항 <b>본선에 적재</b>하면 인도. 컨테이너를 터미널에서 넘기는 거래에는 FCA가 맞다. 선박명·적재지점 통지는 매수인이 한다."},
+ CFR:{n:"Cost and Freight",ko:"운임포함인도",m:"sea",cost:[0,1,2,3,4,5],del:3,ins:"없음",exp:"매도인",imp:"매수인",
+   note:"위험은 <b>선적항 본선 적재</b> 때, 비용은 <b>목적항</b>까지. 분기점이 두 개다. 목적항 양하비는 운송계약상 매도인 부담일 때만 매도인 몫이고 별도로 청구할 수 없다."},
+ CIF:{n:"Cost Insurance and Freight",ko:"운임·보험료포함인도",m:"sea",cost:[0,1,2,3,4,5],del:3,ins:"매도인 · ICC(C) 최소, 110%",exp:"매도인",imp:"매수인",
+   note:"CFR + 매도인 부보. 최소 담보는 <b>ICC(C)</b>, 금액은 계약금액의 <b>110%</b>. 더 넓은 담보는 당사자가 합의하면 가능."},
+ CPT:{n:"Carriage Paid To",ko:"운송비지급인도",m:"all",cost:[0,1,2,3,4,5],del:2,ins:"없음",exp:"매도인",imp:"매수인",
+   note:"위험은 <b>최초 운송인</b>에게 인도할 때, 운송비는 지정 목적지까지 매도인. 인도는 매도인 쪽(seller's end)에서 일어난다."},
+ CIP:{n:"Carriage and Insurance Paid To",ko:"운송비·보험료지급인도",m:"all",cost:[0,1,2,3,4,5],del:2,ins:"매도인 · ICC(A) 최소, 110%",exp:"매도인",imp:"매수인",
+   note:"CPT + 매도인 부보. 2020 개정으로 최소 담보가 <b>ICC(A)</b>로 올라갔다(CIF는 C 유지)."},
+ DAP:{n:"Delivered at Place",ko:"도착지인도",m:"all",cost:[0,1,2,3,4,5],del:5,ins:"없음",exp:"매도인",imp:"매수인",
+   note:"목적지에서 도착 운송수단에 실린 채 <b>양하 준비된 상태</b>로 처분 가능하게 두면 인도. 매도인은 양하 의무가 없다."},
+ DPU:{n:"Delivered at Place Unloaded",ko:"도착지양하인도",m:"all",cost:[0,1,2,3,4,5,6],del:6,ins:"없음",exp:"매도인",imp:"매수인",
+   note:"매도인이 목적지에서 <b>양하까지</b> 하는 유일한 규칙(2010의 DAT를 개명). 양하비는 운송계약과 관계없이 매도인 부담."},
+ DDP:{n:"Delivered Duty Paid",ko:"관세지급인도",m:"all",cost:[0,1,2,3,4,5,7],del:5,ins:"없음",exp:"매도인",imp:"매도인",
+   note:"매도인 의무가 가장 큰 규칙. 위험은 DAP와 같은 지점에서 넘어가지만 <b>수입통관과 관세</b>까지 매도인이 부담한다. 양하는 매수인."}
+};
+const ORDER=["EXW","FCA","CPT","CIP","DAP","DPU","DDP","FAS","FOB","CFR","CIF"];
+let cur=get("inco-cur","CIF");
+function renderRules(){
+  const g=(m,l)=>`<div class="rgrp"><span class="label">${l}</span>${ORDER.filter(k=>R[k].m===m).map(k=>`<button type="button" class="rule" data-rule="${k}" aria-pressed="${k===cur}">${k}</button>`).join("")}</div>`;
+  $("#rules").innerHTML=g("all","모든 운송방식 7개")+g("sea","해상·내수로 운송 4개");
+}
+function renderRule(){
+  const r=R[cur];
+  $("#r-name").innerHTML=`${cur}<small>${r.n} · ${r.ko}</small>`;
+  const sea=r.m==="sea";
+  let h=`<div class="colh"><span></span><span>지점</span><span>비용</span><span>위험</span></div>`;
+  ST.forEach((s,i)=>{
+    let nm=s[0],sub=s[1];
+    if(i===2)sub=sea?"선적항 본선 선측":"합의 장소에서 운송인 인도";
+    if(i===3&&!sea){nm="운송 중";sub="(해상 규칙에서만 본선 적재가 인도 지점)"}
+    const exportSt=i===1, importSt=i===7;
+    let cost=r.cost.includes(i)?"s":"b", risk=i<=r.del?"s":"b";
+    if(exportSt)cost=r.exp==="매도인"?"s":"b";
+    if(importSt){cost=r.imp==="매도인"?"s":"b";risk="b"}
+    if(cur==="EXW"&&i===0){cost="s";risk="s"}
+    const lab=c=>c==="s"?"매도인":"매수인";
+    h+=`<div class="stn ${i===r.del?"transfer deliver":""}"><span class="ic">${i+1}</span><span class="nm">${nm}<small>${sub}</small></span><span class="pill ${cost}">${lab(cost)}</span><span class="pill ${risk}">${lab(risk)}</span></div>`;
+  });
+  $("#route").innerHTML=h;
+  const f=(k,v,c)=>`<div class="fact"><div class="k">${k}</div><div class="v ${c||""}">${v}</div></div>`;
+  $("#facts").innerHTML=f("인도·위험 이전",ST[r.del][0]+(r.del===2?(sea?" (본선 선측)":" (최초 운송인)"):""))+
+    f("주운송 계약",r.cost.includes(4)?"매도인":"매수인",r.cost.includes(4)?"s":"b")+
+    f("적하보험 계약",r.ins,r.ins==="없음"?"":"s")+
+    f("수출통관 / 수입통관",`${r.exp} / ${r.imp}`)+
+    f("목적지 양하",cur==="DPU"?"매도인 의무":"매수인 (운송계약상 매도인 부담분 제외)")+
+    f("운송방식",sea?"해상·내수로 전용":"모든 운송방식");
+  $("#rnote").innerHTML=r.note;
+  put("inco-cur",cur);
+}
+
+/* ---------- 규칙 맞히기 ---------- */
+let gq=null,gscore=get("inco-score",{ok:0,n:0});
+function clues(k){
+  const r=R[k],c=[];
+  c.push(`인도·위험 이전: ${ST[r.del][0]}${r.del===2?(r.m==="sea"?" (본선 선측)":" (최초 운송인)"):""}`);
+  c.push(`주운송 계약: ${r.cost.includes(4)?"매도인":"매수인"}`);
+  c.push(`보험: ${r.ins}`);
+  if(k==="DDP")c.push("수입통관도 매도인");
+  else if(k==="EXW")c.push("수출통관도 매수인");
+  c.push(r.m==="sea"?"해상·내수로 전용":"모든 운송방식");
+  return c;
+}
+function newQ(){
+  const k=ORDER[Math.floor(Math.random()*ORDER.length)];
+  const others=ORDER.filter(x=>x!==k).sort(()=>Math.random()-.5).slice(0,3);
+  gq={k,opts:[k,...others].sort(()=>Math.random()-.5),pick:null};renderGame();
+}
+function renderGame(){
+  if(!gq)return newQ();
+  const fb=gq.pick?`<div class="note">${gq.pick===gq.k?"<b>정답</b> ":"<b>오답</b> 정답은 "+gq.k+". "}${R[gq.k].note}</div><button type="button" class="btn primary" data-gnext>다음 문제</button>`:"";
+  $("#qz").innerHTML=`<div class="head"><span class="label">이 조건에 맞는 규칙은?</span><span class="score">${gscore.ok} / ${gscore.n}</span></div>
+   <ul>${clues(gq.k).map(c=>`<li>${esc(c)}</li>`).join("")}</ul>
+   <div class="opts">${gq.opts.map(o=>{let c="";if(gq.pick){if(o===gq.k)c="right";else if(o===gq.pick)c="wrong"}return `<button type="button" class="opt ${c}" data-gpick="${o}" ${gq.pick?"disabled":""}>${o}</button>`}).join("")}</div>${fb}`;
+}
+
+/* ---------- 국제규범 ---------- */
+const LAWS=[
+ {ab:"UCP 600",t:"화환신용장통일규칙",d:"신용장 거래의 기본 규칙",k:["UCP 600","UCP600"],p:[
+   "신용장은 표시가 없어도 <b>취소불능</b>(제3조)","은행은 서류로만 거래, 물품과 무관(제4·5조)","서류 심사: 제시일 다음 날부터 최장 <b>5은행영업일</b>(제14조)","운송서류 원본 제시: 선적일 후 <b>21일</b> 이내, 유효기일 이내","about·approximately: 금액·수량·단가 <b>±10%</b>, 개수 단위가 아닌 수량 <b>±5%</b>(제30조)","보험: 최소 CIF·CIP 가액의 <b>110%</b>, 보험서류 일자는 선적일 이후 불가(제28조)","분할선적·분할청구는 금지하지 않으면 허용(제31조)","할부선적 중 한 회분을 못하면 그 회분과 이후 분 모두 사용 불가(제32조)","양도 신용장: 금액·단가·유효기일·제시기간·선적기일은 감액·단축 가능(제38조)"]},
+ {ab:"eUCP",t:"전자적 제시 UCP 추록",d:"전자기록 제시 규칙",k:["eUCP"],p:["eUCP 신용장은 UCP를 명시하지 않아도 UCP 적용","심사 기간은 완료 통지(notice of completeness) 수령일의 다음 은행영업일부터","인증할 수 없는 전자기록은 제시되지 않은 것으로 봄","재제시(re-present): 이미 제시한 전자기록을 대체·교체"]},
+ {ab:"URC 522",t:"추심에 관한 통일규칙",d:"D/P · D/A 추심",k:["URC 522","URC522","추심"],p:["당사자: principal(추심의뢰인) · remitting bank · collecting bank · presenting bank · drawee","은행은 추심을 취급할 <b>의무가 없다</b>","기한부 환어음을 포함한 추심에 D/P 지시를 하지 않아야 한다","은행은 물품 보관·보험 등 조치 의무가 없다","이자·수수료 거절 시 포기할 수 없다고 명시하지 않으면 징수 없이 인도 가능"]},
+ {ab:"CISG",t:"국제물품매매계약에 관한 유엔협약",d:"1980 비엔나협약",k:["CISG"],p:["적용: 영업소가 <b>서로 다른</b> 체약국 간 매매, 국적·민상사 성격 불문","제외: 선박·항공기·전기 매매, 노무 공급이 주된 계약, 사망·상해 책임","청약 효력은 도달 시(제15조), 승낙도 <b>도달주의</b>(제18조)","특정인에게 향하지 않은 제안은 청약의 유인(제14조)","서면에는 전보·텔렉스 포함(제13조)","제74조 손해배상: <b>일실이익 포함</b>, 예견가능 범위","제77조 손해경감의무, 제79조 통제 불가 장애 면책","운송 수반 매매: <b>최초 운송인</b> 인도 시 위험 이전(제67조)"]},
+ {ab:"MIA 1906",t:"영국해상보험법",d:"해상보험 기본법",k:["MIA","영국해상보험법"],p:["기평가보험증권(valued) · 선명미상보험증권(floating)","담보(warranty) 위반: 위반 시점부터 보험자 책임 면제","이로(deviation): 정당한 사유 없이 항로 이탈하면 그때부터 면책, 원항로 복귀해도 동일","위부(abandonment) 통지는 합리적 신속성, 보험자 침묵은 승낙이 아님","공동해손(제66조): 위험 시 자발적·합리적 희생·비용, 분담금은 보험자에게 청구"]},
+ {ab:"ICC 2009",t:"협회적하약관",d:"(A)·(B)·(C) 담보 범위",k:["Institute Cargo","ICC"],p:["(A): 면책 사항 외 모든 위험(all risks), 해적 포함","(B): 열거 위험 + 지진·낙뢰, 갑판유실, 해수 유입","(C): 가장 좁은 열거 위험","공통 면책: 고의, 통상의 누손·자연소모, 포장불량, 고유하자, 지연, 지급불능, 핵무기","쌍방과실충돌약관: 운송인 청구 시 피보험자가 보험자에게 통지"]},
+ {ab:"Hague-Visby",t:"헤이그·비스비 규칙",d:"선하증권 국제조약",k:["Hague","헤이그"],p:["운송인 면책: 항해과실, 화재, 고유하자 등","체약국에서 B/L 발행 또는 체약국 항구에서 운송 시 적용","가치는 양하 장소·시기 기준으로 산정","송하인이 성질·가치를 알면서 허위 기재하면 운송인·선박 면책"]},
+ {ab:"Montreal 1999",t:"몬트리올협약",d:"국제항공운송",k:["Montreal","몬트리올"],p:["유상 국제항공운송과 항공운송사업자의 무상운송에 적용","항공운송장 3통: 운송인용(송하인 서명), 수하인용(송하인·운송인 서명), 송하인용(운송인 서명)","화물 면책: 고유하자, 운송인 외의 자 포장불량, 전쟁, 공권력","제소기간: 도착일 등부터 <b>2년</b>","days는 역일(calendar days)"]},
+ {ab:"CMI SWB",t:"해상화물운송장 CMI 통일규칙",d:"Sea Waybill 1990",k:["Sea Waybill","CMI"],p:["B/L 등 권리증권이 없는 운송계약에 적용","송하인은 수하인의 대리인 자격도 겸함","운송인 유보 없는 기재: 송하인에게 추정적 증거, 선의 수하인에게 결정적 증거","수하인 확인에 합리적 주의를 다하면 오인도 면책"]},
+ {ab:"New York 1958",t:"외국중재판정 승인·집행 협약",d:"뉴욕협약",k:["뉴욕협약","New York"],p:["적용: 승인·집행국 외 영토에서 내려진 판정, 국내판정으로 보지 않는 판정","거부 사유(제5조): 무능력·무효, 통지 불비, 범위 초과, 구성·절차 위반, 구속력 없음·취소","직권 거부: 중재 불가능 사항, 공서 위반","발효: 3번째 비준서 기탁 후 <b>90일</b>째, 폐기: 서면 통고 후 <b>1년</b>"]},
+ {ab:"SGA 1979",t:"영국물품매매법",d:"Sale of Goods Act",k:["SGA","Sale of Goods"],p:["Delivery: 점유의 자발적 이전","Specific goods: 계약 시 특정·합의된 물품, Future goods: 계약 후 제조·취득할 물품","운송 중 정지권(stoppage in transit)과 운송 종료 시점"]},
+ {ab:"MT 1980",t:"국제물품복합운송 유엔협약",d:"복합운송증권",k:["복합운송","MT조약"],p:["유통성 증권: 지시식은 배서로, 소지인식은 배서 없이 양도","사본에는 'non-negotiable copy' 표시"]}
+];
+const ICC=[["화재·폭발",1,1,1],["선박 좌초·침몰·전복",1,1,1],["육상운송용구 전복·탈선",1,1,1],["충돌·접촉",1,1,1],["피난항에서 양하",1,1,1],["공동해손 희생",1,1,1],["투하(jettison)",1,1,1],["지진·화산 분화·낙뢰",1,1,0],["갑판유실(washing overboard)",1,1,0],["해수·호수·강물 유입",1,1,0],["적재·양하 중 추락한 포장당 전손",1,1,0],["해적행위",1,0,0],["악의적 손해·그 밖의 모든 위험",1,0,0]];
+const TQ=(window.Q1||[]).filter(q=>q.s==="trade");
+const qtext=q=>[...q.q.map(([t,v])=>t==="p"?v:v.join(" ")),...q.o].join(" ");
+const rel=L=>TQ.filter(q=>L.k.some(k=>qtext(q).includes(k)));
+function renderLaws(){
+  $("#lawgrid").innerHTML=LAWS.map((L,i)=>`<button type="button" class="law" data-law="${i}"><span class="abbr">${L.ab}</span><span class="t">${esc(L.t)}</span><span class="d">${esc(L.d)}</span><span class="c">기출 ${rel(L).length}문제</span></button>`).join("");
+  $("#icc").innerHTML=`<tr><th>위험</th><th style="text-align:center">A</th><th style="text-align:center">B</th><th style="text-align:center">C</th></tr>`+
+    ICC.map(r=>`<tr><td>${r[0]}</td>${[1,2,3].map(i=>`<td class="m ${r[i]?"y":"x"}">${r[i]?"○":"✕"}</td>`).join("")}</tr>`).join("");
+}
+function openLaw(i){
+  const L=LAWS[i],n=rel(L).length;
+  $("#sheet").innerHTML=`<div class="grab"></div><div class="sub">${L.ab}</div><h2>${esc(L.t)}</h2><ul>${L.p.map(x=>`<li>${x}</li>`).join("")}</ul>
+   <div class="row">${n?`<button type="button" class="btn primary" data-drill="${i}">관련 기출 ${n}문제 풀기</button>`:""}<button type="button" class="btn" data-close>닫기</button></div>`;
+  $("#sheet").hidden=false;$("#scrim").hidden=false;$("#sheet").scrollTop=0;
+}
+function closeSheet(){$("#sheet").hidden=true;$("#scrim").hidden=true}
+$("#scrim").onclick=closeSheet;
+(function(){let y0=null;const sh=$("#sheet");
+ sh.addEventListener("touchstart",e=>{if(sh.scrollTop<=0)y0=e.touches[0].clientY},{passive:true});
+ sh.addEventListener("touchmove",e=>{if(y0!==null&&e.touches[0].clientY-y0>90){y0=null;closeSheet()}},{passive:true});
+ sh.addEventListener("touchend",()=>{y0=null});})();
+// swipe left/right on route to change rule
+(function(){let x0=null;const r=$("#route");
+ r.addEventListener("touchstart",e=>{x0=e.touches[0].clientX},{passive:true});
+ r.addEventListener("touchend",e=>{if(x0===null)return;const dx=e.changedTouches[0].clientX-x0;x0=null;if(Math.abs(dx)<60)return;
+   const i=ORDER.indexOf(cur);cur=ORDER[(i+(dx<0?1:-1)+ORDER.length)%ORDER.length];renderRules();renderRule()},{passive:true});})();
+
+document.addEventListener("click",e=>{
+  const b=e.target.closest("button");if(!b)return;
+  if(b.dataset.view){view(b.dataset.view);return}
+  if(b.dataset.rule){cur=b.dataset.rule;renderRules();renderRule();return}
+  if(b.dataset.gpick&&!gq.pick){gq.pick=b.dataset.gpick;gscore.n++;if(gq.pick===gq.k)gscore.ok++;put("inco-score",gscore);renderGame();return}
+  if(b.hasAttribute("data-gnext")){newQ();return}
+  if(b.dataset.law!==undefined){openLaw(+b.dataset.law);return}
+  if(b.hasAttribute("data-close")){closeSheet();return}
+  if(b.dataset.drill!==undefined){const L=LAWS[+b.dataset.drill];put("gc-drill",{label:L.ab,ids:rel(L).map(q=>q.id)});try{parent.location.hash="gc1"}catch(_){location.href="gichul.html"}closeSheet();return}
+});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeSheet()});
+function view(v){
+  ["inco","game","laws"].forEach(id=>{$("#"+id).hidden=id!==v});
+  document.querySelectorAll("[data-view]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.view===v));
+  if(v==="game")renderGame();closeSheet();put("trademap-view",v);
+}
+renderRules();renderRule();renderLaws();
+const h=location.hash.slice(1);view(["inco","game","laws"].includes(h)?h:get("trademap-view","inco"));
+</script>
+</body>
+</html>

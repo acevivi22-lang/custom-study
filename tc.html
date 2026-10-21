@@ -1,0 +1,203 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<script>(function(){if(window.self===window.top)return;var r=document.documentElement;r.classList.add("embed");try{var t=parent.document.documentElement.getAttribute("data-theme");if(t)r.setAttribute("data-theme",t)}catch(e){}})();</script>
+<style>html.embed .wrap{padding-top:16px}</style>
+
+<title>통칙 타자 연습</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
+<style>
+/* Layout: one study desk column — item rail on top, the clause card, the typing slip below */
+:root{
+  --bg:#eef1f4; --surface:#ffffff; --ink:#1c2633; --muted:#5f6b7a; --line:#d5dbe3;
+  --accent:#2b4c8c; --hl:#fff07a; --good:#1f7a4d; --bad:#c23b3b; --soft:#e4e9f1;
+  --display:"Gowun Batang","Noto Serif KR",serif;
+  --body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#141a22; --surface:#1c2430; --ink:#e6ebf2; --muted:#9aa6b6; --line:#2f3a49;
+  --accent:#8fb0f0; --hl:#6b5f12; --good:#5cc994; --bad:#f07b7b; --soft:#243041; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141a22; --surface:#1c2430; --ink:#e6ebf2; --muted:#9aa6b6; --line:#2f3a49;
+  --accent:#8fb0f0; --hl:#6b5f12; --good:#5cc994; --bad:#f07b7b; --soft:#243041; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.6}
+.wrap{max-width:760px;margin:0 auto;padding-block:24px 48px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;flex-direction:column;gap:18px}
+header{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:12px}
+h1{font-family:var(--display);font-size:1.7rem;margin:0;text-wrap:balance}
+.mnemo{font-family:var(--display);font-size:1.05rem;color:var(--muted)}
+.mnemo b{background:var(--hl);color:var(--ink);padding:0 3px;font-weight:700}
+.modes{display:flex;gap:6px;flex-wrap:wrap}
+.modes button,.rail button,.btn{font:inherit;border:1px solid var(--line);background:var(--surface);color:var(--ink);
+  border-radius:6px;padding:6px 12px;cursor:pointer}
+.modes button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.rail{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:6px}
+.rail button{display:flex;flex-direction:column;align-items:center;padding:6px 4px;line-height:1.2}
+.rail button .k{font-family:var(--display);font-size:1.15rem;font-weight:700}
+.rail button .n{font-size:.75rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.rail button.on{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.rail button .best{font-size:.7rem;font-variant-numeric:tabular-nums;color:var(--good)}
+button:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.label{font-size:.75rem;letter-spacing:.06em;color:var(--muted)}
+.title{font-family:var(--display);font-size:1.25rem;font-weight:700}
+.title .tag{background:var(--hl);padding:0 4px;margin-right:6px}
+.target{font-family:var(--display);font-size:1.15rem;line-height:1.9;word-break:keep-all;overflow-wrap:anywhere}
+.target span.ok{color:var(--good)} .target span.no{color:var(--bad);background:color-mix(in srgb,var(--bad) 14%,transparent)}
+.target span.cur{border-bottom:2px solid var(--accent)}
+.target span.pend{color:var(--muted)}
+.hint{font-family:var(--display);font-size:1.3rem;letter-spacing:.08em}
+textarea{width:100%;box-sizing:border-box;min-height:120px;font:inherit;font-family:var(--display);font-size:1.1rem;line-height:1.8;
+  background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:12px;resize:vertical}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.stats{display:flex;gap:18px;flex-wrap:wrap;font-variant-numeric:tabular-nums;color:var(--muted);font-size:.9rem}
+.stats b{color:var(--ink);font-size:1.1rem}
+.diff{font-family:var(--display);font-size:1.1rem;line-height:1.9;word-break:keep-all;overflow-wrap:anywhere}
+.diff .miss{color:var(--bad);text-decoration:underline wavy}
+.diff .extra{color:var(--muted);text-decoration:line-through}
+.diff .hit{color:var(--good)}
+.note{font-size:.85rem;color:var(--muted)}
+details summary{cursor:pointer;color:var(--muted);font-size:.9rem}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>통칙 타자 연습</h1>
+      <div class="mnemo"><b>표</b>, <b>미혼</b>, <b>구본마</b>, <b>유</b>, <b>케포</b>, <b>소</b></div>
+    </div>
+    <div class="modes" role="group" aria-label="연습 모드">
+      <button id="m-follow" data-mode="follow" aria-pressed="true">따라치기</button>
+      <button id="m-hint" data-mode="hint" aria-pressed="false">키워드 힌트</button>
+      <button id="m-blank" data-mode="blank" aria-pressed="false">백지 복원</button>
+    </div>
+  </header>
+
+  <nav class="rail" id="rail" aria-label="통칙 선택"></nav>
+
+  <section class="card">
+    <div class="label" id="modeLabel">따라치기 · 회색 글자를 그대로 입력하세요</div>
+    <div class="title" id="title"></div>
+    <div id="show"></div>
+    <textarea id="input" placeholder="여기에 입력하세요" spellcheck="false" autocomplete="off"></textarea>
+    <div class="row">
+      <button class="btn primary" id="check">채점</button>
+      <button class="btn" id="retry">다시</button>
+      <button class="btn" id="next">다음 통칙 →</button>
+      <button class="btn" id="shuffle">랜덤</button>
+    </div>
+    <div class="stats" id="stats"></div>
+    <div class="diff" id="diff" hidden></div>
+    <div class="note">채점은 띄어쓰기와 문장부호를 무시하고 글자만 비교해요. 빨간 물결 = 빠뜨린 글자, 회색 취소선 = 원문에 없는 글자.</div>
+  </section>
+
+  <details class="card">
+    <summary>문장 고치기 (기본서 원문으로 바꾸기)</summary>
+    <div class="note">지금 문장은 핵심 구절 요약이에요. 2차 공부 들어가면 기본서 원문으로 바꿔서 연습하세요. 이 브라우저에만 저장돼요.</div>
+    <textarea id="edit" aria-label="현재 통칙 문장 수정"></textarea>
+    <div class="row">
+      <button class="btn primary" id="save">이 문장 저장</button>
+      <button class="btn" id="reset">원래 문장으로</button>
+      <span class="note" id="saveMsg"></span>
+    </div>
+  </details>
+</div>
+
+<script>
+const BASE=[
+ {n:"1",k:"표",t:"통칙 1",s:"부, 류, 절의 표제는 참조의 편의를 위한 것이며, 법적인 품목분류는 각 호의 용어와 관련 부나 류의 주에 따라 결정하고, 각 호나 주에서 따로 규정하지 않는 경우에는 통칙 2부터 6까지에 따라 결정한다."},
+ {n:"2가",k:"미",t:"통칙 2가",s:"각 호에 열거된 물품에는 불완전하거나 미완성된 물품도 제시된 상태에서 완성된 물품의 본질적인 특성을 지니고 있으면 포함되며, 미조립 상태나 분해된 상태로 제시된 완성된 물품도 포함된다."},
+ {n:"2나",k:"혼",t:"통칙 2나",s:"각 호에 열거된 재료나 물질에는 그 재료나 물질과 다른 재료나 물질의 혼합물이나 복합물이 포함되며, 둘 이상의 재료나 물질로 구성된 물품의 분류는 통칙 3에 따른다."},
+ {n:"3가",k:"구",t:"통칙 3가",s:"물품이 둘 이상의 호로 분류될 것으로 보이는 경우에는 가장 구체적으로 표현된 호가 일반적으로 표현된 호에 우선한다."},
+ {n:"3나",k:"본",t:"통칙 3나",s:"혼합물, 서로 다른 재료로 구성된 복합물, 소매용으로 하기 위하여 세트로 된 물품으로서 통칙 3가에 따라 분류할 수 없는 것은 가능한 한 이들 물품에 본질적인 특성을 부여하는 재료나 구성요소로 이루어진 물품으로 보아 분류한다."},
+ {n:"3다",k:"마",t:"통칙 3다",s:"통칙 3가나 3나에 따라 분류할 수 없는 물품은 동일하게 분류가 가능한 호 중에서 그 번호가 가장 마지막인 호로 분류한다."},
+ {n:"4",k:"유",t:"통칙 4",s:"위의 통칙에 따라 분류할 수 없는 물품은 그 물품과 가장 유사한 물품이 해당되는 호로 분류한다."},
+ {n:"5가",k:"케",t:"통칙 5가",s:"특정한 물품이나 물품의 세트를 수납하기 위하여 특별한 모양으로 만들어지고 장기간 사용하기에 적합하며 그 내용물과 함께 제시되는 케이스와 이와 유사한 용기는 그 내용물과 함께 분류한다. 다만, 용기가 전체 물품에 본질적인 특성을 부여하는 경우에는 그렇지 않다."},
+ {n:"5나",k:"포",t:"통칙 5나",s:"물품과 함께 제시되는 포장재료와 포장용기는 그 물품의 포장용으로 정상적으로 사용되는 것이면 그 물품과 함께 분류한다. 다만, 반복적으로 사용하기에 적합한 것이 명백한 경우에는 그렇지 않다."},
+ {n:"6",k:"소",t:"통칙 6",s:"호 중 소호의 품목분류는 같은 수준의 소호들만을 서로 비교할 수 있다는 점을 조건으로 해당 소호의 용어와 관련 소호의 주에 따라 결정하며, 이 통칙의 목적상 문맥에서 달리 해석되지 않는 한 관련 부나 류의 주도 적용한다."}
+];
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+let custom=store.get("tc-custom",{}), best=store.get("tc-best",{}), tries=store.get("tc-tries",{});
+let mode="follow", idx=0;
+const $=id=>document.getElementById(id);
+const textOf=i=>custom[BASE[i].n]||BASE[i].s;
+const norm=s=>s.replace(/[\s.,·:;!?"'()\[\]~\-]/g,"");
+
+function renderRail(){
+  $("rail").innerHTML=BASE.map((b,i)=>`<button class="${i===idx?'on':''}" data-i="${i}" aria-label="${b.t}">
+    <span class="k">${b.k}</span><span class="n">${b.n}</span><span class="best">${best[mode+b.n]!=null?best[mode+b.n]+'%':''}</span></button>`).join("");
+}
+function hintOf(s){ // first char of each 어절, keep punctuation
+  return s.split(/\s+/).map(w=>w[0]).join(" ");
+}
+function render(){
+  const b=BASE[idx], s=textOf(idx);
+  $("title").innerHTML=`<span class="tag">${b.k}</span>${b.t}`;
+  const labels={follow:"따라치기 · 회색 글자를 그대로 입력하세요",hint:"키워드 힌트 · 어절 첫 글자만 보고 문장을 복원하세요",blank:"백지 복원 · 제목만 보고 문장 전체를 써 보세요"};
+  $("modeLabel").textContent=labels[mode];
+  if(mode==="follow") paintFollow();
+  else if(mode==="hint") $("show").innerHTML=`<div class="hint">${hintOf(s)}</div>`;
+  else $("show").innerHTML=`<div class="note">키워드: <b>${b.k}</b> — 떠올려서 끝까지 써 본 다음 채점을 누르세요.</div>`;
+  $("edit").value=s; $("saveMsg").textContent="";
+  $("diff").hidden=true; updateStats(); renderRail();
+}
+function paintFollow(){
+  const s=textOf(idx), typed=$("input").value;
+  let html="";
+  for(let i=0;i<s.length;i++){
+    const c=s[i]; let cls="pend";
+    if(i<typed.length) cls= typed[i]===c?"ok":"no";
+    if(i===typed.length) cls+=" cur";
+    html+=`<span class="${cls}">${c===" "?" ":c.replace("<","&lt;")}</span>`;
+  }
+  $("show").innerHTML=`<div class="target">${html}</div>`;
+}
+function lcsDiff(a,b){ // a=target, b=typed (normalized)
+  const n=a.length,m=b.length,dp=Array.from({length:n+1},()=>new Uint16Array(m+1));
+  for(let i=n-1;i>=0;i--)for(let j=m-1;j>=0;j--)dp[i][j]=a[i]===b[j]?dp[i+1][j+1]+1:Math.max(dp[i+1][j],dp[i][j+1]);
+  let i=0,j=0,out=[];
+  while(i<n&&j<m){ if(a[i]===b[j]){out.push(["hit",a[i]]);i++;j++} else if(dp[i+1][j]>=dp[i][j+1]){out.push(["miss",a[i]]);i++} else {out.push(["extra",b[j]]);j++} }
+  while(i<n)out.push(["miss",a[i++]]); while(j<m)out.push(["extra",b[j++]]);
+  return {ops:out,lcs:dp[0][0]};
+}
+let t0=null;
+function updateStats(r){
+  const b=BASE[idx], k=mode+b.n;
+  $("stats").innerHTML=(r?`<span>정확도 <b>${r.acc}%</b></span><span>시간 <b>${r.sec}초</b></span>`:"")+
+    `<span>최고 <b>${best[k]!=null?best[k]+'%':'–'}</b></span><span>연습 횟수 <b>${tries[k]||0}</b></span>`;
+}
+function grade(){
+  const a=norm(textOf(idx)), b=norm($("input").value);
+  if(!b){$("stats").innerHTML='<span>먼저 문장을 입력하세요.</span>';return}
+  const {ops,lcs}=lcsDiff(a,b);
+  const acc=Math.round(lcs/Math.max(a.length,b.length)*100);
+  const sec=t0?Math.round((Date.now()-t0)/1000):0;
+  const k=mode+BASE[idx].n;
+  tries[k]=(tries[k]||0)+1; if(best[k]==null||acc>best[k])best[k]=acc;
+  store.set("tc-best",best); store.set("tc-tries",tries);
+  $("diff").innerHTML=ops.map(([c,ch])=>`<span class="${c}">${ch}</span>`).join("");
+  $("diff").hidden=false; updateStats({acc,sec}); renderRail();
+}
+function go(i){idx=(i+BASE.length)%BASE.length;$("input").value="";t0=null;render();$("input").focus()}
+$("input").addEventListener("input",()=>{if(!t0)t0=Date.now(); if(mode==="follow")paintFollow();
+  if(mode==="follow"&&$("input").value===textOf(idx))grade();});
+$("input").addEventListener("keydown",e=>{if(e.key==="Enter"&&(e.ctrlKey||e.metaKey)){e.preventDefault();grade()}});
+$("check").onclick=grade;
+$("retry").onclick=()=>go(idx);
+$("next").onclick=()=>go(idx+1);
+$("shuffle").onclick=()=>{let r;do{r=Math.floor(Math.random()*BASE.length)}while(r===idx);go(r)};
+$("rail").onclick=e=>{const btn=e.target.closest("button");if(btn)go(+btn.dataset.i)};
+document.querySelectorAll(".modes button").forEach(btn=>btn.onclick=()=>{
+  mode=btn.dataset.mode;document.querySelectorAll(".modes button").forEach(x=>x.setAttribute("aria-pressed",x===btn));
+  store.set("tc-mode",mode);go(idx)});
+$("save").onclick=()=>{const v=$("edit").value.trim();if(!v)return;custom[BASE[idx].n]=v;store.set("tc-custom",custom);$("saveMsg").textContent="저장했어요.";$("input").value="";render()};
+$("reset").onclick=()=>{delete custom[BASE[idx].n];store.set("tc-custom",custom);$("input").value="";render();$("saveMsg").textContent="원래 문장으로 돌렸어요."};
+mode=store.get("tc-mode","follow");
+document.querySelectorAll(".modes button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.mode===mode));
+render();
+</script>
+
+</body></html>

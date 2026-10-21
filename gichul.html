@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>관세사 기출</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<script>(function(){if(window.self===window.top)return;var r=document.documentElement;try{var t=parent.document.documentElement.getAttribute("data-theme");if(t)r.setAttribute("data-theme",t)}catch(e){}})();</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@600;900&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: OMR 답안지 — 위에 과목·연도 선택과 40칸 답안 카드, 아래에 문제지 한 장. 2차는 문제지 이미지 + 답안 칸 */
+:root{
+  color-scheme:light;
+  --bg:#eef1f4; --surface:#ffffff; --ink:#18212b; --muted:#5b6876; --line:#d5dbe2;
+  --accent:#1f4e79; --accent-soft:#dbe6f1; --stamp:#b3261e; --stamp-soft:#f6dedb; --ok:#1d6b45; --ok-soft:#d9eee2;
+  --omr:#f3d9de; --omr-ink:#b23a52;
+  --f-display:"Noto Serif KR","Nanum Myeongjo",serif;
+  --f-body:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --img-filter:none;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#11161c; --surface:#19212a; --ink:#e6ebf0; --muted:#97a3b0; --line:#2c3743;
+  --accent:#7fb0e0; --accent-soft:#1e3247; --stamp:#f08a80; --stamp-soft:#3e211f; --ok:#7fd1a4; --ok-soft:#173226;
+  --omr:#3a2128; --omr-ink:#f0a0b2; --img-filter:invert(1) hue-rotate(180deg) brightness(.92); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#11161c; --surface:#19212a; --ink:#e6ebf0; --muted:#97a3b0; --line:#2c3743;
+  --accent:#7fb0e0; --accent-soft:#1e3247; --stamp:#f08a80; --stamp-soft:#3e211f; --ok:#7fd1a4; --ok-soft:#173226;
+  --omr:#3a2128; --omr-ink:#f0a0b2; --img-filter:invert(1) hue-rotate(180deg) brightness(.92); color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.65}
+[hidden]{display:none!important}
+.wrap{max-width:860px;margin:0 auto;padding-block:16px 56px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;flex-direction:column;gap:14px}
+.bar{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center}
+.label{font-size:.72rem;letter-spacing:.06em;color:var(--muted);font-weight:500}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--surface)}
+.seg button{font:inherit;font-size:.88rem;border:0;background:transparent;color:var(--muted);padding:6px 11px;cursor:pointer;white-space:nowrap}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+button:focus-visible,textarea:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn{font:inherit;font-size:.88rem;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:6px;padding:6px 12px;cursor:pointer}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--bg);font-weight:500}
+.btn:disabled{opacity:.45;cursor:default}
+
+/* OMR card */
+.drill{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:var(--accent-soft);border:1px solid var(--accent);border-radius:8px;padding:8px 12px;font-size:.9rem}
+.omr{background:var(--omr);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.omr-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;color:var(--omr-ink);font-family:var(--f-mono);font-size:.78rem;font-weight:600}
+.omr-grid{display:grid;grid-template-columns:repeat(10,1fr);gap:4px}
+.cell{font:600 .78rem var(--f-mono);font-variant-numeric:tabular-nums;border:1px solid var(--omr-ink);border-radius:10px;background:var(--surface);color:var(--omr-ink);padding:3px 0;cursor:pointer;text-align:center;min-width:0}
+.cell.ok{background:var(--ok);border-color:var(--ok);color:var(--surface)}
+.cell.no{background:var(--stamp);border-color:var(--stamp);color:var(--surface)}
+.cell.cur{box-shadow:0 0 0 2px var(--ink)}
+.omr-foot{display:flex;gap:14px;flex-wrap:wrap;font-size:.78rem;color:var(--omr-ink)}
+
+/* question */
+.paper{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.meta{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-family:var(--f-mono);font-size:.78rem;color:var(--muted)}
+.meta b{color:var(--stamp);font-weight:600}
+.stem{display:flex;flex-direction:column;gap:10px;min-width:0}
+.stem .lead{font-size:1.05rem;font-weight:500;margin:0;word-break:keep-all;overflow-wrap:anywhere}
+.stem .lead .no{font-family:var(--f-mono);color:var(--accent);margin-right:6px}
+.box{border:1px solid var(--line);border-radius:6px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;background:var(--bg)}
+.box p{margin:0;word-break:keep-all;overflow-wrap:anywhere}
+.figwrap{overflow-x:auto;border:1px solid var(--line);border-radius:6px;background:#fff}
+.figwrap img{display:block;width:100%;max-width:100%;filter:var(--img-filter)}
+.figwrap.zoom img{width:180%;max-width:none}
+.opts{display:grid;gap:7px}
+.opt{font:inherit;text-align:left;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:8px;padding:10px 12px;cursor:pointer;display:grid;grid-template-columns:1.6em 1fr;gap:6px;align-items:baseline;word-break:keep-all;overflow-wrap:anywhere}
+.opt .k{font-family:var(--f-display);font-weight:900;color:var(--muted)}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt:disabled{cursor:default}
+.opt.right{background:var(--ok-soft);border-color:var(--ok)}
+.opt.right .k{color:var(--ok)}
+.opt.wrong{background:var(--stamp-soft);border-color:var(--stamp)}
+.opt.wrong .k{color:var(--stamp)}
+.verdict{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.verdict b{font-family:var(--f-display);font-weight:900;font-size:1.1rem}
+.verdict b.r{color:var(--ok)} .verdict b.w{color:var(--stamp)}
+.verdict span{color:var(--muted);font-size:.88rem}
+.exp{border-left:3px solid var(--accent);background:var(--accent-soft);border-radius:0 6px 6px 0;padding:10px 12px;font-size:.92rem;word-break:keep-all;overflow-wrap:anywhere}
+.exp .tag{display:block;font-size:.72rem;letter-spacing:.06em;color:var(--accent);font-weight:700;margin-bottom:2px}
+.nav{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.note{font-size:.8rem;color:var(--muted)}
+.empty{color:var(--muted);text-align:center;padding:24px}
+
+/* 2차 */
+.sheet{display:flex;flex-direction:column;gap:10px}
+.sheet .figwrap img{width:100%}
+.timer{font-family:var(--f-mono);font-size:1.4rem;font-weight:600;font-variant-numeric:tabular-nums}
+.timer.over{color:var(--stamp)}
+.ans{display:flex;flex-direction:column;gap:6px}
+.ans label{font-weight:700;font-size:.92rem;display:flex;justify-content:space-between;gap:8px}
+.ans label span{font-weight:400;color:var(--muted);font-family:var(--f-mono);font-size:.78rem}
+textarea{width:100%;min-height:160px;font:inherit;line-height:1.7;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:10px 12px;resize:vertical}
+@media (max-width:520px){.omr-grid{grid-template-columns:repeat(8,1fr)}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section id="p1">
+    <div class="wrap" style="padding:0;gap:12px">
+      <div class="bar">
+        <span class="label">과목</span>
+        <div class="seg" id="subj"></div>
+      </div>
+      <div class="bar">
+        <span class="label">회차</span>
+        <div class="seg" id="year"></div>
+        <span class="label">풀기</span>
+        <div class="seg" id="mode"></div>
+      </div>
+      <div class="drill" id="drillbar" hidden></div>
+      <div class="omr" id="omr"></div>
+      <div class="paper" id="paper"></div>
+      <p class="note">문제와 최종 정답은 큐넷에서 공개한 2024~2026년 1차 A형 기준이에요. 해설은 최종 정답을 바탕으로 Claude가 쓴 것이라, 조문 번호나 세부 수치는 기본서로 한 번 더 확인하세요. 표가 있는 문제는 원본 문제지를 그대로 잘라 보여 줘요.</p>
+    </div>
+  </section>
+
+  <section id="p2" hidden>
+    <div class="wrap" style="padding:0;gap:12px">
+      <div class="bar">
+        <span class="label">과목</span>
+        <div class="seg" id="subj2"></div>
+      </div>
+      <div class="bar">
+        <span class="label">회차</span>
+        <div class="seg" id="year2"></div>
+        <span class="timer" id="timer">80:00</span>
+        <button class="btn primary" id="tstart" type="button">시작</button>
+        <button class="btn" id="treset" type="button">초기화</button>
+      </div>
+      <div class="sheet" id="sheet"></div>
+      <div class="paper" id="answers"></div>
+      <p class="note">과목당 80분이에요. 답안은 문제마다 이 브라우저에 자동 저장돼요. 모범답안은 들어 있지 않으니 다 쓴 뒤 기본서·법령 원문과 비교해 보세요.</p>
+    </div>
+  </section>
+</div>
+
+<script src="gichul-data.js"></script>
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const get=(k,d)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}};
+const put=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+const SUBJ=[["law","관세법개론"],["trade","무역영어"],["nk","내국소비세법"],["acc","회계학"]];
+const YEARS=[[2026,"43회"],[2025,"42회"],[2024,"41회"]];
+const KO={law:"관세법개론",trade:"무역영어",nk:"내국소비세법",acc:"회계학"};
+const CIRC="①②③④⑤";
+const Q=window.Q1||[];
+let rec=get("gc-v1",{});            // id -> {p:last pick, ok:bool, w:wrong count}
+let st=Object.assign({s:"law",y:2026,m:"seq"},get("gc-state",{}));
+let list=[],idx=0,picked=null;
+
+function save(){put("gc-v1",rec);put("gc-state",{s:st.s,y:st.y,m:st.m})}
+function seg(el,items,cur,key){
+  el.innerHTML=items.map(([v,l])=>`<button type="button" data-${key}="${v}" aria-pressed="${String(v)===String(cur)}">${l}</button>`).join("");
+}
+let drill=null;
+function build(){
+  drill=get("gc-drill",null);
+  if(drill&&drill.ids&&drill.ids.length){list=Q.filter(q=>drill.ids.includes(q.id));idx=0;picked=null;return}
+  drill=null;
+  let pool=Q.filter(q=>q.s===st.s&&(st.y==="all"||q.y===+st.y));
+  if(st.m==="wrong")pool=pool.filter(q=>rec[q.id]&&!rec[q.id].ok);
+  if(st.m==="new")pool=pool.filter(q=>!rec[q.id]);
+  if(st.m==="shuf"){pool=pool.slice();for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]]}}
+  list=pool;idx=0;picked=null;
+}
+function renderControls(){
+  seg($("#subj"),SUBJ,st.s,"s");
+  seg($("#year"),[...YEARS.map(([y,h])=>[y,`${y} ${h}`]),["all","3개년"]],st.y,"y");
+  seg($("#mode"),[["seq","순서대로"],["shuf","섞기"],["new","안 푼 것"],["wrong","틀린 것"]],st.m,"m");
+}
+function renderOMR(){
+  const ys=st.y==="all"?YEARS.map(x=>x[0]):[+st.y];
+  const cur=list[idx]&&list[idx].id;
+  let h="";
+  for(const y of ys){
+    const qs=Q.filter(q=>q.s===st.s&&q.y===y);
+    const done=qs.filter(q=>rec[q.id]).length, ok=qs.filter(q=>rec[q.id]&&rec[q.id].ok).length;
+    h+=`<div class="omr-head"><span>${y}년 ${KO[st.s]} 답안지</span><span>푼 문제 ${done}/40 · 맞힘 ${ok}${done?` (${Math.round(ok/done*100)}%)`:""}</span></div>`;
+    h+=`<div class="omr-grid">${qs.map(q=>{const r=rec[q.id];const c=r?(r.ok?"ok":"no"):"";
+      return `<button type="button" class="cell ${c} ${q.id===cur?"cur":""}" data-jump="${q.id}" aria-label="${q.n}번${r?(r.ok?" 맞힘":" 틀림"):""}">${q.n}</button>`}).join("")}</div>`;
+  }
+  const all=Q.filter(q=>q.s===st.s), wr=all.filter(q=>rec[q.id]&&!rec[q.id].ok).length;
+  h+=`<div class="omr-foot"><span>칸을 누르면 그 문제로 가요</span><span>${KO[st.s]} 틀린 문제 ${wr}개</span><button type="button" class="btn" data-clear style="margin-left:auto;padding:2px 10px;font-size:.78rem">이 과목 기록 지우기</button></div>`;
+  $("#omr").innerHTML=h;
+}
+function stemHTML(q){
+  let h="",first=true;
+  if(q.img){
+    const lead=q.q[0]&&q.q[0][0]==="p"?q.q[0][1]:"";
+    return `<div class="figwrap" id="fig"><img src="${q.img}" alt="${esc(q.n+"번 "+lead)}" loading="lazy"></div>
+      <div class="bar"><button type="button" class="btn" data-zoom style="font-size:.8rem;padding:3px 10px">문제지 크게 보기</button></div>`;
+  }
+  for(const [t,v] of q.q){
+    if(t==="p"){h+=`<p class="lead">${first?`<span class="no">${q.n}.</span>`:""}${esc(v)}</p>`;first=false}
+    else h+=`<div class="box">${v.map(x=>`<p>${esc(x)}</p>`).join("")}</div>`;
+  }
+  return h;
+}
+function renderPaper(){
+  const p=$("#paper");
+  if(!list.length){
+    p.innerHTML=`<div class="empty">${st.m==="wrong"?"틀린 문제가 없어요. 다른 방식으로 풀어 보세요.":st.m==="new"?"이 범위는 모두 풀었어요.":"문제가 없어요."}</div>`;return}
+  const q=list[idx], r=rec[q.id], ans=picked!==null;
+  const isRight=v=>q.a===0||v===q.a;
+  const opts=q.o.map((o,i)=>{const v=i+1;let c="";
+    if(ans){if(isRight(v))c="right";else if(v===picked)c="wrong"}
+    return `<button type="button" class="opt ${c}" data-pick="${v}" ${ans?"disabled":""}><span class="k">${CIRC[i]}</span><span>${esc(o)}</span></button>`}).join("");
+  const prev=r&&!ans?`<span class="note">지난번: ${CIRC[r.p-1]||"-"} ${r.ok?"맞힘":"틀림"}${r.w?` · 틀린 횟수 ${r.w}`:""}</span>`:"";
+  const fb=ans?`<div class="verdict"><b class="${isRight(picked)?"r":"w"}">${isRight(picked)?"정답":"오답"}</b><span>${q.a===0?"이 문제는 최종 정답에서 전항 정답 처리됐어요.":`정답 ${CIRC[q.a-1]}`}</span></div>${q.x?`<div class="exp"><span class="tag">해설</span>${esc(q.x)}</div>`:""}`:"";
+  p.innerHTML=`<div class="meta"><span><b>${q.y}</b> ${KO[q.s]} ${q.n}번</span><span>${idx+1} / ${list.length}</span></div>
+    <div class="stem">${stemHTML(q)}</div>${prev}<div class="opts">${opts}</div>${fb}
+    <div class="nav"><button type="button" class="btn" data-prev ${idx===0?"disabled":""}>← 이전</button><button type="button" class="btn primary" data-next ${idx>=list.length-1?"disabled":""}>다음 →</button></div>`;
+}
+function render1(){
+  renderControls();
+  const db=$("#drillbar");
+  if(drill){db.hidden=false;db.innerHTML=`<span><b>${esc(drill.label)}</b> 관련 기출 ${list.length}문제를 풀고 있어요.</span><button type="button" class="btn" data-undrill>전체 기출로 돌아가기</button>`}
+  else db.hidden=true;
+  renderOMR();renderPaper()}
+
+document.addEventListener("click",e=>{
+  const b=e.target.closest("button");if(!b||!$("#p1").contains(b))return;
+  if(b.hasAttribute("data-undrill")){try{localStorage.removeItem("gc-drill")}catch(_){}build();render1();return}
+  if(b.dataset.s){try{localStorage.removeItem("gc-drill")}catch(_){}st.s=b.dataset.s;build();save();render1();return}
+  if(b.dataset.y){try{localStorage.removeItem("gc-drill")}catch(_){}st.y=b.dataset.y==="all"?"all":+b.dataset.y;build();save();render1();return}
+  if(b.dataset.m){try{localStorage.removeItem("gc-drill")}catch(_){}st.m=b.dataset.m;build();save();render1();return}
+  if(b.dataset.jump){
+    let i=list.findIndex(q=>q.id===b.dataset.jump);
+    if(i<0){try{localStorage.removeItem("gc-drill")}catch(_){}st.m="seq";build();i=list.findIndex(q=>q.id===b.dataset.jump);save();renderControls()}
+    idx=Math.max(0,i);picked=null;renderOMR();renderPaper();$("#paper").scrollIntoView({block:"start",behavior:"smooth"});return}
+  if(b.dataset.pick&&picked===null){
+    const q=list[idx];picked=+b.dataset.pick;const ok=q.a===0||picked===q.a;
+    const r=rec[q.id]||{w:0};r.p=picked;r.ok=ok;if(!ok)r.w=(r.w||0)+1;rec[q.id]=r;save();renderOMR();renderPaper();return}
+  if(b.hasAttribute("data-next")){if(idx<list.length-1){idx++;picked=null;renderOMR();renderPaper()}return}
+  if(b.hasAttribute("data-prev")){if(idx>0){idx--;picked=null;renderOMR();renderPaper()}return}
+  if(b.hasAttribute("data-zoom")){const f=$("#fig");f.classList.toggle("zoom");b.textContent=f.classList.contains("zoom")?"원래 크기로":"문제지 크게 보기";return}
+  if(b.hasAttribute("data-clear")){
+    if(b.dataset.armed){Q.filter(q=>q.s===st.s).forEach(q=>delete rec[q.id]);save();build();render1()}
+    else{b.dataset.armed="1";b.textContent="한 번 더 누르면 지워져요"}
+    return}
+});
+document.addEventListener("keydown",e=>{
+  if($("#p1").hidden||e.target.closest("textarea"))return;
+  if(/^[1-5]$/.test(e.key)&&picked===null)document.querySelector(`[data-pick="${e.key}"]`)?.click();
+  else if(e.key==="ArrowRight"||e.key==="Enter")document.querySelector("[data-next]")?.click();
+  else if(e.key==="ArrowLeft")document.querySelector("[data-prev]")?.click();
+});
+
+/* ---------- 2차 ---------- */
+const S2=[["1","관세법"],["2","관세율표·상품학"],["3","관세평가"],["4","무역실무"]];
+const PAGES={"2024-1":2,"2024-2":3,"2024-3":4,"2024-4":2,"2025-1":2,"2025-2":4,"2025-3":6,"2025-4":2,"2026-1":2,"2026-2":3,"2026-3":6,"2026-4":2};
+let st2=Object.assign({s:"1",y:2026},get("gc2-state",{}));
+let drafts=get("gc2-ans",{});
+let tLeft=80*60,tRun=null;
+function key2(){return st2.y+"-"+st2.s}
+function render2(){
+  seg($("#subj2"),S2,st2.s,"s2");
+  seg($("#year2"),YEARS.map(([y,h])=>[y,`${y} ${h}`]),st2.y,"y2");
+  const k=key2(),n=PAGES[k]||0;
+  $("#sheet").innerHTML=Array.from({length:n},(_,i)=>`<div class="figwrap"><img src="p2/${k}-${i+1}.png" alt="${st2.y}년 2차 ${S2.find(x=>x[0]===st2.s)[1]} 문제지 ${i+1}쪽" loading="lazy"></div>`).join("");
+  $("#answers").innerHTML=`<div class="meta"><span><b>${st2.y}</b> 2차 ${S2.find(x=>x[0]===st2.s)[1]} 답안지</span><span id="cnt"></span></div>`+
+    [1,2,3,4].map(i=>{const id=`a-${k}-${i}`,v=drafts[id]||"";
+      return `<div class="ans"><label for="${id}">문제 ${i}<span id="c-${id}">${v.length}자</span></label><textarea id="${id}" data-draft="${id}" placeholder="목차를 먼저 잡고, 조문 근거를 붙여서 써 보세요.">${esc(v)}</textarea></div>`}).join("");
+  put("gc2-state",st2);
+}
+function tick(){
+  const m=Math.floor(Math.abs(tLeft)/60),s=Math.abs(tLeft)%60;
+  $("#timer").textContent=(tLeft<0?"+":"")+String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");
+  $("#timer").classList.toggle("over",tLeft<0);
+}
+$("#tstart").onclick=()=>{
+  if(tRun){clearInterval(tRun);tRun=null;$("#tstart").textContent="계속"}
+  else{tRun=setInterval(()=>{tLeft--;tick()},1000);$("#tstart").textContent="멈춤"}
+};
+$("#treset").onclick=()=>{clearInterval(tRun);tRun=null;tLeft=80*60;tick();$("#tstart").textContent="시작"};
+document.addEventListener("click",e=>{
+  const b=e.target.closest("button");if(!b||!$("#p2").contains(b))return;
+  if(b.dataset.s2){st2.s=b.dataset.s2;render2()}
+  if(b.dataset.y2){st2.y=+b.dataset.y2;render2()}
+});
+let saveT=null;
+document.addEventListener("input",e=>{
+  const t=e.target.closest("textarea[data-draft]");if(!t)return;
+  drafts[t.dataset.draft]=t.value;const c=document.getElementById("c-"+t.dataset.draft);if(c)c.textContent=t.value.length+"자";
+  clearTimeout(saveT);saveT=setTimeout(()=>put("gc2-ans",drafts),400);
+});
+
+/* ---------- view switch ---------- */
+function view(){
+  const h=location.hash.slice(1);
+  const two=h==="p2";
+  $("#p1").hidden=two;$("#p2").hidden=!two;
+  if(two)render2();else{const d=get("gc-drill",null);if(JSON.stringify(d)!==JSON.stringify(drill))build();render1();}
+}
+window.addEventListener("hashchange",view);
+build();tick();view();
+</script>
+</body>
+</html>

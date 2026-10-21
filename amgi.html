@@ -1,0 +1,363 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<script>(function(){if(window.self===window.top)return;var r=document.documentElement;r.classList.add("embed");try{var t=parent.document.documentElement.getAttribute("data-theme");if(t)r.setAttribute("data-theme",t)}catch(e){}})();</script>
+<style>html.embed .wrap>header{display:none}html.embed .wrap{padding-top:16px}</style>
+
+<title>관세사 암기장</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@600;900&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: 세관 서류철 — 상단 탭(과목) + 단일 문제 카드, 번호는 HS 코드처럼 모노스페이스 */
+:root{
+  --bg:#eef1f4; --surface:#ffffff; --ink:#18212b; --muted:#5b6876; --line:#d5dbe2;
+  --accent:#1f4e79; --accent-soft:#dbe6f1; --stamp:#b3261e; --stamp-soft:#f6dedb; --ok:#1d6b45; --ok-soft:#d9eee2;
+  --f-display:"Noto Serif KR", "Nanum Myeongjo", serif;
+  --f-body:"Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#11161c; --surface:#19212a; --ink:#e6ebf0; --muted:#97a3b0; --line:#2c3743;
+  --accent:#7fb0e0; --accent-soft:#1e3247; --stamp:#f08a80; --stamp-soft:#3e211f; --ok:#7fd1a4; --ok-soft:#173226; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#11161c; --surface:#19212a; --ink:#e6ebf0; --muted:#97a3b0; --line:#2c3743;
+  --accent:#7fb0e0; --accent-soft:#1e3247; --stamp:#f08a80; --stamp-soft:#3e211f; --ok:#7fd1a4; --ok-soft:#173226; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6}
+.wrap{max-width:760px;margin:0 auto;padding-inline:16px;padding-block:20px 48px;display:flex;flex-direction:column;gap:18px}
+header{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;border-bottom:2px solid var(--ink);padding-bottom:10px}
+h1{font-family:var(--f-display);font-weight:900;font-size:1.9rem;margin:0;letter-spacing:-.01em}
+.sub{color:var(--muted);font-size:.85rem}
+nav{display:flex;gap:6px;flex-wrap:wrap}
+nav button,.chip,.btn{font:inherit;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:6px;padding:7px 12px;cursor:pointer}
+nav button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip{padding:4px 10px;font-size:.82rem}
+.chip[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:500}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--bg);font-weight:500}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.label{font-size:.75rem;letter-spacing:.06em;color:var(--muted);font-weight:500}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:22px;display:flex;flex-direction:column;gap:16px}
+.meta{display:flex;justify-content:space-between;font-family:var(--f-mono);font-size:.8rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.q{font-size:1.15rem;font-weight:500;text-wrap:balance}
+.q .code{font-family:var(--f-mono);font-size:2.6rem;font-weight:600;color:var(--accent);display:block;line-height:1.1}
+.opts{display:grid;gap:8px}
+.opt{font:inherit;text-align:left;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:8px;padding:12px 14px;cursor:pointer;display:flex;gap:10px;align-items:baseline}
+.opt .k{font-family:var(--f-mono);color:var(--muted);font-size:.85rem;min-width:1.2em}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt.right{background:var(--ok-soft);border-color:var(--ok)}
+.opt.wrong{background:var(--stamp-soft);border-color:var(--stamp)}
+.opt:disabled{cursor:default}
+.ox{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ox .opt{justify-content:center;font-family:var(--f-display);font-size:2rem;font-weight:900;padding:14px}
+.exp{border-left:3px solid var(--accent);padding:4px 0 4px 12px;color:var(--ink);font-size:.92rem}
+.verdict{font-family:var(--f-display);font-weight:900;font-size:1.1rem}
+.verdict.r{color:var(--ok)} .verdict.w{color:var(--stamp)}
+.bar{height:4px;background:var(--line);border-radius:2px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);transition:width .2s}
+.done{text-align:center;gap:10px}
+.done .big{font-family:var(--f-mono);font-size:3rem;font-weight:600;color:var(--accent)}
+.stamp{display:inline-block;border:3px solid var(--stamp);color:var(--stamp);font-family:var(--f-display);font-weight:900;padding:2px 12px;transform:rotate(-4deg);border-radius:4px;letter-spacing:.1em}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.88rem}
+th,td{border-bottom:1px solid var(--line);padding:7px 8px;text-align:left;vertical-align:top}
+td.n{font-family:var(--f-mono);font-weight:600;color:var(--accent);white-space:nowrap;width:3.5em}
+tr.sec th{background:var(--accent-soft);color:var(--accent);font-weight:700;font-size:.82rem}
+.note{font-size:.8rem;color:var(--muted)}
+.empty{color:var(--muted);text-align:center;padding:20px}
+@media (prefers-reduced-motion:reduce){.bar i{transition:none}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>관세사 암기장</h1>
+      <div class="sub">1차 · 2차 대비 | 틀린 문제는 오답노트에 자동 저장</div>
+    </div>
+    <nav id="tabs"></nav>
+  </header>
+  <section id="controls" class="row"></section>
+  <main id="main"></main>
+  <p class="note">류 명칭은 외우기 쉽게 줄인 형태도 있으니, 2차 서술은 교재·관세율표 원문으로 최종 확인하세요. 기록은 이 브라우저에만 저장됩니다.</p>
+</div>
+
+<script>
+const SECTIONS=[
+ [1,"산 동물과 동물성 생산품",1,5],[2,"식물성 생산품",6,14],[3,"동물성·식물성·미생물성 지방과 기름",15,15],
+ [4,"조제 식료품, 음료·주류·식초, 담배",16,24],[5,"광물성 생산품",25,27],[6,"화학공업이나 연관공업의 생산품",28,38],
+ [7,"플라스틱·고무와 그 제품",39,40],[8,"원피·가죽·모피와 그 제품, 여행용구·핸드백",41,43],[9,"목재·코르크·짚 제품",44,46],
+ [10,"펄프, 종이·판지와 그 제품",47,49],[11,"방직용 섬유와 그 제품",50,63],[12,"신발류·모자류·산류·조화",64,67],
+ [13,"돌·시멘트·도자제품·유리",68,70],[14,"진주·귀석·귀금속",71,71],[15,"비금속과 그 제품",72,83],
+ [16,"기계류·전기기기",84,85],[17,"차량·항공기·선박",86,89],[18,"광학·정밀·의료기기, 시계, 악기",90,92],
+ [19,"무기·총포탄",93,93],[20,"잡품",94,96],[21,"예술품·수집품·골동품",97,97]];
+const HS={1:"산 동물",2:"육과 식용 설육",3:"어류·갑각류·연체동물과 그 밖의 수생 무척추동물",4:"낙농품, 새의 알, 천연꿀, 그 밖의 식용 동물성 생산품",5:"다른 류로 분류되지 않은 동물성 생산품",6:"살아 있는 수목과 식물, 인경·뿌리, 절화와 장식용 잎",7:"식용의 채소·뿌리·괴경",8:"식용의 과실과 견과류, 감귤류·멜론의 껍질",9:"커피·차·마테·향신료",10:"곡물",11:"제분공업 생산품, 맥아, 전분, 이눌린, 밀의 글루텐",12:"채유용 종자·과실, 공업용·의약용 식물, 짚과 사료용 식물",13:"락·검·수지와 그 밖의 식물성 수액·추출물",14:"식물성 편조물용 재료, 그 밖의 식물성 생산품",15:"동물성·식물성·미생물성 지방과 기름, 조제 식용 지방, 왁스",16:"육류·어류·갑각류·연체동물·곤충의 조제품",17:"당류와 설탕과자",18:"코코아와 그 조제품",19:"곡물·고운 가루·전분·밀크의 조제품과 베이커리 제품",20:"채소·과실·견과류나 식물의 그 밖의 부분의 조제품",21:"각종 조제 식료품",22:"음료·주류·식초",23:"식품 공업의 잔재물과 웨이스트, 조제 사료",24:"담배와 제조한 담배 대용물, 비연소 흡입용 물품, 니코틴 함유 물품",25:"소금, 황, 토석류, 석고·석회·시멘트",26:"광·슬래그·회",27:"광물성 연료·광물유와 그 증류물, 역청 물질, 광물성 왁스",28:"무기화학품, 귀금속·희토류 금속·방사성 원소의 화합물",29:"유기화학품",30:"의료용품",31:"비료",32:"유연용·염색용 추출물, 염료·안료, 페인트·바니시, 퍼티, 잉크",33:"정유와 레지노이드, 조제향료와 화장품·화장용품",34:"비누, 유기계면활성제, 세제, 윤활제, 왁스, 양초, 조형용 페이스트",35:"단백질계 물질, 변성전분, 글루, 효소",36:"화약류, 화공품, 성냥, 발화성 합금, 특정 가연성 조제품",37:"사진용이나 영화용 재료",38:"각종 화학공업 생산품",39:"플라스틱과 그 제품",40:"고무와 그 제품",41:"원피(모피 제외)와 가죽",42:"가죽제품, 마구, 여행용구·핸드백, 동물 거트 제품",43:"모피·인조모피와 그 제품",44:"목재와 그 제품, 목탄",45:"코르크와 그 제품",46:"짚·에스파르토 등 조물 재료의 제품, 바구니 세공물",47:"목재 등 섬유질 셀룰로오스재료의 펄프, 회수한 종이·판지",48:"종이와 판지, 제지용 펄프·종이·판지의 제품",49:"인쇄서적·신문·회화 등 인쇄물, 수제·타자문서, 도면",50:"견",51:"양모·동물의 털, 말의 털로 만든 실과 직물",52:"면",53:"그 밖의 식물성 방직용 섬유, 종이실과 그 직물",54:"인조필라멘트, 인조방직용 섬유재료의 스트립",55:"인조스테이플섬유",56:"워딩·펠트·부직포, 특수사, 끈·로프·케이블과 그 제품",57:"양탄자류와 그 밖의 방직용 섬유 바닥깔개",58:"특수직물, 터프트 직물, 레이스, 태피스트리, 트리밍, 자수천",59:"침투·도포·피복·적층한 직물, 공업용 방직용 섬유제품",60:"메리야스 편물과 뜨개질 편물",61:"의류와 그 부속품 (메리야스·뜨개질 편물로 한정)",62:"의류와 그 부속품 (메리야스·뜨개질 편물 제외)",63:"그 밖의 방직용 섬유제품, 세트, 사용하던 의류, 넝마",64:"신발류·각반과 그 부분품",65:"모자류와 그 부분품",66:"산류·양산·지팡이·채찍과 그 부분품",67:"조제 깃털·솜털과 그 제품, 조화, 사람 머리카락 제품",68:"돌·플라스터·시멘트·석면·운모 등의 제품",69:"도자제품",70:"유리와 유리제품",71:"천연·양식진주, 귀석·반귀석, 귀금속과 그 제품, 모조 신변장식용품, 주화",72:"철강",73:"철강의 제품",74:"구리와 그 제품",75:"니켈과 그 제품",76:"알루미늄과 그 제품",78:"납과 그 제품",79:"아연과 그 제품",80:"주석과 그 제품",81:"그 밖의 비금속, 서멧과 그 제품",82:"비금속으로 만든 공구·도구·칼붙이·스푼·포크",83:"비금속으로 만든 각종 제품",84:"원자로·보일러·기계류와 그 부분품",85:"전기기기와 그 부분품, 녹음기·재생기·텔레비전 영상 기록기·재생기",86:"철도·궤도용 기관차·차량과 장비품, 교통신호용 기기",87:"철도·궤도용 외의 차량과 그 부분품·부속품",88:"항공기와 우주선, 그 부분품",89:"선박과 수상 구조물",90:"광학·사진·영화·측정·검사·정밀·의료용 기기",91:"시계와 그 부분품",92:"악기와 그 부분품·부속품",93:"무기·총포탄과 그 부분품·부속품",94:"가구, 침구·매트리스·쿠션, 조명기구, 조명용 사인, 조립식 건축물",95:"완구·게임용구·운동용구",96:"잡품",97:"예술품·수집품·골동품"};
+
+const LAW=[
+ ["관세의 과세물건 확정시기는 원칙적으로 수입신고를 하는 때이다. (법 제16조)",1,"원칙은 수입신고 시점. 선박 내 소비, 우편물 등은 예외 시점이 따로 있음."],
+ ["관세 부과에 적용되는 법령은 원칙적으로 수입신고 수리 당시의 법령이다. (법 제17조)",0,"수리 당시가 아니라 수입신고 당시의 법령이 원칙."],
+ ["과세가격 결정 시 외국통화 환산은 수입신고일이 속하는 주의 전주 기준환율 평균을 기초로 관세청장이 정한 율로 한다. (법 제18조)",1,"'전주 평균' 키워드를 기억."],
+ ["관세의 납세의무자는 원칙적으로 수입신고를 한 물품의 화주이다. (법 제19조)",1,"원칙은 화주. 화주가 불분명하면 대리인, 양수인 등으로 넘어감."],
+ ["신고납부 방식의 관세는 수입신고 수리일부터 30일 이내에 납부해야 한다. (법 제9조)",0,"30일이 아니라 15일 이내."],
+ ["관세 부과제척기간은 원칙적으로 관세를 부과할 수 있는 날부터 5년이다. (법 제21조)",1,"부정한 방법으로 포탈·환급받은 경우는 10년."],
+ ["관세 징수권의 소멸시효는 5억원 이상 관세는 10년, 그 외는 5년이다. (법 제22조)",1,"금액 기준 5억원이 포인트."],
+ ["관세환급청구권의 소멸시효는 3년이다. (법 제22조)",0,"환급청구권도 5년."],
+ ["관세를 납부해야 하는 물품에 대해서는 다른 조세·공과금·채권보다 우선하여 관세를 징수한다. (법 제3조)",1,"관세 우선징수 원칙."],
+ ["기한의 마지막 날이 공휴일이면 그 전날을 기한으로 한다. (법 제8조)",0,"전날이 아니라 그 다음 날이 기한."],
+ ["신고납부한 세액이 부족한 것을 안 경우, 신고납부한 날부터 6개월 이내에는 보정신청을 할 수 있다. (법 제38조의2)",1,"보정 6개월, 이후엔 수정신고."],
+ ["경정청구는 최초로 신고납부한 날부터 3년 이내에 할 수 있다.",0,"경정청구 기간은 5년."],
+ ["관세의 과세표준은 수입물품의 가격 또는 수량으로 한다. (법 제15조)",1,"종가세는 가격, 종량세는 수량."],
+ ["합의세율은 일괄 수입신고된 물품 중 가장 낮은 세율을 적용한다. (법 제82조)",0,"가장 높은 세율을 일괄 적용."],
+ ["덤핑방지관세는 정상가격과 덤핑가격의 차액에 상당하는 금액 이하로 부과한다. (법 제51조)",1,"차액 '이하'로 부과."],
+ ["계절관세는 계절에 따라 가격 차이가 심한 물품에 대해 기본세율과의 차이를 높이거나 낮출 수 있는 탄력관세이다. (법 제72조)",1,"동종물품 등의 수입으로 국내시장이 교란될 우려가 있을 때."],
+ ["상계관세는 수출국에서 보조금이나 장려금을 받은 물품의 수입에 대해 부과한다. (법 제57조)",1,"덤핑은 가격, 상계는 보조금으로 구분."],
+ ["할당관세는 일정 수량까지는 높은 세율, 그 초과분은 낮은 세율을 적용하는 방식만 가능하다. (법 제71조)",0,"기본세율에서 40%p 범위 내 인하가 주된 형태이고, 수량 초과분에 40%p 범위 내 가산하는 경우도 있음."],
+ ["“수입”이란 외국물품을 우리나라에 반입(보세구역을 경유하는 것은 보세구역으로부터 반입)하거나 우리나라에서 소비 또는 사용하는 것을 말한다. (법 제2조)",1,"수입의 정의. 보세구역을 거치면 '보세구역으로부터 반입'이 기준."],
+ ["“수출”이란 내국물품을 외국으로 반출하는 것을 말한다. (법 제2조)",1,"수출의 정의."],
+ ["“반송”이란 국내에 도착한 외국물품이 수입통관절차를 거쳐 다시 외국으로 반출되는 것을 말한다. (법 제2조)",0,"수입통관절차를 '거치지 아니하고' 다시 외국으로 반출되는 것."],
+ ["수입신고가 수리된 물품은 내국물품이다. (법 제2조)",1,"수입신고 수리 → 내국물품."],
+ ["입항전수입신고가 수리된 물품은 외국물품이다. (법 제2조)",0,"입항전수입신고가 수리된 물품은 내국물품."],
+ ["우리나라 선박 등이 공해에서 채집하거나 포획한 수산물은 내국물품이다. (법 제2조)",1,"우리나라 선박 + 공해 → 내국물품. 외국 선박이 공해에서 포획한 것은 수입신고 수리 전까지 외국물품."],
+ ["세관장이 납부고지를 한 관세는 납부고지를 받은 날부터 30일 이내에 납부해야 한다. (법 제9조)",0,"납부고지를 받은 날부터 15일 이내."],
+ ["수입신고전 즉시반출신고를 한 물품의 관세는 수입신고일부터 15일 이내에 납부해야 한다. (법 제9조)",1,"즉시반출 후 10일 이내 수입신고, 신고일부터 15일 이내 납부."],
+ ["월별납부를 승인받으면 납부기한이 같은 달에 속하는 세액을 그 달 말일까지 한꺼번에 낼 수 있다. (법 제9조)",1,"성실 납세자 대상 월별납부 제도."],
+ ["납세의무자가 부정한 행위로 과소신고한 경우 가산세는 부족세액의 100분의 20이다. (법 제42조)",0,"부정행위 과소신고는 100분의 40. 일반 과소신고는 100분의 10."],
+ ["신고납부한 세액이 부족해 경정하는 경우 가산세는 부족세액의 100분의 10에 이자상당액을 더한 금액이다. (법 제42조)",1,"과소신고 가산세 10% + 납부지연 이자 성격의 가산액."],
+ ["관세 감면을 받으려는 자는 원칙적으로 해당 물품의 수입신고 수리 전까지 감면신청서를 제출해야 한다. (영 제112조)",1,"원칙은 수리 전. 일부 예외(경정·수리 후 사유 등)가 있음."],
+ ["재수출면세 물품은 원칙적으로 수입신고 수리일부터 1년의 범위에서 세관장이 정하는 기간에 다시 수출해야 한다. (법 제97조)",1,"재수출면세 기간은 1년 범위, 부득이한 경우 연장 가능."],
+ ["재수출감면세는 장기간 사용할 수 있는 물품으로서 수입신고 수리일부터 2년(일정한 경우 4년) 이내에 재수출하는 물품에 적용된다. (법 제98조)",1,"재수출면세(97조, 1년)와 재수출감면(98조, 2년·최장 4년)을 구분."],
+ ["덤핑방지관세·상계관세·보복관세·긴급관세 등은 다른 세율보다 우선하여 적용한다. (법 제50조)",1,"세율 적용 1순위 그룹."],
+ ["국제협력관세와 편익관세는 기본세율·잠정세율보다 낮은 경우에만 우선하여 적용한다. (법 제50조)",1,"'낮은 경우에만' 우선 적용되는 세율 그룹."],
+ ["여행자 휴대품이나 우편물 등에는 간이세율을 적용할 수 있다. (법 제81조)",1,"간이세율 적용 대상: 여행자·승무원 휴대품, 우편물, 탁송품·별송품 등."],
+ ["관세청장은 품목분류 사전심사 신청을 받으면 60일 이내에 결과를 통지해야 한다. (법 제86조)",0,"30일 이내 통지. 재심사도 신청일부터 60일 이내 통지."],
+ ["품목분류 사전심사 결과에 이의가 있는 자는 통지를 받은 날부터 30일 이내에 재심사를 신청할 수 있다. (법 제86조)",1,"재심사 신청 기간 30일."],
+ ["보세구역은 지정보세구역, 특허보세구역, 종합보세구역으로 구분한다. (법 제154조)",1,"지정: 지정장치장·세관검사장 / 특허: 보세창고·보세공장·보세전시장·보세건설장·보세판매장."],
+ ["지정장치장에 물품을 장치하는 기간은 1년의 범위에서 관세청장이 정한다. (법 제170조)",0,"6개월 범위에서 관세청장이 정하고, 세관장은 3개월 범위에서 연장 가능."],
+ ["보세창고에 장치한 외국물품의 장치기간은 원칙적으로 1년의 범위에서 관세청장이 정하는 기간이다. (법 제177조)",1,"외국물품은 1년 범위, 필요 시 1년 범위에서 연장."],
+ ["특허보세구역의 특허기간은 10년 이내로 한다. (법 제176조)",1,"보세전시장·보세건설장은 해당 박람회·공사 기간을 고려해 따로 정함."],
+ ["수입신고는 화주 또는 관세사 등의 명의로 하여야 한다. (법 제242조)",1,"관세사·관세법인·통관취급법인 등."],
+ ["수입하려는 물품을 적재한 선박이 우리나라에 입항하기 전에도 수입신고를 할 수 있다. (법 제244조)",1,"입항전수입신고."],
+ ["관세청장이 정하는 보세구역에 반입한 물품을 반입일부터 30일 이내에 신고하지 않으면 과세가격의 100분의 2 범위에서 가산세를 징수한다. (법 제241조)",1,"신고지연 가산세."],
+ ["여행자가 휴대품 신고를 하지 않아 과세하는 경우 가산세는 납부할 세액의 100분의 20이다. (법 제241조)",0,"100분의 40 (2년 내 2회 이상이면 100분의 60)."],
+ ["세관장은 수입신고수리전 반출승인을 할 때 원칙적으로 관세에 상당하는 담보를 제공하게 해야 한다. (법 제252조)",1,"일정 요건 시 담보 생략 가능."],
+ ["2개국 이상에 걸쳐 생산된 물품은 실질적 변형을 하여 새로운 특성을 부여하는 행위를 최종적으로 수행한 나라를 원산지로 한다. (법 제229조)",1,"완전생산기준과 실질적변형기준."],
+ ["원산지증명서는 원칙적으로 발행일부터 2년 이내의 것이어야 한다. (영 제236조)",0,"제출일부터 소급하여 1년 이내에 발행된 것."],
+ ["세관공무원은 관세조사를 위해 납세자를 방문하려면 조사 시작 7일 전까지 통지해야 한다. (법 제114조)",0,"조사 시작 15일 전까지 사전통지."],
+ ["심사청구는 해당 처분을 한 것을 안 날부터 90일 이내에 제기해야 한다. (법 제121조)",1,"이의신청·심사청구·심판청구 모두 90일."],
+ ["이의신청은 세관장에게, 심사청구는 관세청장에게 한다. (법 제121조·제132조)",1,"심사청구는 세관장을 거쳐 관세청장에게."],
+ ["심사청구에 대한 결정은 청구를 받은 날부터 60일 이내에 해야 한다. (법 제127조)",0,"90일 이내 결정."]
+];
+
+const VAL=[
+ {t:"mc",q:"과세가격 결정의 원칙적 방법(제1방법)은?",o:["실제 지급했거나 지급할 가격에 가산·공제한 거래가격","동종·동질물품의 거래가격","국내판매가격을 기초로 한 가격","산정가격"],a:0,e:"법 제30조. 제1방법이 안 될 때 제2~6방법으로 순차 적용."},
+ {t:"mc",q:"제3방법(법 제32조)의 기초가 되는 가격은?",o:["유사물품의 거래가격","동종·동질물품의 거래가격","산정가격","합리적 기준"],a:0,e:"제2방법 동종·동질(31조), 제3방법 유사물품(32조)."},
+ {t:"mc",q:"제4방법(국내판매가격 기초, 법 제33조)에서 공제하지 않는 항목은?",o:["수입물품 제조에 든 재료비","국내 판매 관련 통상적 이윤과 일반경비","수입항 도착 후 국내 운임·보험료","국내에서 납부할 조세와 공과금"],a:0,e:"재료비는 제5방법(산정가격)을 구성하는 요소. 제4방법은 국내 판매가격에서 이윤·경비, 국내 운송비, 조세를 빼는 방식."},
+ {t:"ox",q:"납세의무자가 요청하면 제4방법보다 제5방법(산정가격)을 먼저 적용할 수 있다.",a:1,e:"제4방법과 제5방법은 납세의무자 요청 시 순서를 바꿀 수 있음."},
+ {t:"ox",q:"구매자가 부담하는 구매수수료는 과세가격에 가산한다.",a:0,e:"구매수수료는 가산하지 않음. 판매수수료·중개료 등 그 밖의 수수료는 가산."},
+ {t:"ox",q:"수입항 도착까지의 운임·보험료는 과세가격에 가산한다.",a:1,e:"법 제30조 제1항 제6호. 우리나라는 CIF 기준 과세."},
+ {t:"ox",q:"수입항 도착 이후 국내 운송에 든 운임은 과세가격에 가산한다.",a:0,e:"구분 가능하면 공제 대상."},
+ {t:"ox",q:"수입 후 조립·설치·유지에 드는 비용이 명백히 구분되면 과세가격에서 공제한다.",a:1,e:"구분 가능한 수입 후 비용은 공제."},
+ {t:"ox",q:"연불조건 수입 시 연불이자가 구분되면 과세가격에서 공제한다.",a:1,e:"연불이자는 공제 항목."},
+ {t:"ox",q:"구매자와 판매자가 특수관계에 있으면 거래가격은 무조건 부인된다.",a:0,e:"특수관계가 가격에 영향을 미치지 않았음을 입증하면 거래가격 인정 가능."},
+ {t:"mc",q:"구매자가 판매자에게 금형을 무료로 제공했다. 금형 비용의 처리는?",o:["생산지원비용으로 가산","권리사용료로 가산","공제","과세가격과 무관"],a:0,e:"무료 또는 인하된 가격으로 제공한 물품·용역은 생산지원비용으로 가산."},
+ {t:"mc",q:"수입물품 관련 특허 로열티를 거래조건으로 판매자에게 지급한다. 처리는?",o:["권리사용료로 가산","생산지원비용으로 가산","공제","중개료로 가산"],a:0,e:"수입물품과 관련되고 거래조건으로 지급되는 권리사용료는 가산."},
+ {t:"ox",q:"수입물품의 국내 재판매 수익 중 판매자에게 직접·간접으로 귀속되는 금액은 가산한다.",a:1,e:"사후귀속이익 가산."},
+ {t:"ox",q:"구매자가 부담하는 용기비용과 포장비용은 과세가격에 가산한다.",a:1,e:"용기·포장비는 가산 항목."},
+ {t:"mc",q:"제6방법(합리적 기준)에서 사용할 수 있는 가격은?",o:["제1~5방법을 합리적으로 조정한 가격","국내에서 생산된 물품의 국내 판매가격","선택 가능한 가격 중 높은 가격","수출국 국내 판매가격"],a:0,e:"나머지 셋은 제6방법에서 사용할 수 없는 가격으로 열거됨."},
+ {"t": "ox", "q": "거래가격은 우리나라에 수출하기 위하여 판매되는 물품에 대해 구매자가 실제로 지급했거나 지급할 가격에 법정 가산요소를 더해 조정한 가격이다.", "a": 1, "e": "법 제30조 제1항. 제1방법의 정의."},
+ {"t": "ox", "q": "구매자가 판매자의 채무를 변제하는 금액처럼 판매자에게 간접적으로 지급하는 금액도 실제지급가격에 포함된다.", "a": 1, "e": "법 제30조 제2항. 직접·간접 지급액을 모두 포함."},
+ {"t": "ox", "q": "우리나라에서 해당 수입물품에 부과된 관세 등의 세금과 공과금은 구분할 수 있으면 과세가격에서 공제한다.", "a": 1, "e": "법 제30조 제2항. 공제요소."},
+ {"t": "ox", "q": "구매자가 부담하는 중개료는 과세가격에 가산한다.", "a": 1, "e": "구매수수료만 가산에서 제외되고, 중개료·판매수수료는 가산."},
+ {"t": "ox", "q": "구매자가 자기 계산으로 수행한 국내 광고 활동 비용은 판매자에게 지급한 것이 아니므로 가산하지 않는다.", "a": 1, "e": "구매자 자신의 활동비는 간접지급액이 아님."},
+ {"t": "ox", "q": "수입물품의 판매지역을 제한하는 조건은 거래가격에 실질적 영향이 없는 제한이므로 거래가격을 부인하는 사유가 아니다.", "a": 1, "e": "영 제21조. 처분·사용 제한 중 법령상 제한, 판매지역 제한 등은 인정."},
+ {"t": "mc", "q": "거래가격 배제 사유가 아닌 것은?", "o": ["수입물품의 판매지역 제한", "금액으로 계산할 수 없는 조건이나 사정에 의한 영향", "사후귀속이익 금액을 알 수 없는 경우", "특수관계가 가격에 영향을 미친 경우"], "a": 0, "e": "법 제30조 제3항. 판매지역 제한은 거래가격에 실질적 영향이 없는 제한으로 봄."},
+ {"t": "ox", "q": "제2방법의 동종·동질물품은 원칙적으로 해당 수입물품의 선적일 전후 60일 이내에 선적되어 우리나라에 수입된 물품이어야 한다.", "a": 1, "e": "영 제25조. 가격에 영향을 미치는 시장조건이나 상관행에 변동이 없는 기간."},
+ {"t": "ox", "q": "제2방법에서 적용 가능한 동종·동질물품의 거래가격이 둘 이상이면 가장 높은 가격을 기초로 한다.", "a": 0, "e": "가장 낮은 가격을 기초로 함 (영 제25조)."},
+ {"t": "ox", "q": "동종·동질물품은 외양에 경미한 차이가 있으면 동종·동질물품으로 보지 않는다.", "a": 0, "e": "외양에 경미한 차이가 있더라도 물리적 특성·품질·소비자 평판 등이 동일하면 동종·동질물품."},
+ {"t": "ox", "q": "유사물품은 모든 면에서 동일하지는 않지만 기능과 구성요소가 유사해 상업적으로 대체할 수 있는 물품이다.", "a": 1, "e": "제3방법(법 제32조)의 기초."},
+ {"t": "ox", "q": "제4방법은 국내에서 가장 많은 수량으로 판매되는 단위가격을 기초로 한다.", "a": 1, "e": "법 제33조 제1항."},
+ {"t": "ox", "q": "제4방법에서 수입물품이 그대로 판매되지 않으면 납세의무자의 요청으로 국내 가공 후 판매가격을 기초로 할 수 있다.", "a": 1, "e": "법 제33조 제3항. 가공에 따른 부가가치를 빼고 계산."},
+ {"t": "mc", "q": "제5방법(산정가격)의 구성요소가 아닌 것은?", "o": ["국내 판매에 따른 통상의 이윤", "해당 물품 생산에 든 재료비와 가공비", "우리나라에 수출하기 위한 판매와 관련된 이윤과 일반경비", "수입항까지의 운임·보험료"], "a": 0, "e": "국내 판매 이윤은 제4방법의 공제요소. 제5방법은 생산비 + 수출 판매 이윤·경비 + 운임 등."},
+ {"t": "ox", "q": "최저과세기준가격은 제6방법(합리적 기준)에서 사용할 수 없는 가격이다.", "a": 1, "e": "영 제29조. 자의적·가공적 가격, 선택가능한 가격 중 높은 가격 등과 함께 배제."},
+ {"t": "ox", "q": "가격이 확정되지 않은 경우 잠정가격으로 신고하고, 잠정가격 신고일부터 2년의 범위에서 세관장이 지정하는 기간에 확정가격을 신고한다.", "a": 1, "e": "법 제28조. 잠정가격신고와 확정가격신고."},
+ {"t": "ox", "q": "과세가격 결정방법 사전심사는 세관장에게 신청한다.", "a": 0, "e": "관세청장에게 신청 (법 제37조)."},
+ {"t": "ox", "q": "특정인이 구매자와 판매자의 의결권 있는 주식을 직접 또는 간접으로 5퍼센트 이상 소유하면 특수관계에 해당한다.", "a": 1, "e": "영 제23조. 3퍼센트가 아니라 5퍼센트."},
+ {"t": "ox", "q": "구매자와 판매자가 동일한 가족의 구성원이면 특수관계에 해당한다.", "a": 1, "e": "영 제23조."},
+ {"t": "ox", "q": "무상으로 수입되는 물품은 '우리나라에 수출하기 위하여 판매되는 물품'에 해당하지 않아 제1방법을 적용할 수 없다.", "a": 1, "e": "영 제17조. 무상물품, 위탁판매물품, 임대차물품 등은 제외."},
+ {"t": "ox", "q": "위탁판매 수입물품도 거래가격(제1방법)으로 과세가격을 결정한다.", "a": 0, "e": "위탁판매수입물품은 판매되는 물품이 아니어서 제1방법 적용 불가."},
+ {"t": "ox", "q": "우리나라에서 개발된 디자인을 구매자가 판매자에게 무료로 제공한 경우 생산지원비용으로 가산한다.", "a": 0, "e": "생산지원 중 기술·설계·고안·디자인은 '우리나라 외에서' 개발된 것만 가산."},
+ {"t": "mc", "q": "과세가격에 가산하지 않는 것은?", "o": ["구매수수료", "판매수수료", "용기비용", "권리사용료"], "a": 0, "e": "구매자가 자신의 구매대리인에게 지급하는 구매수수료는 가산 제외."},
+ {"t": "mc", "q": "제1방법을 적용할 수 없을 때 다음으로 검토하는 방법은?", "o": ["동종·동질물품의 거래가격(제2방법)", "유사물품의 거래가격(제3방법)", "국내판매가격(제4방법)", "합리적 기준(제6방법)"], "a": 0, "e": "제1→제2→제3→제4→제5→제6 순서 (제4·제5는 요청 시 교체)."},
+ {"t": "ox", "q": "수입물품의 가격에 대한 할인이 객관적으로 정해진 수량할인이라면 할인된 가격을 실제지급가격으로 볼 수 있다.", "a": 1, "e": "수량할인 등 통상적인 할인은 인정."},
+ {"t": "ox", "q": "가산요소를 더할 때 객관적이고 수량화할 수 있는 자료가 없으면 제1방법이 아닌 제2방법 이하로 결정한다.", "a": 1, "e": "법 제30조 제1항 단서."},
+ {"t": "ox", "q": "사후귀속이익의 금액을 알 수 없으면 거래가격을 과세가격으로 인정하지 않는다.", "a": 1, "e": "법 제30조 제3항 제3호."},
+ {"t": "ox", "q": "구매자가 부담하는 포장 노무비와 자재비는 과세가격에 가산한다.", "a": 1, "e": "용기·포장비용은 가산 항목."},
+ {"t": "mc", "q": "우리나라 과세가격이 기준으로 삼는 가격 조건에 가장 가까운 것은?", "o": ["CIF (수입항 도착가격)", "FOB (선적항 본선인도가격)", "EXW (공장인도가격)", "DDP (관세지급인도가격)"], "a": 0, "e": "수입항 도착까지의 운임·보험료를 가산하므로 CIF 기준."},
+ {"t": "ox", "q": "항공기로 운송되는 물품 중 일부는 항공운임 대신 해상운송 운임을 기준으로 운임을 산출하는 특례가 있다.", "a": 1, "e": "영 제20조. 운임 특례."},
+ {"t": "mc", "q": "과세가격에서 공제하는 것은?", "o": ["수입 후 조립·설치 비용(구분 가능한 경우)", "판매수수료", "용기비용", "무상 제공 금형 비용"], "a": 0, "e": "구분 가능한 수입 후 비용은 공제. 나머지는 가산."},
+ {"t": "mc", "q": "권리사용료를 과세가격에 가산하는 요건으로 옳은 것은?", "o": ["해당 물품에 관련되고 거래조건으로 지급될 것", "국내 판매 후 지급될 것", "구매자가 국내에서 사용하는 권리일 것", "판매자가 아닌 제3자에게 지급될 것"], "a": 0, "e": "법 제30조 제1항 제4호. 관련성 + 거래조건."},
+ {"t": "ox", "q": "구매자가 수입물품 대금 중 일부를 판매자에 대한 기존 채권과 상계했다면 상계한 금액도 실제지급가격에 포함한다.", "a": 1, "e": "간접지급액에 포함."},
+ {"t": "ox", "q": "제4방법의 국내판매가격에서는 국내 판매와 관련한 통상의 이윤과 일반경비를 공제한다.", "a": 1, "e": "법 제33조. 이윤·일반경비, 국내 운임·보험료, 국내 조세 등을 공제."},
+ {"t": "ox", "q": "과세가격 결정의 원칙적 방법을 적용할 수 없으면 바로 제6방법(합리적 기준)을 적용한다.", "a": 0, "e": "제2방법부터 순차 적용하고, 모두 안 될 때 제6방법."}
+];
+
+const INCO=[
+ {t:"mc",q:"Incoterms 2020에서 매도인이 목적지에서 양하(unloading)까지 책임지는 유일한 규칙은?",o:["DPU","DAP","DDP","CPT"],a:0,e:"DPU = Delivered at Place Unloaded. 2010의 DAT가 이름이 바뀐 것."},
+ {t:"mc",q:"해상·내수로 운송에만 쓰는 규칙 묶음은?",o:["FAS, FOB, CFR, CIF","FCA, FOB, CPT, CIF","EXW, FAS, FOB, DAP","FOB, CFR, CIP, DPU"],a:0,e:"나머지 7개(EXW, FCA, CPT, CIP, DAP, DPU, DDP)는 모든 운송방식에 사용."},
+ {t:"mc",q:"Incoterms 2020 CIP 조건에서 매도인의 최소 부보 조건은?",o:["ICC(A)","ICC(B)","ICC(C)","부보 의무 없음"],a:0,e:"2020부터 CIP는 ICC(A)로 상향. CIF는 ICC(C) 유지."},
+ {t:"mc",q:"CIF 조건에서 매도인의 최소 부보 조건은?",o:["ICC(C)","ICC(A)","ICC(B)","부보 의무 없음"],a:0,e:"CIF는 최소 담보 ICC(C), 송장금액의 110%."},
+ {t:"mc",q:"매도인의 의무가 가장 적은 규칙은?",o:["EXW","FCA","FAS","FOB"],a:0,e:"Ex Works: 매도인 영업장에서 물품을 처분 가능하게 두면 끝."},
+ {t:"mc",q:"매도인이 수입통관과 수입관세까지 부담하는 규칙은?",o:["DDP","DAP","DPU","CIP"],a:0,e:"Delivered Duty Paid. 매도인 의무 최대."},
+ {t:"mc",q:"CFR 조건에서 위험이 매수인에게 이전되는 시점은?",o:["선적항에서 본선에 적재된 때","목적항에 도착한 때","운송인에게 인도한 때","목적항에서 양하된 때"],a:0,e:"C조건은 비용은 목적지까지, 위험은 선적지에서 이전 (분기점이 둘)."},
+ {t:"mc",q:"매수인이 운송인에게 본선적재 표기 선하증권을 매도인에게 발행하도록 지시할 수 있게 2020에 새로 규정된 규칙은?",o:["FCA","FOB","EXW","CPT"],a:0,e:"신용장 거래에서 FCA를 쓰기 쉽게 하려는 개정."},
+ {t:"ox",q:"C조건(CFR, CIF, CPT, CIP)은 비용 이전 지점과 위험 이전 지점이 같다.",a:0,e:"다르다. 비용은 목적지까지 매도인, 위험은 선적·인도 지점에서 매수인에게."},
+ {t:"ox",q:"FAS 조건에서 매도인은 선적항 본선 선측에 물품을 놓으면 인도 의무를 다한다.",a:1,e:"Free Alongside Ship."},
+ {t:"mc",q:"UCP 600에서 운송서류 원본은 선적일 후 며칠 이내에 제시해야 하나? (신용장 유효기일 이내 조건)",o:["21일","15일","30일","7일"],a:0,e:"UCP 600 제14조 c항. 선적일 후 21일 이내, 그리고 유효기일 이내."},
+ {t:"mc",q:"UCP 600에서 은행이 제시된 서류를 심사하는 최대 기간은?",o:["제시일 다음 날부터 최장 5은행영업일","제시일부터 7은행영업일","제시일 다음 날부터 3은행영업일","합리적인 기간"],a:0,e:"UCP 600 제14조 b항. UCP 500의 '합리적 기간(7일 한도)'에서 5은행영업일로 바뀜."},
+ {t:"mc",q:"신용장 금액·수량·단가 앞에 \"about\" 또는 \"approximately\"가 쓰였을 때 허용되는 과부족은?",o:["10% 이내","5% 이내","3% 이내","허용되지 않음"],a:0,e:"UCP 600 제30조 a항. about/approximately는 ±10%."},
+ {t:"ox",q:"신용장에 수량이 포장단위나 개별품목 수로 정해지지 않았고 청구금액이 신용장 금액을 넘지 않으면, 수량은 5% 범위의 과부족이 허용된다.",a:1,e:"UCP 600 제30조 b항. 예: 벌크 화물(톤 단위)."},
+ {t:"ox",q:"UCP 600에서 신용장에 취소가능 여부 표시가 없으면 취소가능 신용장으로 본다.",a:0,e:"UCP 600 제3조. 표시가 없어도 취소불능(irrevocable)이다."},
+ {t:"ox",q:"UCP 600에서 신용장이 분할선적을 금지하지 않으면 분할선적은 허용된다.",a:1,e:"UCP 600 제31조 a항. Partial drawings or shipments are allowed."},
+ {t:"mc",q:"신용장에서 보험 부보금액에 대한 요구가 없을 때 최소 부보금액은?",o:["CIF 또는 CIP 가격의 110%","상업송장 금액의 100%","CIF 가격의 120%","FOB 가격의 110%"],a:0,e:"UCP 600 제28조 f항 ii."},
+ {t:"mc",q:"CISG(비엔나협약)에서 승낙의 효력이 발생하는 시점은?",o:["동의의 의사표시가 청약자에게 도달한 때","승낙 통지를 발송한 때","청약자가 승낙을 읽은 때","계약서에 서명한 때"],a:0,e:"CISG 제18조 2항. 도달주의."},
+ {t:"mc",q:"\"Consignee\"의 뜻은?",o:["수하인","송하인","착화통지처","운송주선인"],a:0,e:"Shipper=송하인, Notify party=착화통지처, Freight forwarder=운송주선인."},
+ {t:"mc",q:"\"Demurrage\"의 뜻은?",o:["체선료","조출료","정박기간","운임 할증"],a:0,e:"허용 정박기간(laytime)을 넘겨 선박을 붙잡아 둔 데 대한 배상금. 반대로 일찍 끝내면 despatch money(조출료)."},
+ {t:"mc",q:"\"Clean B/L\"은?",o:["물품·포장에 하자 표시가 없는 무사고 선하증권","운임이 선지급된 선하증권","기명식 선하증권","본선적재 전 발행된 선하증권"],a:0,e:"하자 문구가 있으면 Foul(Dirty) B/L. 은행은 원칙적으로 clean 운송서류만 수리."},
+ {t:"mc",q:"\"Negotiation\"(신용장 거래)의 뜻은?",o:["매입: 지정은행이 일치하는 제시에 대해 대금을 미리 지급하거나 지급을 약정하는 것","인수: 기한부 환어음에 지급을 약속하는 것","통지: 신용장을 수익자에게 전달하는 것","확인: 개설은행 외 은행이 지급을 추가로 확약하는 것"],a:0,e:"UCP 600 제2조 정의. Acceptance=인수, Advising=통지, Confirmation=확인."}
+
+];
+
+/* ---------- storage ---------- */
+const KEY="cbStudy.v1";
+function load(){try{return JSON.parse(localStorage.getItem(KEY))||{}}catch(e){return {}}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(store))}catch(e){}}
+const store=Object.assign({wrong:{},solved:0,correct:0},load());
+
+/* ---------- question builders ---------- */
+const CH=Object.keys(HS).map(Number);
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const secOf=n=>SECTIONS.find(s=>n>=s[2]&&n<=s[3]);
+function hsQ(n,mode){
+  if(mode==="n2t"){
+    const sec=secOf(n);
+    const pool=shuffle(CH.filter(x=>x!==n));
+    const near=pool.filter(x=>secOf(x)===sec).slice(0,2);
+    const rest=pool.filter(x=>!near.includes(x)).slice(0,3-near.length);
+    const opts=shuffle([n,...near,...rest]);
+    return {id:"hs-n2t-"+n,t:"mc",code:String(n).padStart(2,"0")+"류",q:"이 류의 품목은?",o:opts.map(x=>HS[x]),a:opts.indexOf(n),e:`제${sec[0]}부 ${sec[1]} (${sec[2]}~${sec[3]}류)`};
+  }
+  const cand=shuffle(CH.filter(x=>x!==n&&Math.abs(x-n)<=6)).slice(0,3);
+  const opts=shuffle([n,...cand]);
+  const sec=secOf(n);
+  return {id:"hs-t2n-"+n,t:"mc",q:HS[n],ask:"몇 류일까?",o:opts.map(x=>String(x).padStart(2,"0")+"류"),a:opts.indexOf(n),mono:true,e:`${String(n).padStart(2,"0")}류 · 제${sec[0]}부 ${sec[1]}`};
+}
+const lawQ=LAW.map((x,i)=>({id:"law-"+i,t:"ox",q:x[0],a:x[1],e:x[2]}));
+const valQ=VAL.map((x,i)=>Object.assign({id:"val-"+i},x));
+const incoQ=INCO.map((x,i)=>Object.assign({id:"inco-"+i},x));
+function byId(id){
+  if(id.startsWith("hs-")){const p=id.split("-");return hsQ(+p[2],p[1])}
+  return [...lawQ,...valQ,...incoQ].find(q=>q.id===id);
+}
+
+/* ---------- state ---------- */
+const TABS=[["hs","관세율표"],["law","관세법 OX"],["val","관세평가"],["inco","무역영어"],["wrong","오답노트"]];
+let tab="hs", hsMode="n2t", hsSecs=new Set(), showTable=false;
+let session=null;
+try{const t=localStorage.getItem(KEY+".tab");if(t)tab=t}catch(e){}
+const TABKEYS=["hs","law","val","inco","wrong"];
+function hashTab(){const h=location.hash.slice(1);return TABKEYS.includes(h)?h:null}
+if(hashTab())tab=hashTab();
+window.addEventListener("hashchange",()=>{const h=hashTab();if(h&&h!==tab){tab=h;showTable=false;buildSession();renderAll()}});
+
+function buildSession(){
+  let qs=[];
+  if(tab==="hs"){
+    let pool=CH.filter(n=>!hsSecs.size||hsSecs.has(secOf(n)[0]));
+    qs=shuffle(pool).slice(0,20).map(n=>hsQ(n,hsMode));
+  }else if(tab==="law")qs=shuffle(lawQ);
+  else if(tab==="val")qs=shuffle(valQ);
+  else if(tab==="inco")qs=shuffle(incoQ);
+  else qs=shuffle(Object.keys(store.wrong)).map(byId).filter(Boolean);
+  session={qs,i:0,score:0,picked:null};
+}
+
+/* ---------- render ---------- */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function renderTabs(){
+  $("#tabs").innerHTML=TABS.map(([k,l])=>{
+    const n=k==="wrong"?` ${Object.keys(store.wrong).length}`:"";
+    return `<button data-tab="${k}" aria-pressed="${tab===k}">${l}${n}</button>`}).join("");
+}
+function renderControls(){
+  const c=$("#controls");
+  if(tab!=="hs"){c.innerHTML="";c.hidden=true;return}
+  c.hidden=false;
+  c.innerHTML=`<div class="row" style="width:100%"><span class="label">방향</span>
+   <button class="chip" data-mode="n2t" aria-pressed="${hsMode==="n2t"}">번호 → 품목</button>
+   <button class="chip" data-mode="t2n" aria-pressed="${hsMode==="t2n"}">품목 → 번호</button>
+   <button class="chip" data-table aria-pressed="${showTable}">전체 표 보기</button></div>
+   <div class="row"><span class="label">범위 (부)</span>
+   <button class="chip" data-sec="all" aria-pressed="${!hsSecs.size}">전체</button>
+   ${SECTIONS.map(s=>`<button class="chip" data-sec="${s[0]}" aria-pressed="${hsSecs.has(s[0])}" title="${esc(s[1])}">${s[0]}부</button>`).join("")}</div>`;
+}
+function renderTable(){
+  let h=`<div class="card"><div class="tablewrap"><table>`;
+  for(const s of SECTIONS){
+    if(hsSecs.size&&!hsSecs.has(s[0]))continue;
+    h+=`<tr class="sec"><th colspan="2">제${s[0]}부 · ${esc(s[1])} (${s[2]}~${s[3]}류)</th></tr>`;
+    for(let n=s[2];n<=s[3];n++){
+      h+=`<tr><td class="n">${String(n).padStart(2,"0")}</td><td>${HS[n]?esc(HS[n]):'<span class="note">(유보)</span>'}</td></tr>`;
+    }
+  }
+  $("#main").innerHTML=h+`</table></div></div>`;
+}
+function renderQ(){
+  if(tab==="hs"&&showTable)return renderTable();
+  const s=session, m=$("#main");
+  if(!s.qs.length){m.innerHTML=`<div class="card empty">오답이 아직 없어요. 다른 탭에서 문제를 풀면 틀린 문제가 여기 모입니다.</div>`;return}
+  if(s.i>=s.qs.length){
+    const pct=Math.round(s.score/s.qs.length*100);
+    m.innerHTML=`<div class="card done"><div class="label">결과</div><div class="big">${s.score} / ${s.qs.length}</div>
+      <div>${pct>=80?'<span class="stamp">통과</span>':`정답률 ${pct}%. 틀린 문제는 오답노트에 저장됐어요.`}</div>
+      <div class="row" style="justify-content:center"><button class="btn primary" data-restart>한 번 더</button></div></div>`;return}
+  const q=s.qs[s.i], answered=s.picked!==null;
+  const head=q.code?`<span class="code">${q.code}</span>${esc(q.q)}`:q.ask?`${esc(q.q)}<div class="note" style="margin-top:6px">${q.ask}</div>`:esc(q.q);
+  let body;
+  if(q.t==="ox"){
+    body=`<div class="ox">${[1,0].map(v=>{let cls="";if(answered){if(v===q.a)cls="right";else if(v===s.picked)cls="wrong"}
+      return `<button class="opt ${cls}" data-pick="${v}" ${answered?"disabled":""}>${v?"O":"X"}</button>`}).join("")}</div>`;
+  }else{
+    body=`<div class="opts">${q.o.map((o,i)=>{let cls="";if(answered){if(i===q.a)cls="right";else if(i===s.picked)cls="wrong"}
+      return `<button class="opt ${cls}" data-pick="${i}" ${answered?"disabled":""}><span class="k">${i+1}</span><span${q.mono?' style="font-family:var(--f-mono);font-weight:600"':""}>${esc(o)}</span></button>`}).join("")}</div>`;
+  }
+  const fb=answered?`<div class="verdict ${s.picked===q.a?"r":"w"}">${s.picked===q.a?"정답":"오답"}</div><div class="exp">${esc(q.e)}</div>
+    <div class="row" style="justify-content:flex-end"><button class="btn primary" data-next>다음 문제 →</button></div>`:"";
+  m.innerHTML=`<div class="card"><div class="meta"><span>${s.i+1} / ${s.qs.length}</span><span>맞힘 ${s.score}</span></div>
+   <div class="bar"><i style="width:${s.i/s.qs.length*100}%"></i></div><div class="q">${head}</div>${body}${fb}</div>`;
+}
+function renderAll(){renderTabs();renderControls();renderQ()}
+
+document.addEventListener("click",e=>{
+  const b=e.target.closest("button");if(!b)return;
+  if(b.dataset.tab){tab=b.dataset.tab;try{localStorage.setItem(KEY+".tab",tab)}catch(_){}buildSession();renderAll();return}
+  if(b.dataset.mode){hsMode=b.dataset.mode;showTable=false;buildSession();renderAll();return}
+  if(b.hasAttribute("data-table")){showTable=!showTable;renderAll();return}
+  if(b.dataset.sec){const v=b.dataset.sec;if(v==="all")hsSecs.clear();else{const n=+v;hsSecs.has(n)?hsSecs.delete(n):hsSecs.add(n)}buildSession();renderAll();return}
+  if(b.dataset.pick!==undefined&&session.picked===null){
+    const q=session.qs[session.i];session.picked=+b.dataset.pick;store.solved++;
+    if(session.picked===q.a){session.score++;store.correct++;if(tab==="wrong")delete store.wrong[q.id]}
+    else store.wrong[q.id]=(store.wrong[q.id]||0)+1;
+    save();renderTabs();renderQ();return}
+  if(b.hasAttribute("data-next")){session.i++;session.picked=null;renderQ();return}
+  if(b.hasAttribute("data-restart")){buildSession();renderQ();return}
+});
+document.addEventListener("keydown",e=>{
+  if(!session||session.i>=session.qs.length)return;
+  const q=session.qs[session.i];
+  if(session.picked===null){
+    if(q.t==="ox"&&/^[ox]$/i.test(e.key)){document.querySelector(`[data-pick="${e.key.toLowerCase()==="o"?1:0}"]`)?.click()}
+    else if(q.t==="mc"&&/^[1-4]$/.test(e.key)){document.querySelector(`[data-pick="${+e.key-1}"]`)?.click()}
+  }else if(e.key==="Enter"){document.querySelector("[data-next]")?.click()}
+});
+buildSession();renderAll();
+</script>
+
+</body></html>

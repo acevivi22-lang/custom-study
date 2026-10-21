@@ -1,0 +1,441 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<script>(function(){if(window.self===window.top)return;var r=document.documentElement;r.classList.add("embed");try{var t=parent.document.documentElement.getAttribute("data-theme");if(t)r.setAttribute("data-theme",t)}catch(e){}})();</script>
+<style>html.embed .wrap>header{display:none}html.embed .wrap{padding-top:16px}</style>
+
+<title>내국소비세 연습장</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: 세금계산서 양식처럼 칸이 나뉜 종이 위에 탭으로 다섯 개의 연습 도구. 빨강=공급자(파는 쪽), 파랑=공급받는자(사는 쪽) */
+:root{
+  --paper:#f6f7f9; --sheet:#ffffff; --ink:#1d2330; --muted:#5d6676; --rule:#d6dbe4;
+  --red:#c2343c; --red-soft:#fbe9ea; --blue:#2453a6; --blue-soft:#e7eefa;
+  --good:#1f7a4d; --good-soft:#e3f3ea; --bad:#b3261e; --bad-soft:#fbe7e5;
+  --display:"Gowun Batang", "Nanum Myeongjo", serif;
+  --body:"IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#12151b; --sheet:#1a1f27; --ink:#e7eaf0; --muted:#9aa3b2; --rule:#2f3642;
+  --red:#ef6b72; --red-soft:#3a2124; --blue:#7ea6ef; --blue-soft:#1d2a42;
+  --good:#5fc893; --good-soft:#18332a; --bad:#f08a82; --bad-soft:#3a1f1d; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#12151b; --sheet:#1a1f27; --ink:#e7eaf0; --muted:#9aa3b2; --rule:#2f3642;
+  --red:#ef6b72; --red-soft:#3a2124; --blue:#7ea6ef; --blue-soft:#1d2a42;
+  --good:#5fc893; --good-soft:#18332a; --bad:#f08a82; --bad-soft:#3a1f1d; color-scheme:dark}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.65;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+.wrap{max-width:920px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px;border-bottom:2px solid var(--ink);padding-bottom:12px}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(26px,5vw,36px);margin:0;line-height:1.2;text-wrap:balance}
+.sub{color:var(--muted);margin:4px 0 0;font-size:14px}
+.stamp{font-family:var(--mono);font-size:12px;color:var(--red);border:1.5px solid var(--red);padding:3px 8px;border-radius:3px;letter-spacing:.04em}
+nav{display:flex;flex-wrap:wrap;gap:6px}
+nav button{font:500 14px var(--body);color:var(--muted);background:transparent;border:1px solid var(--rule);border-radius:999px;padding:6px 14px;cursor:pointer}
+nav button[aria-selected="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+nav button:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+section{display:flex;flex-direction:column;gap:16px}
+h2{font-family:var(--display);font-size:24px;margin:0;text-wrap:balance}
+.lead{color:var(--muted);margin:0;max-width:65ch}
+.sheet{background:var(--sheet);border:1px solid var(--rule);border-radius:6px;padding:16px}
+.label{font-size:12px;letter-spacing:.06em;color:var(--muted);font-weight:600}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+/* 구조 지도 */
+.lawtabs{display:flex;gap:6px;flex-wrap:wrap}
+.lawtabs button{font:600 14px var(--body);border:1px solid var(--rule);background:var(--sheet);color:var(--ink);padding:6px 12px;border-radius:4px;cursor:pointer}
+.lawtabs button[aria-pressed="true"]{border-color:var(--blue);color:var(--blue);background:var(--blue-soft)}
+.frame{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
+.cell{background:var(--sheet);border:1px solid var(--rule);border-radius:6px;padding:14px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.cell .q{display:flex;gap:8px;align-items:baseline}
+.cell .k{font-family:var(--mono);font-size:12px;color:var(--red)}
+.cell h3{margin:0;font-size:16px}
+.cell ul{margin:0;padding-left:18px}
+.cell li{margin:2px 0}
+.tip{font-size:13px;color:var(--blue);background:var(--blue-soft);border-radius:4px;padding:6px 8px}
+
+/* 시뮬레이터 */
+.controls{display:flex;flex-wrap:wrap;gap:16px;align-items:center}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:6px;overflow:hidden}
+.seg button{font:500 14px var(--body);border:0;background:var(--sheet);color:var(--muted);padding:6px 12px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+label.chk{display:flex;gap:6px;align-items:center;font-size:14px;cursor:pointer}
+.tablebox{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:620px;font-size:14px}
+th,td{border-bottom:1px solid var(--rule);padding:8px 10px;text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+thead th{font-size:12px;color:var(--muted);font-weight:600;letter-spacing:.03em}
+td input{width:100px;font:500 14px var(--mono);text-align:right;padding:4px 6px;border:1px solid var(--rule);border-radius:4px;background:var(--paper);color:var(--ink)}
+.out{color:var(--red)} .in{color:var(--blue)}
+.pay.neg{color:var(--good)}
+.tag{display:inline-block;font-size:11px;padding:1px 6px;border-radius:3px;margin-left:6px;font-weight:600;vertical-align:1px}
+.tag.ex{background:var(--bad-soft);color:var(--bad)} .tag.zr{background:var(--good-soft);color:var(--good)}
+tfoot td{font-weight:600;border-bottom:0}
+.insight{border-left:3px solid var(--red);padding:8px 12px;background:var(--sheet);border-radius:0 6px 6px 0;max-width:70ch}
+.insight b{color:var(--red)}
+
+/* 수입 계산 */
+.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.form label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted)}
+.form input{font:500 16px var(--mono);padding:8px 10px;border:1px solid var(--rule);border-radius:4px;background:var(--paper);color:var(--ink)}
+.ledger{display:flex;flex-direction:column}
+.ledger .row{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px dashed var(--rule);flex-wrap:wrap}
+.ledger .row:last-child{border-bottom:0;font-weight:600}
+.ledger .note{font-size:12px;color:var(--muted)}
+.chip{font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px}
+.chip.cost{background:var(--red-soft);color:var(--red)} .chip.back{background:var(--good-soft);color:var(--good)}
+
+/* 왜 카드 */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
+.card{background:var(--sheet);border:1px solid var(--rule);border-radius:6px;padding:14px;text-align:left;font:inherit;color:inherit;cursor:pointer;display:flex;flex-direction:column;gap:8px;min-height:120px}
+.card .rule{font-weight:600}
+.card .why{color:var(--muted);font-size:14px}
+.card .hint{font-size:12px;color:var(--blue)}
+.card[aria-expanded="true"]{border-color:var(--blue)}
+
+/* 퀴즈 */
+.qhead{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.bar{height:6px;background:var(--rule);border-radius:3px;overflow:hidden;flex:1;min-width:120px}
+.bar i{display:block;height:100%;background:var(--blue);width:0}
+.qcard{display:flex;flex-direction:column;gap:14px}
+.qtext{font-family:var(--display);font-size:20px;line-height:1.5;margin:0}
+.ox{display:flex;gap:10px}
+.ox button{flex:1;font:700 22px var(--display);padding:12px;border-radius:6px;border:1.5px solid var(--rule);background:var(--sheet);color:var(--ink);cursor:pointer}
+.ox button.o:hover{border-color:var(--blue)} .ox button.x:hover{border-color:var(--red)}
+.ox button:disabled{cursor:default}
+.ox button.right{background:var(--good-soft);border-color:var(--good);color:var(--good)}
+.ox button.wrong{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.exp{border-radius:6px;padding:10px 12px;background:var(--paper);border:1px solid var(--rule)}
+.exp b.r{color:var(--good)} .exp b.w{color:var(--bad)}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap}
+.btn{font:600 14px var(--body);padding:8px 14px;border-radius:6px;border:1px solid var(--ink);background:var(--ink);color:var(--paper);cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink)}
+.tiny{font-size:12px;color:var(--muted)}
+.topic{font-size:12px;color:var(--red);font-weight:600}
+
+/* 공부법 */
+.steps{display:flex;flex-direction:column;gap:10px;counter-reset:s}
+.step{display:grid;grid-template-columns:36px 1fr;gap:12px;align-items:start;background:var(--sheet);border:1px solid var(--rule);border-radius:6px;padding:14px}
+.step::before{counter-increment:s;content:counter(s);font:700 20px var(--display);color:var(--red);text-align:center}
+.step h3{margin:0 0 4px;font-size:16px}
+.step p{margin:0;color:var(--muted);max-width:65ch}
+footer{color:var(--muted);font-size:12px;border-top:1px solid var(--rule);padding-top:10px}
+@media (prefers-reduced-motion: no-preference){.bar i{transition:width .3s}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>내국소비세 연습장</h1>
+      <p class="sub">부가가치세법 · 개별소비세법 · 주세법 — 돈의 흐름을 먼저 보고, 이유를 묻고, O/X로 확인하기</p>
+    </div>
+    <span class="stamp">관세사 1차 · 2027.3</span>
+  </header>
+
+  <nav role="tablist" id="nav">
+    <button role="tab" data-tab="method">공부 순서</button>
+    <button role="tab" data-tab="map">구조 지도</button>
+    <button role="tab" data-tab="flow">돈 흐름</button>
+    <button role="tab" data-tab="import">수입 세금</button>
+    <button role="tab" data-tab="why">왜? 카드</button>
+    <button role="tab" data-tab="quiz">O/X</button>
+  </nav>
+
+  <!-- 공부 순서 -->
+  <section id="method" role="tabpanel">
+    <h2>이 순서로 쓰세요</h2>
+    <p class="lead">조문부터 외우면 금방 섞여요. 먼저 숫자로 흐름을 손에 익히고, 큰 틀 다섯 칸을 만든 뒤, 예외는 "왜"로 묶어서 외우는 순서예요.</p>
+    <div class="steps">
+      <div class="step"><div><h3>돈 흐름부터 만지기</h3><p>'돈 흐름' 탭에서 가격을 바꾸고, 수출과 면세를 켜고 꺼 보세요. 영세율은 세금이 0이 되고, 중간 단계 면세는 오히려 세금이 늘어나는 걸 숫자로 보면 면세·영세율 파트가 한 번에 정리돼요.</p></div></div>
+      <div class="step"><div><h3>다섯 칸으로 분류하기</h3><p>'구조 지도'의 다섯 칸(무엇에, 누가, 얼마에, 뭘 빼주나, 언제 어떻게)을 보고 강의를 들으세요. 새로 배우는 내용은 반드시 이 다섯 칸 중 하나에 넣어요. 개별소비세·주세도 같은 틀이라 부가세를 기준으로 차이점만 보면 돼요.</p></div></div>
+      <div class="step"><div><h3>예외는 이유로 묶기</h3><p>'왜? 카드'를 먼저 규칙만 보고 이유를 스스로 말해 본 뒤 눌러서 확인하세요. 공급의제, 불공제, 면세포기 같은 예외는 대부분 "공제받고 빼돌리기 방지" 아니면 "생필품 부담 줄이기"예요.</p></div></div>
+      <div class="step"><div><h3>O/X로 함정 확인</h3><p>기출은 "옳지 않은 것은?" 형태가 많아요. O/X로 함정 문장에 익숙해지고, 틀린 문제만 다시 풀기로 반복하세요. 진행 상황은 이 브라우저에 저장돼요.</p></div></div>
+      <div class="step"><div><h3>수입 세금으로 관세법과 연결</h3><p>'수입 세금' 계산기는 관세법과 부가세법이 만나는 지점이에요. 수입재화 과세표준 문제는 관세사 시험에서 거의 매년 나오는 유형이라 계산 순서를 손에 익혀 두세요.</p></div></div>
+      <div class="step"><div><h3>기출로 마무리</h3><p>흐름이 잡히면 기출 문제를 연도별로 풀면서 틀린 지문을 O/X 문장으로 직접 바꿔 적어 보세요. 그게 나만의 오답 노트가 돼요.</p></div></div>
+    </div>
+  </section>
+
+  <!-- 구조 지도 -->
+  <section id="map" role="tabpanel" hidden>
+    <h2>세 법을 같은 다섯 칸으로</h2>
+    <p class="lead">세 법 모두 "무엇에 · 누가 · 얼마에 · 뭘 빼주나 · 언제 어떻게"로 짜여 있어요. 부가세를 먼저 채우고, 나머지 두 법은 부가세와 다른 점만 보면 돼요.</p>
+    <div class="lawtabs" id="lawtabs">
+      <button data-law="vat" aria-pressed="true">부가가치세법</button>
+      <button data-law="ict" aria-pressed="false">개별소비세법</button>
+      <button data-law="liq" aria-pressed="false">주세법</button>
+    </div>
+    <div class="frame" id="frame"></div>
+  </section>
+
+  <!-- 돈 흐름 -->
+  <section id="flow" role="tabpanel" hidden>
+    <h2>물건 하나를 따라가 보기</h2>
+    <p class="lead">각 단계에서 파는 가격(공급가액)을 바꿔 보세요. <span class="out">빨강</span>은 팔 때 받은 부가세(매출세액), <span class="in">파랑</span>은 살 때 낸 부가세(매입세액)예요.</p>
+    <div class="controls">
+      <div class="seg" id="dest">
+        <button data-dest="dom" aria-pressed="true">국내 소비자에게</button>
+        <button data-dest="exp" aria-pressed="false">해외로 수출 (영세율)</button>
+      </div>
+      <label class="chk"><input type="checkbox" id="exw"> 도매 단계를 면세로</label>
+    </div>
+    <div class="sheet tablebox">
+      <table>
+        <thead><tr><th>단계</th><th>파는 가격(공급가액)</th><th>매출세액</th><th>매입세액</th><th>납부(−는 환급)</th><th>원가로 남는 세금</th></tr></thead>
+        <tbody id="flowbody"></tbody>
+        <tfoot><tr><td>국가가 걷은 합계</td><td></td><td></td><td></td><td class="num" id="flowsum"></td><td class="num" id="flowsunk"></td></tr></tfoot>
+      </table>
+    </div>
+    <div class="insight" id="flowmsg"></div>
+  </section>
+
+  <!-- 수입 세금 -->
+  <section id="import" role="tabpanel" hidden>
+    <h2>수입할 때 세관에서 내는 돈</h2>
+    <p class="lead">세관은 관세와 내국세(개별소비세, 부가세 등)를 한꺼번에 걷어요. 순서가 중요해요. 뒤의 세금은 앞의 세금까지 포함한 금액에 매겨요.</p>
+    <div class="sheet form">
+      <label for="imp-p">과세가격 (원)<input id="imp-p" class="num" inputmode="numeric" value="1000000"></label>
+      <label for="imp-c">관세율 (%)<input id="imp-c" class="num" inputmode="decimal" value="8"></label>
+      <label for="imp-i">개별소비세율 (%) — 해당 물품만<input id="imp-i" class="num" inputmode="decimal" value="0"></label>
+    </div>
+    <div class="sheet ledger" id="ledger"></div>
+    <p class="tiny">교육세·농어촌특별세·교통·에너지·환경세가 붙는 물품은 그 금액도 부가세 과세표준에 더해요. 계산기에서는 생략했어요.</p>
+  </section>
+
+  <!-- 왜 카드 -->
+  <section id="why" role="tabpanel" hidden>
+    <h2>규칙을 보고 이유를 먼저 말해 보기</h2>
+    <p class="lead">카드를 누르면 이유가 나와요. 누르기 전에 소리 내어 이유를 말해 보세요. 이유를 아는 규칙은 지문이 비틀려도 안 헷갈려요.</p>
+    <div class="cards" id="cards"></div>
+  </section>
+
+  <!-- 퀴즈 -->
+  <section id="quiz" role="tabpanel" hidden>
+    <div class="qhead">
+      <h2>O/X 함정 연습</h2>
+      <div class="btnrow">
+        <button class="btn ghost" id="q-all">전체 섞어 풀기</button>
+        <button class="btn ghost" id="q-wrong">틀린 문제만</button>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px"><div class="bar"><i id="qbar"></i></div><span class="tiny num" id="qstat"></span></div>
+    <div class="sheet qcard" id="qcard"></div>
+  </section>
+
+  <footer>2026년 10월 기준 일반 내용으로 정리했어요. 세율·기준금액은 개정될 수 있으니 시험 직전 수험서의 최신 개정판과 법령을 기준으로 확인하세요.</footer>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+const won=n=>(n<0?'−':'')+Math.abs(Math.round(n)).toLocaleString('ko-KR');
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+
+/* 탭 */
+const tabs=[...document.querySelectorAll('#nav button')];
+function show(id){
+  if(!document.getElementById(id))id='method';
+  tabs.forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===id));
+  document.querySelectorAll('section[role=tabpanel]').forEach(s=>s.hidden=s.id!==id);
+  store.set('nk-tab',id);
+}
+tabs.forEach(b=>b.addEventListener('click',()=>show(b.dataset.tab)));
+show((location.hash||'').slice(1)||store.get('nk-tab','method'));
+
+/* 구조 지도 */
+const MAP={
+ vat:[
+  ['무엇에','과세대상',['재화의 공급','용역의 공급','재화의 수입 (사업자 여부 불문)'],'용역의 수입은 과세대상이 아니에요. 대신 국내 사업자가 대리납부해요.'],
+  ['누가','납세의무자',['사업자: 영리·비영리 관계없이 사업상 독립적으로 재화·용역을 공급하는 자 (국가·지자체 포함)','재화를 수입하는 자: 개인도 해당'],'"영리 목적이어야 사업자" 지문은 틀린 거예요.'],
+  ['얼마에','과세표준·세율',['과세표준 = 공급가액 (부가세 제외 금액)','세율 10%, 수출 등은 영세율 0%','수입재화 = 관세과세가격 + 관세 + 개소세·주세·교육세 등'],'간이과세자는 공급대가(부가세 포함 금액) × 업종별 부가가치율 × 10%'],
+  ['뭘 빼주나','매입세액 공제',['납부세액 = 매출세액 − 매입세액','불공제: 세금계산서 미수취·부실, 사업과 무관, 비영업용 소형승용차, 기업업무추진비(접대비), 면세사업 관련, 토지 관련, 등록 전 매입(일정 기간 밖)'],'면세는 공제 불가, 영세율은 공제 가능. 이 차이가 핵심이에요.'],
+  ['언제 어떻게','과세기간·신고',['일반과세자: 1기 1.1~6.30, 2기 7.1~12.31','확정신고: 과세기간 끝난 뒤 25일 이내','개인 일반과세자는 예정신고 대신 예정고지가 원칙','간이과세자: 1.1~12.31 한 번'],'간이과세 기준: 직전 연도 공급대가 1억 400만 원 미만 (부동산임대업·과세유흥장소 4,800만 원)'],
+ ],
+ ict:[
+  ['무엇에','과세대상',['특정 물품: 고가 귀금속·시계·가방 등, 승용자동차, 유류, 담배 등','특정 장소 입장: 경마장, 골프장, 카지노 등','유흥음식행위, 카지노 영업행위'],'부가세는 거의 모든 거래, 개소세는 법에 열거된 것만. "열거주의"예요.'],
+  ['누가','납세의무자',['과세물품을 제조해 반출하는 자','과세물품을 수입하는 자 (관세 납세의무자)','과세장소 경영자, 유흥음식업자 등'],'부가세처럼 단계마다 걷지 않고 제조장 반출이나 수입 때 한 번만 걷어요.'],
+  ['얼마에','과세표준·세율',['종가세(가격 기준)가 원칙, 유류·담배 등은 종량세(수량 기준)','고가 물품은 기준가격 초과분에만 과세하는 경우가 있음','탄력세율로 세율을 조정하기도 함'],'승용차 세율은 탄력세율로 자주 바뀌니 수험서 최신판 기준으로 외우세요.'],
+  ['뭘 빼주나','면세·공제',['수출·군납 등은 면세','미납세반출: 원재료로 쓰려고 다른 제조장에 옮길 때는 일단 안 걷음','이미 낸 개소세가 있는 원재료로 만들면 그 세액 공제'],'중복 과세를 막으려는 장치라는 점에서 부가세 매입세액 공제와 같은 발상이에요.'],
+  ['언제 어떻게','과세시기·신고',['물품: 제조장에서 반출할 때, 수입은 수입신고할 때','장소: 입장할 때','유흥음식: 요금을 받을 때'],'수입물품의 개소세는 세관장이 관세와 함께 부과·징수해요.'],
+ ],
+ liq:[
+  ['무엇에','과세대상',['주류 (주정과 알코올분 1도 이상 음료)','제조장에서 반출하거나 수입하는 주류'],'술을 "마실 때"가 아니라 "제조장 밖으로 나갈 때" 과세해요.'],
+  ['누가','납세의무자',['주류 제조자 (제조장에서 반출하는 자)','주류 수입자'],'개소세와 마찬가지로 단계마다가 아니라 한 번만 걷어요.'],
+  ['얼마에','과세표준·세율',['종량세: 맥주, 탁주, 주정 (양 기준)','종가세: 소주, 위스키, 약주, 청주, 과실주 등 (가격 기준)','소주·위스키 72%, 약주·청주·과실주 30%'],'맥주·탁주 세율은 물가에 연동해 해마다 바뀔 수 있어요.'],
+  ['뭘 빼주나','면세·공제',['수출, 군납 등 면세','미납세반출','원료로 쓴 주류의 주세 공제'],'구조는 개별소비세와 거의 같아요. 같이 묶어서 공부하세요.'],
+  ['언제 어떻게','과세시기·신고',['제조장에서 반출할 때','수입은 수입신고할 때 (세관장이 징수)'],'주세가 붙는 수입주류는 부가세 과세표준에 주세와 교육세까지 들어가요.'],
+ ]};
+function renderMap(law){
+  document.querySelectorAll('#lawtabs button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.law===law));
+  $('#frame').innerHTML=MAP[law].map(([k,t,items,tip])=>`<div class="cell"><div class="q"><span class="k">${k}</span><h3>${t}</h3></div><ul>${items.map(i=>`<li>${i}</li>`).join('')}</ul><div class="tip">${tip}</div></div>`).join('');
+}
+document.querySelectorAll('#lawtabs button').forEach(b=>b.addEventListener('click',()=>renderMap(b.dataset.law)));
+renderMap('vat');
+
+/* 돈 흐름 */
+const stages=[{n:'제조업자',p:10000},{n:'도매상',p:15000},{n:'소매상',p:20000}];
+let dest='dom';
+function flow(){
+  const exW=$('#exw').checked;
+  let prevOut=0,sum=0,sunk=0,rows='';
+  stages.forEach((s,i)=>{
+    const ex=(i===1&&exW), last=i===stages.length-1;
+    const zr=last&&dest==='exp';
+    const out=ex||zr?0:Math.round(s.p*0.1);
+    const inp=prevOut;
+    let pay,lost=0;
+    if(ex){pay=0;lost=inp}else{pay=out-inp}
+    sum+=pay;sunk+=lost;
+    const buyer=last?(dest==='exp'?'해외 수입업자':'소비자'):stages[i+1].n;
+    rows+=`<tr><td>${s.n} → ${buyer}${ex?'<span class="tag ex">면세</span>':''}${zr?'<span class="tag zr">영세율</span>':''}</td>
+      <td><input id="st${i}" class="num" inputmode="numeric" value="${s.p}" aria-label="${s.n} 공급가액"></td>
+      <td class="num out">${won(out)}</td><td class="num in">${won(inp)}</td>
+      <td class="num pay ${pay<0?'neg':''}">${won(pay)}</td><td class="num">${lost?won(lost):'–'}</td></tr>`;
+    prevOut=out;
+  });
+  $('#flowbody').innerHTML=rows;
+  $('#flowsum').textContent=won(sum);
+  $('#flowsunk').textContent=sunk?won(sunk):'–';
+  stages.forEach((s,i)=>{const el=$('#st'+i);el.addEventListener('change',()=>{s.p=Math.max(0,parseInt(el.value.replace(/\D/g,''))||0);flow()})});
+  const lastOut=prevOut;
+  let msg;
+  if(dest==='exp'&&!exW) msg=`수출 단계는 <b>영세율</b>이라 매출세액이 0이고, 앞에서 낸 매입세액은 전부 환급돼요. 국가가 걷은 합계가 <b>${won(sum)}원</b>이 되어 한국 부가세가 하나도 남지 않은 채 국경을 넘어요. 이게 소비지국 과세 원칙이에요.`;
+  else if(exW&&dest==='dom') msg=`도매상이 면세라 앞에서 낸 부가세 ${won(sunk)}원을 공제받지 못하고 원가로 떠안아요. 소매상은 매입세액이 0이라 매출세액 전부를 내요. 결과적으로 국가가 걷은 돈(<b>${won(sum)}원</b>)이 소비자가 낸 부가세(${won(lastOut)}원)보다 많아져요. 중간 단계 면세가 오히려 세 부담을 늘리는 <b>누적효과</b>예요.`;
+  else if(exW&&dest==='exp') msg=`수출은 영세율이지만 중간에 면세 단계가 끼면 그 앞의 부가세(${won(sunk)}원)는 이미 원가에 묻혀서 돌려받을 수 없어요. 그래서 수출품에는 면세가 아니라 영세율을 써야 세금이 완전히 지워져요.`;
+  else msg=`각 단계가 낸 세금을 더하면 <b>${won(sum)}원</b>, 소비자가 마지막에 낸 부가세(${won(lastOut)}원)와 똑같아요. 사업자는 거쳐 가기만 하고 최종소비자가 부담하는 구조예요.`;
+  $('#flowmsg').innerHTML=msg;
+}
+document.querySelectorAll('#dest button').forEach(b=>b.addEventListener('click',()=>{dest=b.dataset.dest;document.querySelectorAll('#dest button').forEach(x=>x.setAttribute('aria-pressed',x===b));flow()}));
+$('#exw').addEventListener('change',flow);
+flow();
+
+/* 수입 세금 */
+function imp(){
+  const n=id=>parseFloat(($(id).value||'').replace(/[^\d.]/g,''))||0;
+  const P=n('#imp-p'),c=n('#imp-c')/100,ic=n('#imp-i')/100;
+  const duty=Math.floor(P*c), ict=Math.floor((P+duty)*ic), base=P+duty+ict, vat=Math.floor(base*0.1);
+  $('#ledger').innerHTML=`
+   <div class="row"><span>관세 = 과세가격 × ${won(c*100)}%<br><span class="note">공제 안 됨, 원가에 들어감</span></span><span><span class="chip cost">비용</span> <span class="num">${won(duty)}원</span></span></div>
+   ${ic?`<div class="row"><span>개별소비세 = (과세가격 + 관세) × ${won(ic*100)}%<br><span class="note">원칙적으로 원가</span></span><span><span class="chip cost">비용</span> <span class="num">${won(ict)}원</span></span></div>`:''}
+   <div class="row"><span>부가세 과세표준 = 과세가격 + 관세${ic?' + 개소세':''}</span><span class="num">${won(base)}원</span></div>
+   <div class="row"><span>부가세 = 과세표준 × 10%<br><span class="note">세관이 발급하는 수입세금계산서로 매입세액 공제</span></span><span><span class="chip back">공제</span> <span class="num">${won(vat)}원</span></span></div>
+   <div class="row"><span>세관에 내는 합계</span><span class="num">${won(duty+ict+vat)}원</span></div>`;
+}
+['#imp-p','#imp-c','#imp-i'].forEach(id=>$(id).addEventListener('input',imp));
+imp();
+
+/* 왜 카드 */
+const WHY=[
+ ['쌀, 채소 같은 미가공 식료품은 면세','누구나 먹어야 하는 생필품이라 세금 부담을 덜어 줘요. 부가세는 소득과 관계없이 같은 세율이라 저소득층에 상대적으로 무겁기 때문(역진성)이에요.'],
+ ['수출에는 면세가 아니라 영세율','면세는 앞 단계 세금을 돌려받지 못해 원가에 남아요. 영세율은 매입세액까지 환급되니 한국 세금이 완전히 빠진 채 나가고, 수입국이 자기 세금을 매겨요(소비지국 과세).'],
+ ['폐업할 때 남은 재고는 자기에게 공급한 것으로 봄','공제받고 산 물건을 폐업 후 개인이 쓰면 최종소비자인데 세금을 안 낸 게 돼요. 그래서 그때 부가세를 다시 매겨요. 개인적 공급, 사업상 증여도 같은 이유예요.'],
+ ['수입하는 개인도 부가세 납세의무','국내에서 산 물건은 부가세를 내는데 해외에서 들여온 물건만 안 내면 국산품이 불리해져요. 그래서 사업자가 아니어도 수입하면 세관에서 걷어요.'],
+ ['용역의 수입은 과세대상이 아님, 대신 대리납부','해외 사업자에게 한국 세금을 걷기 어려우니, 그 용역을 받은 국내 사람(면세사업자 등 공제 못 받는 자)이 대신 내게 해요.'],
+ ['세금계산서가 없으면 매입세액 불공제','파는 쪽은 매출로, 사는 쪽은 매입으로 같은 계산서를 신고해요. 증빙을 공제 조건으로 걸어야 서로의 신고가 맞물려 탈세를 막을 수 있어요.'],
+ ['면세포기를 하면 3년간 다시 면세 불가','유리할 때만 과세·면세를 오가며 환급만 챙기는 걸 막으려는 거예요.'],
+ ['토지의 공급은 면세','토지는 새로 만들어지는 재화가 아니라서 부가가치가 생기지 않는다고 봐요. 반대로 건물 공급은 과세(국민주택 등 예외)예요.'],
+ ['사업의 포괄적 양도는 공급으로 보지 않음','사업 전체를 넘기면 받는 사람이 곧바로 매입세액을 공제받아요. 걷었다가 바로 돌려주는 셈이라 자금 부담만 생기니 아예 과세하지 않아요.'],
+ ['접대비(기업업무추진비), 비영업용 승용차는 불공제','사업 관련성은 있어도 개인 소비와 경계가 흐려서 정책적으로 공제를 막아 둔 항목이에요.'],
+ ['개별소비세는 열거된 물품에만 한 번','부가세는 모든 소비에 넓게, 개소세는 사치성 물품이나 사회적 비용이 큰 것에 추가로 매기는 세금이에요. 그래서 법에 열거된 것만, 제조장 반출이나 수입 때 한 번 걷어요.'],
+ ['맥주·탁주는 종량세, 소주·위스키는 종가세','가격에 매기면 고급 국산 맥주가 수입 맥주보다 불리해지는 문제가 있어서 맥주·탁주는 양 기준으로 바꿨어요.'],
+ ['간이과세 제도','장부 작성과 세금계산서 발급이 부담스러운 영세 사업자를 위해 계산을 단순화하고 세 부담을 줄여 준 거예요. 대신 매입세액은 일부만 반영돼요.'],
+ ['내국신용장·구매확인서로 공급하면 영세율','수출업자가 국내에서 원재료를 살 때 부가세를 냈다가 환급받기까지 자금이 묶여요. 수출용임이 서류로 확인되면 앞 단계부터 0%로 해 줘요.'],
+];
+$('#cards').innerHTML=WHY.map(([r,w],i)=>`<button class="card" aria-expanded="false" data-i="${i}"><span class="rule">${r}</span><span class="hint">이유를 말해 본 뒤 눌러서 확인</span><span class="why" hidden>${w}</span></button>`).join('');
+document.querySelectorAll('.card').forEach(c=>c.addEventListener('click',()=>{const o=c.getAttribute('aria-expanded')==='true';c.setAttribute('aria-expanded',!o);c.querySelector('.why').hidden=o;c.querySelector('.hint').hidden=!o}));
+
+/* O/X */
+const Q=[
+ ['과세대상','용역의 수입은 부가가치세 과세대상이다.',0,'과세대상은 재화의 공급, 용역의 공급, 재화의 수입 세 가지예요. 용역의 수입은 대리납부로 보완해요.'],
+ ['납세의무자','재화를 수입하는 개인은 사업자가 아니어도 부가가치세 납세의무가 있다.',1,'재화의 수입은 사업자 여부와 관계없이 수입하는 자가 납세의무자예요.'],
+ ['납세의무자','사업자는 영리 목적으로 재화나 용역을 공급하는 자에 한정된다.',0,'영리·비영리 관계없이 사업상 독립적으로 공급하면 사업자예요. 국가·지자체도 포함돼요.'],
+ ['영세율·면세','재화의 수출에는 부가가치세 면세가 적용된다.',0,'수출은 영세율이에요. 면세면 매입세액 환급이 안 돼서 앞 단계 세금이 남아요.'],
+ ['영세율·면세','면세사업자는 매입할 때 낸 부가가치세를 환급받을 수 있다.',0,'면세사업자는 부가세 체계 밖이라 매입세액 공제·환급이 안 돼요.'],
+ ['영세율·면세','주택과 그 부수토지의 임대는 면세, 상가 임대는 과세다.',1,'주거용 임대는 면세, 사업용 공간 임대는 10% 과세예요.'],
+ ['영세율·면세','토지의 공급은 부가가치세가 과세된다.',0,'토지 공급은 면세예요. 건물 공급은 원칙적으로 과세예요.'],
+ ['영세율·면세','가공되지 않은 국내산 채소는 면세다.',1,'미가공 식료품은 면세예요. 국산·외국산 모두 해당돼요.'],
+ ['영세율·면세','면세포기를 신고하면 언제든 다시 면세를 적용받을 수 있다.',0,'면세포기 후 3년간은 면세를 다시 적용받을 수 없어요.'],
+ ['영세율·면세','영세율이 적용되면 매입세액을 공제받아 세 부담이 완전히 없어진다.',1,'그래서 영세율을 완전면세, 면세를 부분면세라고 불러요.'],
+ ['영세율·면세','내국신용장에 의해 수출업자에게 공급하는 재화는 영세율을 적용받을 수 있다.',1,'수출용임이 내국신용장·구매확인서로 확인되면 국내 거래라도 영세율이에요.'],
+ ['과세표준','수입재화의 과세표준은 관세의 과세가격만으로 한다.',0,'관세과세가격 + 관세 + 개별소비세·주세·교육세·농특세·교통에너지환경세를 합한 금액이에요.'],
+ ['공급의 범위','사업의 포괄적 양도는 재화의 공급으로 보지 않는다.',1,'받는 쪽이 곧바로 공제받으니 과세 실익이 없어 공급으로 보지 않아요.'],
+ ['공급의 범위','질권 등 담보로 재화를 제공하는 것은 재화의 공급이다.',0,'담보 제공은 소유권이 넘어가는 게 아니라서 공급으로 보지 않아요.'],
+ ['공급의 범위','매입세액을 공제받은 재화를 폐업할 때까지 남겨두면 자기에게 공급한 것으로 본다.',1,'폐업 시 잔존재화는 공급의제예요. 매입세액 공제를 받은 재화만 해당돼요.'],
+ ['공급의 범위','사업자가 매입세액을 공제받은 재화를 개인적 용도로 쓰면 재화의 공급으로 본다.',1,'개인적 공급이에요. 공제받고 최종소비하는 걸 막으려는 거예요.'],
+ ['매입세액','기업업무추진비(접대비) 관련 매입세액은 공제된다.',0,'접대비 관련 매입세액은 불공제 항목이에요.'],
+ ['매입세액','비영업용 소형승용차의 구입·유지 관련 매입세액은 공제된다.',0,'불공제예요. 운수업·자동차 판매업 등 영업용은 예외예요.'],
+ ['매입세액','면세사업과 관련된 매입세액은 공제되지 않는다.',1,'면세사업에 쓴 매입세액은 불공제예요. 과세·면세 겸영이면 안분해요.'],
+ ['신고·납부','일반과세자의 제1기 과세기간은 1월 1일부터 6월 30일까지다.',1,'1기 1.1~6.30, 2기 7.1~12.31이에요.'],
+ ['신고·납부','확정신고는 각 과세기간이 끝난 후 25일 이내에 해야 한다.',1,'그래서 1기 확정신고는 7월 25일, 2기는 다음 해 1월 25일까지예요.'],
+ ['간이과세','간이과세자는 해당 연도 공급대가가 4,800만 원 미만이면 신고 의무도 없다.',0,'납부의무만 면제돼요. 신고는 해야 해요.'],
+ ['간이과세','간이과세 판정 기준금액은 직전 연도 공급가액(부가세 제외)이다.',0,'공급대가, 즉 부가세 포함 금액 기준이에요. 공급가액/공급대가 구분이 단골 함정이에요.'],
+ ['개별소비세','개별소비세는 모든 재화의 공급에 과세된다.',0,'법에 열거된 물품·장소·행위에만 과세해요.'],
+ ['개별소비세','수입물품의 개별소비세는 수입신고를 할 때 과세하며 세관장이 징수한다.',1,'관세와 함께 세관장이 부과·징수해요.'],
+ ['주세','맥주와 탁주에는 종량세가 적용된다.',1,'맥주·탁주·주정은 종량세, 소주·위스키·약주·청주·과실주 등은 종가세예요.'],
+ ['주세','주세는 소비자가 술을 구입할 때 과세한다.',0,'제조장에서 반출할 때, 수입은 수입신고할 때 과세해요.'],
+ ["공급시기", "현금판매·외상판매의 공급시기는 재화가 인도되는 때이다.", 1, "재화의 이동이 필요하면 인도되는 때, 이동이 필요 없으면 이용가능하게 되는 때예요."],
+ ["공급시기", "장기할부판매의 공급시기는 재화를 인도하는 때이다.", 0, "장기할부판매는 대가의 각 부분을 받기로 한 때가 공급시기예요."],
+ ["공급시기", "내국물품을 외국으로 반출하는 수출재화의 공급시기는 수출재화의 선(기)적일이다.", 1, "원칙은 선적일. 중계무역 등은 따로 정해요."],
+ ["공급시기", "용역의 공급시기는 역무의 제공이 완료되는 때 또는 시설물·권리 등 재화가 사용되는 때이다.", 1, "부가가치세법 제16조의 원칙이에요."],
+ ["세금계산서", "공급시기가 되기 전에 대가를 받고 그 대가에 대해 세금계산서를 발급하면 발급한 때를 공급시기로 본다.", 1, "선발급 세금계산서 특례예요."],
+ ["세금계산서", "법인사업자는 전자세금계산서를 발급해야 한다.", 1, "법인은 모두, 개인은 공급가액 기준 이상이면 의무예요."],
+ ["세금계산서", "전자세금계산서를 발급하면 발급일의 다음 날까지 국세청장에게 전송해야 한다.", 1, "전송기한은 발급일의 다음 날이에요."],
+ ["세금계산서", "거래처별로 1역월의 공급가액을 합해 그 달의 다음 달 10일까지 세금계산서를 발급할 수 있다.", 1, "월합계 세금계산서 특례예요."],
+ ["세금계산서", "영수증 발급 대상 업종이라도 공급받는 사업자가 요구하면 원칙적으로 세금계산서를 발급해야 한다.", 1, "목욕·이발·미용 등 일부 업종은 예외예요."],
+ ["사업자등록", "사업자는 사업장마다 사업개시일부터 20일 이내에 사업자등록을 신청해야 한다.", 1, "신규 사업자는 사업개시일 이전에도 신청할 수 있어요."],
+ ["사업자등록", "사업을 새로 시작하려는 자는 사업개시일 이전에는 사업자등록을 신청할 수 없다.", 0, "사업개시일 이전에도 신청할 수 있어요."],
+ ["납세지", "부가가치세는 원칙적으로 사업장마다 신고·납부한다.", 1, "사업장별 과세가 원칙이고, 주사업장 총괄납부와 사업자단위과세는 예외예요."],
+ ["과세표준", "공급받는 자에게 도달하기 전에 파손되거나 멸실된 재화의 가액은 공급가액에 포함하지 않는다.", 1, "애초에 공급되지 않은 것이라 빼요."],
+ ["과세표준", "대가의 지급이 늦어져 받는 연체이자는 공급가액에 포함한다.", 0, "연체이자는 공급가액에 포함하지 않아요."],
+ ["과세표준", "재화를 공급받는 자에게 금전으로 지급하는 판매장려금은 과세표준에서 공제하지 않는다.", 1, "금전 장려금은 차감하지 않고, 장려물품을 주면 그 자체가 공급이에요."],
+ ["과세표준", "대손금은 과세표준에서 공제한다.", 0, "과세표준에서 빼지 않고 대손세액공제로 처리해요."],
+ ["매입세액", "토지의 조성 등을 위한 자본적 지출과 관련된 매입세액은 공제되지 않는다.", 1, "토지는 면세라서 관련 매입세액도 불공제예요."],
+ ["매입세액", "사업자등록 신청 전 매입세액도 공급시기가 속하는 과세기간이 끝난 후 20일 이내에 등록을 신청하면 공제받을 수 있다.", 1, "등록 전 매입세액 공제 특례예요."],
+ ["영세율", "국외에서 공급하는 용역에는 영세율이 적용된다.", 1, "해외 건설공사 등이 대표 예예요."],
+ ["영세율", "비거주자나 외국법인인 사업자에게는 상호주의에 따라 영세율을 적용한다.", 1, "그 외국에서 우리나라 사업자에게 같은 면세를 해 줄 때 적용해요."],
+ ["면세", "도서·신문·잡지의 공급은 면세지만 광고는 과세다.", 1, "광고 용역은 과세예요."],
+ ["면세", "여객운송 용역은 항공기·고속버스·택시를 포함해 모두 면세다.", 0, "항공기, 고속버스, 전세버스, 택시 등은 과세예요. 일반 시내버스 등이 면세예요."],
+ ["면세", "의료보건 용역은 면세지만 미용 목적의 성형수술 등은 과세다.", 1, "쌍꺼풀·코성형 등 미용 목적 시술은 과세예요."],
+ ["간이과세", "직전 연도 공급대가가 4,800만 원 이상인 간이과세자는 원칙적으로 세금계산서를 발급해야 한다.", 1, "4,800만 원 미만이거나 신규 간이과세자는 영수증을 발급해요."],
+ ["개별소비세", "과세유흥장소의 유흥음식행위에 대한 개별소비세 세율은 유흥음식요금의 100분의 10이다.", 1, "유흥주점 등의 유흥음식요금 10%예요."],
+ ["개별소비세", "개별소비세 과세물품은 제조장에서 반출할 때 과세한다.", 1, "제조장 반출 시점에 과세하고, 수입은 수입신고 시 과세해요."]
+];
+let st=store.get('nk-quiz',{wrong:[],done:[]});
+let order=[],pos=0,answered=false,mode='all';
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function start(m){
+  mode=m;
+  order= m==='wrong'?shuffle([...st.wrong]):shuffle(Q.map((_,i)=>i));
+  pos=0;renderQ();
+}
+function stat(){
+  $('#qstat').textContent=`푼 문제 ${st.done.length}/${Q.length} · 틀린 문제 ${st.wrong.length}`;
+  $('#qbar').style.width=(st.done.length/Q.length*100)+'%';
+}
+function renderQ(){
+  stat();
+  const card=$('#qcard');
+  if(!order.length){card.innerHTML=`<p class="qtext">틀린 문제가 없어요.</p><div class="btnrow"><button class="btn" id="q-again">전체 섞어 풀기</button></div>`;$('#q-again').onclick=()=>start('all');return}
+  if(pos>=order.length){card.innerHTML=`<p class="qtext">${mode==='wrong'?'틀린 문제 복습':'한 바퀴'} 끝! 틀린 문제 ${st.wrong.length}개가 남았어요.</p><div class="btnrow"><button class="btn" id="q-w2">틀린 문제만 다시</button><button class="btn ghost" id="q-a2">전체 다시</button></div>`;$('#q-w2').onclick=()=>start('wrong');$('#q-a2').onclick=()=>start('all');return}
+  const i=order[pos],[t,q]=Q[i];answered=false;
+  card.innerHTML=`<span class="topic">${t} · ${pos+1}/${order.length}</span><p class="qtext">${q}</p>
+   <div class="ox"><button class="o" data-a="1" aria-label="맞다">O</button><button class="x" data-a="0" aria-label="틀리다">X</button></div><div id="qexp"></div>`;
+  card.querySelectorAll('.ox button').forEach(b=>b.addEventListener('click',()=>answer(i,+b.dataset.a,b)));
+}
+function answer(i,a,btn){
+  if(answered)return;answered=true;
+  const [,,ans,exp]=Q[i],ok=a===ans;
+  document.querySelectorAll('.ox button').forEach(b=>{b.disabled=true;if(+b.dataset.a===ans)b.classList.add('right')});
+  if(!ok)btn.classList.add('wrong');
+  if(!st.done.includes(i))st.done.push(i);
+  st.wrong=st.wrong.filter(x=>x!==i);if(!ok)st.wrong.push(i);
+  store.set('nk-quiz',st);stat();
+  $('#qexp').innerHTML=`<div class="exp"><b class="${ok?'r':'w'}">${ok?'정답':'오답'} · 답은 ${ans?'O':'X'}</b><br>${exp}</div><div class="btnrow" style="margin-top:10px"><button class="btn" id="q-next">다음</button></div>`;
+  $('#q-next').onclick=()=>{pos++;renderQ()};
+  $('#q-next').focus();
+}
+$('#q-all').onclick=()=>start('all');
+$('#q-wrong').onclick=()=>start('wrong');
+start('all');
+</script>
+
+</body></html>

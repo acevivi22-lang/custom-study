@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>관세법 지도</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<script>(function(){if(window.self===window.top)return;var r=document.documentElement;try{var t=parent.document.documentElement.getAttribute("data-theme");if(t)r.setAttribute("data-theme",t)}catch(e){}})();</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@600;900&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: 법전 목차처럼 장(章) 띠를 세로로 쌓고, 누르면 아래 시트에 핵심 조문. 플래시카드는 카드 한 장 + 엄지 닿는 하단 버튼 */
+:root{
+  color-scheme:light;
+  --bg:#eef1f4; --surface:#ffffff; --ink:#18212b; --muted:#5b6876; --line:#d5dbe2;
+  --accent:#1f4e79; --accent-soft:#dbe6f1; --stamp:#b3261e; --stamp-soft:#f6dedb; --ok:#1d6b45; --ok-soft:#d9eee2; --warn:#8a5a00; --warn-soft:#f6ead2;
+  --f-display:"Noto Serif KR","Nanum Myeongjo",serif;
+  --f-body:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#11161c; --surface:#19212a; --ink:#e6ebf0; --muted:#97a3b0; --line:#2c3743;
+  --accent:#7fb0e0; --accent-soft:#1e3247; --stamp:#f08a80; --stamp-soft:#3e211f; --ok:#7fd1a4; --ok-soft:#173226; --warn:#e8c070; --warn-soft:#3a2f17; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#11161c; --surface:#19212a; --ink:#e6ebf0; --muted:#97a3b0; --line:#2c3743;
+  --accent:#7fb0e0; --accent-soft:#1e3247; --stamp:#f08a80; --stamp-soft:#3e211f; --ok:#7fd1a4; --ok-soft:#173226; --warn:#e8c070; --warn-soft:#3a2f17; color-scheme:dark}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.6}
+[hidden]{display:none!important}
+button{font:inherit;color:inherit;touch-action:manipulation}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:760px;margin:0 auto;padding-block:14px 120px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;flex-direction:column;gap:14px}
+.seg{display:grid;grid-template-columns:1fr 1fr;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:4px;gap:4px}
+.seg button{border:0;background:transparent;border-radius:9px;padding:10px;font-weight:700;color:var(--muted);cursor:pointer;min-height:44px}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.lead{color:var(--muted);font-size:.9rem;margin:0}
+
+/* map */
+.chap{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.chap>button{width:100%;border:0;background:transparent;display:grid;grid-template-columns:3.2em 1fr auto;gap:10px;align-items:center;padding:14px;text-align:left;cursor:pointer;min-height:56px}
+.chap .no{font-family:var(--f-mono);font-weight:600;color:var(--stamp);font-size:.85rem}
+.chap .t{font-weight:700;line-height:1.35}
+.chap .t small{display:block;font-weight:400;color:var(--muted);font-size:.78rem;font-family:var(--f-mono)}
+.chap .cnt{font-family:var(--f-mono);font-size:.75rem;color:var(--accent);background:var(--accent-soft);border-radius:999px;padding:2px 8px;white-space:nowrap}
+.chap .nodes{display:flex;flex-wrap:wrap;gap:6px;padding:0 14px 14px}
+.node{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:8px 12px;font-size:.88rem;cursor:pointer;min-height:40px}
+.node .a{font-family:var(--f-mono);font-size:.72rem;color:var(--muted);margin-left:4px}
+.node.hot{border-color:var(--stamp)}
+.node.hot::after{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--stamp);margin-left:6px;vertical-align:2px}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:.78rem;color:var(--muted);align-items:center}
+.legend i{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--stamp);margin-right:4px;vertical-align:2px}
+
+/* sheet */
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:20}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;background:var(--surface);border-radius:18px 18px 0 0;max-height:78vh;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding:10px max(18px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-left,0px));box-shadow:0 -8px 30px rgba(0,0,0,.18)}
+@media (min-width:800px){.sheet{left:50%;transform:translateX(-50%);width:720px;bottom:24px;border-radius:18px}}
+.grab{width:40px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 10px}
+.sheet h2{font-family:var(--f-display);font-weight:900;font-size:1.3rem;margin:0;text-wrap:balance}
+.sheet .art{font-family:var(--f-mono);color:var(--stamp);font-size:.8rem}
+.sheet ul{margin:10px 0 0;padding-left:1.1em;display:flex;flex-direction:column;gap:6px}
+.sheet li{word-break:keep-all;overflow-wrap:anywhere}
+.sheet b{color:var(--accent)}
+.sheet .trap{margin-top:12px;background:var(--warn-soft);color:var(--ink);border-radius:8px;padding:10px 12px;font-size:.9rem}
+.sheet .trap strong{color:var(--warn)}
+.sheet .row{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:10px 14px;cursor:pointer;min-height:44px;font-weight:500}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--bg);font-weight:700}
+
+/* cards */
+.deckbar{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px;text-align:center}
+.stat .v{font-family:var(--f-mono);font-size:1.4rem;font-weight:600;font-variant-numeric:tabular-nums}
+.stat .k{font-size:.72rem;color:var(--muted);letter-spacing:.04em}
+.stat.due .v{color:var(--stamp)} .stat.new .v{color:var(--accent)} .stat.done .v{color:var(--ok)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;min-height:300px;display:flex;flex-direction:column;justify-content:center;gap:12px;padding:22px;text-align:center;cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:pan-y}
+.card .tag{font-family:var(--f-mono);font-size:.75rem;color:var(--muted)}
+.card .front{font-family:var(--f-display);font-weight:900;font-size:1.3rem;line-height:1.5;text-wrap:balance;word-break:keep-all}
+.card .back{border-top:1px dashed var(--line);padding-top:12px;font-size:1.08rem;font-weight:500;word-break:keep-all;overflow-wrap:anywhere}
+.card .back .ref{display:block;margin-top:6px;font-family:var(--f-mono);font-size:.75rem;color:var(--stamp);font-weight:500}
+.card .hint{font-size:.8rem;color:var(--muted)}
+.rate{position:fixed;left:0;right:0;bottom:0;z-index:10;background:var(--surface);border-top:1px solid var(--line);
+  padding:10px max(16px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.rate .in{max-width:760px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.rate button{border:0;border-radius:12px;padding:10px 4px;min-height:58px;cursor:pointer;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:2px}
+.rate button small{font-family:var(--f-mono);font-weight:500;font-size:.72rem;opacity:.8}
+.r1{background:var(--stamp-soft);color:var(--stamp)} .r2{background:var(--warn-soft);color:var(--warn)} .r3{background:var(--ok-soft);color:var(--ok)} .r4{background:var(--accent-soft);color:var(--accent)}
+.rate .show{grid-column:1/-1;background:var(--ink);color:var(--bg);min-height:52px;font-size:1rem}
+.empty{color:var(--muted);text-align:center;padding:30px 10px}
+.tools{display:flex;gap:8px;flex-wrap:wrap;justify-content:space-between;align-items:center}
+.tools .note{font-size:.78rem;color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){.sheet{animation:up .22s ease-out}@keyframes up{from{transform:translateY(30px);opacity:.6}}}
+@media (prefers-reduced-motion:no-preference) and (min-width:800px){.sheet{animation:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="seg" role="group" aria-label="보기 선택">
+    <button type="button" id="v-map" aria-pressed="true">구조 지도</button>
+    <button type="button" id="v-card" aria-pressed="false">플래시카드</button>
+  </div>
+
+  <section id="mapv">
+    <div class="wrap" style="padding:0;gap:10px">
+      <p class="lead">관세법 13개 장을 법전 순서대로 놓았어요. 장을 누르면 핵심 조문이 펼쳐지고, 조문을 누르면 숫자·함정·관련 기출이 아래에서 올라와요.</p>
+      <div class="legend"><span><i></i>최근 3년 1차 기출에 자주 나온 조문</span></div>
+      <div id="chaps" style="display:flex;flex-direction:column;gap:10px"></div>
+    </div>
+  </section>
+
+  <section id="cardv" hidden>
+    <div class="wrap" style="padding:0;gap:12px">
+      <div class="deckbar">
+        <div class="stat due"><div class="v" id="s-due">0</div><div class="k">복습할 카드</div></div>
+        <div class="stat new"><div class="v" id="s-new">0</div><div class="k">오늘 새 카드</div></div>
+        <div class="stat done"><div class="v" id="s-done">0</div><div class="k">익힌 카드</div></div>
+      </div>
+      <div class="card" id="card" role="button" tabindex="0" aria-live="polite"></div>
+      <div class="tools">
+        <span class="note">카드를 누르거나 스페이스로 뒤집기 · 1~4로 평가</span>
+        <button type="button" class="btn" id="reset" style="min-height:36px;padding:6px 12px;font-size:.82rem">카드 기록 초기화</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sh-t" hidden></div>
+<div class="rate" id="rate" hidden><div class="in" id="rate-in"></div></div>
+
+<script src="gichul-data.js"></script>
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const get=(k,d)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}};
+const put=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+
+/* ---------- 관세법 구조 ---------- */
+const CH=[
+ {no:"1장",t:"총칙",a:"제1조~제13조",n:[
+  {t:"용어의 정의",a:"제2조",k:["용어의 정의","용어에 관한","외국물품인 것","탁송품"],p:["<b>수입</b>: 외국물품을 우리나라에 반입(보세구역 경유 시 보세구역에서 반입)하거나 우리나라에서 소비·사용","<b>반송</b>: 국내 도착 외국물품이 수입통관절차를 <b>거치지 않고</b> 다시 외국으로 반출","<b>내국물품</b>: 우리나라 물품으로 외국물품 아닌 것, 우리 선박이 공해에서 포획한 수산물, 입항전수입신고 수리 물품, 수입신고 수리 전 반출승인 물품, 즉시반출 물품","<b>탁송품</b>: 상업서류·견본품 등을 휴대 반출입 업자에게 위탁해 <b>우리나라에 반입</b>하는 물품"],trap:"'반송은 수입통관절차를 거쳐 반출'·'탁송품은 외국으로 반출'처럼 방향과 절차를 뒤집는 지문이 매년 나온다."},
+  {t:"기간과 기한",a:"제8조",k:["기간과 기한","기간을 계산"],p:["수입신고수리전 반출승인을 받으면 그 <b>승인일</b>을 수리일로 본다","기한이 공휴일·토요일이면 <b>그 다음 날</b>이 기한","국가관세종합정보시스템 장애로 신고 불가 시 <b>장애 복구일의 다음 날</b>이 기한"],trap:"'그 전날', '복구된 날' 같은 하루 차이 함정."},
+  {t:"관세의 납부기한",a:"제9조",k:["납부기한","월별납부"],p:["신고납부: 수입신고 <b>수리일부터 15일</b> 이내","납부고지: 고지를 <b>받은 날부터 15일</b> 이내","즉시반출: 수입신고일부터 15일 이내","월별납부: 승인 유효기간은 승인일부터 <b>2년</b>이 되는 날이 속하는 달의 말일까지"]},
+  {t:"천재지변 등 기한연장",a:"제10조",k:["기한을 연장","기한연장"],p:["천재지변 등 사유로 신고·신청·납부를 못하면 <b>1년</b>을 넘지 않는 기간에서 연장"]}
+ ]},
+ {no:"2장",t:"과세가격과 관세의 부과·징수",a:"제14조~제48조",n:[
+  {t:"과세물건 확정시기",a:"제16조",k:["확정의 시기","확정시기"],p:["원칙: <b>수입신고를 하는 때</b>","우편물: 통관우체국에 도착한 때","도난·분실물품: 도난되거나 분실된 때","보세운송기간 경과: 보세운송을 신고하거나 승인받은 때","즉시반출: 즉시반출신고를 한 때","매각물품: 매각된 때"],trap:"예외 시점끼리 바꿔 끼우는 지문(수취인 주소지 도착, 회수된 때 등)."},
+  {t:"적용법령·환율",a:"제17조·제18조",k:["적용 법령","환율"],p:["적용법령: <b>수입신고 당시</b>의 법령(예외 시점은 그때 법령)","과세환율: 수입신고일이 속하는 주의 <b>전주</b> 기준환율 평균을 기초로 관세청장이 정함"]},
+  {t:"납세의무자",a:"제19조",k:["납세의무자","연대하여"],p:["원칙: 수입신고 시의 <b>화주</b>","대행수입에서 화주 불분명: 수입을 <b>위탁한 자</b>","우편물: 수취인, 도난·분실 보세운송물품: 보세운송 신고·승인을 받은 자","공동사업 물품: 공동사업자 연대납부"],trap:"'위탁받은 자'로 바꾼 지문 주의."},
+  {t:"제척기간·소멸시효",a:"제21조~제23조",k:["제척기간","소멸시효"],p:["부과 제척기간 <b>5년</b>(부정행위 10년)","징수권 소멸시효: 5억원 이상 <b>10년</b>, 그 외 <b>5년</b>","환급청구권 소멸시효 <b>5년</b>","분할납부·징수유예 기간 중에는 시효가 진행하지 않음"]},
+  {t:"납세담보",a:"제24조~제26조",k:["납세담보","담보물","담보의 종류"],p:["종류: 금전, 국채·지방채, 유가증권, 납세보증보험증권, 토지, 보험 든 건물·공장재단 등, 보증인의 납세보증서","보증보험증권·보증서: 세관장 요청 시 언제든 지급한다는 내용이어야","포괄담보 제공 가능, 충당 후 잔액은 보증인에게 반환"]},
+  {t:"과세가격 결정",a:"제30조~제35조",k:["과세가격","거래가격","특수관계","권리사용료"],p:["순서: 제1(거래가격) → 제2(동종·동질) → 제3(유사) → 제4(국내판매가격) → 제5(산정가격) → 제6(합리적 기준)","제4·제5는 납세의무자 요청 시 순서 교체","가산: 수수료·중개료(구매수수료 제외), 용기·포장비, 생산지원, 권리사용료, 사후귀속이익, 운임·보험료","특수관계: 의결권 주식 <b>5%</b> 이상 등"],trap:"특수관계 3%·구매수수료 가산 등 숫자·항목 바꾸기."},
+  {t:"신고납부·보정·경정",a:"제38조~제38조의3",k:["보정","경정청구","수정신고","세액심사"],p:["세액심사는 원칙적으로 수리 후, 감면·분할납부 물품 등은 수리 전","보정신청: 신고납부한 날부터 <b>6개월</b> 이내","경정청구: 최초 신고납부한 날부터 <b>5년</b> 이내"]},
+  {t:"부과고지·징수 최저한",a:"제39조·제40조",k:["부과고지","최저한"],p:["부과고지 대상: 여행자 휴대품·별송품, 우편물, 법령상 세관장 부과 물품, 수리 전 가동된 보세건설장 시설 등","징수 최저한: <b>1만원</b> 미만이면 징수 안 함(수리일을 납부일로 봄)"]},
+  {t:"가산세",a:"제42조",k:["가산세"],p:["과소신고: 부족세액의 <b>10%</b> + 이자상당액","부정행위: 부족세액의 <b>40%</b>"]}
+ ]},
+ {no:"3장",t:"세율과 품목분류",a:"제49조~제87조",n:[
+  {t:"세율 적용 우선순위",a:"제50조",k:["적용 순위","우선하여 적용"],p:["1순위: 덤핑방지·상계·보복·긴급관세 등","국제협력관세·편익관세: 기본·잠정세율보다 <b>낮을 때만</b> 우선","할당·계절관세 인하분: 일반특혜관세보다 낮을 때만 우선"]},
+  {t:"덤핑방지관세",a:"제51조~제56조",k:["덤핑"],p:["정상가격과 덤핑가격의 <b>차액 이하</b>로 부과","조치 효력: 시행일부터 <b>5년</b>"]},
+  {t:"상계관세",a:"제57조~제62조",k:["상계관세","보조금"],p:["수출국 보조금·장려금을 받은 물품","조치 효력: <b>5년</b>(기획재정부령으로 따로 정하면 그에 따름)"]},
+  {t:"긴급관세",a:"제65조~제67조",k:["긴급관세"],p:["부과기간 <b>4년</b> 이내, 연장 포함 총 <b>8년</b> 이내","잠정긴급관세 <b>200일</b> 초과 불가","부과조치 결정 시행일 이후 수입 물품에만 적용"]},
+  {t:"할당·계절·조정관세",a:"제69조~제72조",k:["할당관세","계절관세","조정관세"],p:["할당관세: 기본세율에서 <b>40%p</b> 범위 인하(수량 초과분은 40%p 범위 가산 가능)","계절관세: 계절 가격차가 큰 물품, 국내외 가격차 범위에서 올리거나 40% 범위에서 내림"]},
+  {t:"국제협력·편익관세",a:"제73조·제74조",k:["국제협력관세","편익관세","양허"],p:["양허 한도: 기본관세율의 <b>100분의 50</b> 범위","양허한 농림축산물 가격 하락 시 양허세율 초과 부과 가능"]},
+  {t:"간이·합의·용도세율",a:"제81조~제83조",k:["간이세율","합의세율","용도세율"],p:["간이세율: 여행자 휴대품, 우편물, 탁송품·별송품 등","제외: 종량세 물품, 고가품, 감면·무세 물품, 수출용원재료 등","합의세율: 일괄 신고 물품 중 <b>가장 높은</b> 세율"]},
+  {t:"품목분류 사전심사",a:"제86조",k:["사전심사","품목분류"],p:["관세청장이 <b>30일</b> 이내 통지","재심사 신청: 통지받은 날부터 <b>30일</b> 이내 → 60일 이내 통지","반려: <b>동일</b> 물품 이미 수출입신고, 불복·소송 진행 중, 보정 미이행 등"]}
+ ]},
+ {no:"4장",t:"감면·환급·분할납부",a:"제88조~제109조",n:[
+  {t:"외교관용·정부용품 면세",a:"제88조·제92조",k:["외교관","정부용품"],p:["외교관용: 외국 공관 업무용품, 대사·가족 사용품, 정부와 사업계약한 외국계약자 업무용품 등","재외공관 반환 공용품은 정부용품 면세(제92조)"]},
+  {t:"소액물품 면세",a:"제94조",k:["소액물품"],p:["거주자가 받는 자가사용 물품: 물품가격 미화 <b>150달러</b> 이하","상업용 견본품 등"]},
+  {t:"재수출면세·재수출감면",a:"제97조·제98조",k:["재수출"],p:["재수출면세: 수리일부터 <b>1년</b> 범위","재수출감면 감면율: 6개월 85% · 1년 70% · 2년 55% · 3년 40% · 4년 30%","재수출면세 미수출 가산세: 500만원 한도, 관세의 20%"],trap:"감면율 표를 한 칸씩 밀어 내는 지문."},
+  {t:"감면 사후관리",a:"제102조·영 제129조",k:["사후관리","용도외","반입하여야"],p:["감면 신청은 원칙적으로 수리 전","감면·분할납부 물품: 수리일부터 <b>1개월</b> 이내 설치장소 반입","사후관리기간: 세율×감면율 3% 이하 1년, 3%초과 7%이하 2년 범위"]},
+  {t:"분할납부",a:"제107조",k:["분할납부"],p:["천재지변 등: 1년 범위 분할납부","특정 물품(정부·지자체 수입 등) 5년 범위"]}
+ ]},
+ {no:"5장",t:"납세자의 권리·불복",a:"제110조~제132조",n:[
+  {t:"관세조사",a:"제110조~제118조",k:["관세조사","통합하여 조사","권리헌장"],p:["사전통지: 조사 시작 <b>15일 전</b>","통합조사가 원칙(긴급 조사 필요 시 특정 분야만 가능)","변호사·관세사 조사 참여 가능","과세전통지 생략: 제척기간이 통지일부터 <b>3개월 이내</b> 만료 등"]},
+  {t:"심사청구·심판청구·이의신청",a:"제119조~제132조",k:["심사청구","심판청구","이의신청","대리인"],p:["청구 기간: 처분을 <b>안 날</b>부터 <b>90일</b>","심사청구: 세관장 거쳐 관세청장, 세관장은 7일 내 송부","결정: <b>90일</b> 이내","대리인 해임은 서면으로 신고"]}
+ ]},
+ {no:"6장",t:"운송수단",a:"제133조~제152조",n:[
+  {t:"국제항",a:"제133조~제134조",k:["국제항"],p:["대통령령으로 지정","항구 기준: 5천톤급 이상 국제무역선 연 <b>50회</b> 이상 입항","국제항 외 출입 허가수수료 총액 <b>50만원</b> 한도"]},
+  {t:"입출항·하역·환적",a:"제135조~제146조",k:["입항","출항","하역","적재화물목록"],p:["입항보고, 출항허가, 국제항 바깥 하역·환적은 허가","군함·군용기, 국가원수 전용 선박·항공기는 국제무역선 규정 준용 안 함"]}
+ ]},
+ {no:"7장",t:"보세구역",a:"제154조~제212조",n:[
+  {t:"보세구역의 종류",a:"제154조",k:["보세구역"],p:["지정보세구역: 지정장치장, 세관검사장(세관장 지정)","특허보세구역: 보세창고·보세공장·보세전시장·보세건설장·보세판매장","종합보세구역: 관세청장이 지정"]},
+  {t:"지정장치장·세관검사장",a:"제169조~제173조",k:["지정장치장","세관검사장"],p:["지정장치장 장치기간 <b>6개월</b> 범위(3개월 연장)","세관검사장은 <b>세관장</b>이 지정"]},
+  {t:"특허보세구역",a:"제174조~제182조",k:["특허보세구역","특허기간","반입정지","보세창고"],p:["특허기간 <b>10년</b> 이내(보세전시장·건설장 제외)","보세창고 외국물품 장치기간 1년 범위","보세판매장 특허수수료: 매출액 구간별(1조원 초과분 1만분의 100)"]},
+  {t:"종합보세구역",a:"제197조~제205조",k:["종합보세구역"],p:["관세청장이 직권 또는 신청으로 지정","외국물품 반입·반출은 세관장에게 신고"]},
+  {t:"장치기간경과물품 매각",a:"제208조~제212조",k:["매각","장치기간경과"],p:["매각 방법: 일반경쟁입찰·지명경쟁입찰·수의계약·경매·위탁판매","매각대금 충당 순서는 조문 확인"]}
+ ]},
+ {no:"8장",t:"운송",a:"제213조~제225조",n:[
+  {t:"보세운송",a:"제213조~제220조",k:["보세운송"],p:["화주 명의로도 신고 가능","수출신고 수리 물품은 관세청장이 정하는 것 외에는 보세운송절차 생략","세관장이 담보 제공 요구 가능"]},
+  {t:"내국운송·보세운송업자",a:"제221조~제225조",k:["내국운송","보세운송업자"],p:["내국물품을 국제무역선·기로 운송하려면 내국운송 신고","보세운송업자 등 등록, 효력 상실 사유: 해산, 등록취소 등"]}
+ ]},
+ {no:"9장",t:"통관",a:"제226조~제261조",n:[
+  {t:"원산지",a:"제229조~제233조",k:["원산지"],p:["완전생산기준 + 실질적변형기준","원산지증명서: 제출일부터 소급 <b>1년</b> 이내 발행","과세가격 <b>15만원</b> 이하는 제출 면제"]},
+  {t:"통관의 제한·보류",a:"제234조~제237조",k:["지식재산권","통관 보류","통관의 보류"],p:["지식재산권 침해물품 통관 보류·유치 요청","통관 보류 사유: 신고 서류 미비, 법령 위반, 체납 등"]},
+  {t:"수출·수입·반송 신고",a:"제241조~제243조",k:["수입신고","수출신고","신고하여야","241조"],p:["관세청장이 정하는 보세구역 반입 물품: 반입일부터 <b>30일</b> 이내 신고, 위반 시 과세가격 2% 범위 가산세","여행자 휴대품 신고 불이행: 납부세액의 <b>40%</b>(반복 60%)","신고사항: 품명·규격·수량·가격, 장치장소, 원산지표시 등"]},
+  {t:"입항전수입신고·즉시반출",a:"제244조·제253조",k:["입항전수입신고","즉시반출"],p:["입항전신고: 선박 입항 <b>5일</b> 전, 항공기 <b>1일</b> 전부터","입항전신고 물품은 우리나라에 도착한 것으로 봄","즉시반출 후 <b>10일</b> 이내 수입신고"]},
+  {t:"우편물",a:"제256조~제261조",k:["우편물"],p:["통관우체국 경유, 관세청장이 지정","세관장 결정은 <b>통관우체국의 장</b>에게 통지","반송되면 납세의무 소멸","사전전자정보는 입항 <b>전</b> 제출"]},
+  {t:"전자상거래물품 특별통관",a:"제254조",k:["전자상거래"],p:["관세청장이 특별통관 대상 업체·물품, 신고 방법, 납부방법 등을 따로 정함"]}
+ ]},
+ {no:"10장",t:"세관공무원의 자료 제출 요청 등",a:"제262조~제267조의2",k2:true,n:[
+  {t:"과세자료 요청·마약류 정보",a:"제264조 등",k:["과세자료","마약류"],p:["관계 기관에 과세자료 요청, 비밀유지의무 위반은 징역·벌금 병과 가능","마약류 위치정보 수집 주체는 관세청장"]}
+ ]},
+ {no:"11장",t:"벌칙",a:"제268조의2~제282조",n:[
+  {t:"밀수출입죄",a:"제269조",k:["밀수출입"],p:["밀수입: 5년 이하 징역 또는 관세액 10배와 물품원가 중 높은 금액 이하 벌금","다른 물품으로 신고하여 수입도 같은 처벌","신고 없이 수출·반송: 3년 이하 징역 또는 물품원가 이하 벌금"]},
+  {t:"관세포탈죄 등",a:"제270조",k:["관세포탈","포탈죄"],p:["과세가격·관세율 거짓 신고 수입(구매대행업자 포함)","부정 감면·부정 환급, 수입제한 회피 부분품 수입 등","밀수출입죄와 함께 교사·방조·미수·예비 처벌(제271조)"]},
+  {t:"과태료",a:"제277조",k:["과태료"],p:["질문 거짓 진술, 보고 거짓, 물품 제시 거부 등","부정 적재화물목록 작성은 벌금형(과태료 아님)"]}
+ ]},
+ {no:"12장",t:"조사와 처분",a:"제283조~제319조",n:[
+  {t:"관세범 조사",a:"제283조~",k:["관세범"],p:["조사·처분은 세관공무원","여성 신변수색 시 성년 여성 참여","압수는 '할 수 있다'"]},
+  {t:"통고처분",a:"제311조",k:["통고처분"],p:["벌금 상당액: 최고액의 <b>30%</b>(물품원가 기준 시 30%)","자진납부·자수 등은 <b>50%</b> 범위 감경"]}
+ ]},
+ {no:"13장",t:"보칙",a:"제320조~제330조",n:[
+  {t:"사업 허가 제한",a:"제326조",k:["허가등의 제한","체납하고"],p:["관세 등 <b>3회</b> 이상 체납 + 합계 <b>500만원</b> 이상이면 사업정지·허가취소 요구"]},
+  {t:"청문·출국금지",a:"제328조 등",k:["청문","출국금지"],p:["청문 대상 처분 목록 암기(지정보세구역 지정취소 등)","체납 관세 <b>5천만원</b> 미만이 되면 출국금지 해제 요청"]}
+ ]}
+];
+const LAWQ=(window.Q1||[]).filter(q=>q.s==="law");
+const qtext=q=>[...q.q.map(([t,v])=>t==="p"?v:v.join(" ")),...q.o].join(" ");
+function related(node){
+  return LAWQ.filter(q=>node.k.some(k=>qtext(q).includes(k)));
+}
+function renderMap(){
+  $("#chaps").innerHTML=CH.map((c,ci)=>{
+    const total=c.n.reduce((s,n)=>s+related(n).length,0);
+    return `<div class="chap"><button type="button" aria-expanded="false" data-ch="${ci}"><span class="no">${c.no}</span><span class="t">${esc(c.t)}<small>${c.a}</small></span><span class="cnt">기출 ${total}</span></button>
+      <div class="nodes" hidden>${c.n.map((n,ni)=>{const r=related(n).length;return `<button type="button" class="node ${r>=4?"hot":""}" data-node="${ci}.${ni}">${esc(n.t)}<span class="a">${n.a}</span></button>`}).join("")}</div></div>`}).join("");
+}
+function openSheet(ci,ni){
+  const n=CH[ci].n[ni], rel=related(n);
+  $("#sheet").innerHTML=`<div class="grab"></div><div class="art">${CH[ci].no} ${esc(CH[ci].t)} · ${n.a}</div><h2 id="sh-t">${esc(n.t)}</h2>
+   <ul>${n.p.map(x=>`<li>${x}</li>`).join("")}</ul>
+   ${n.trap?`<div class="trap"><strong>함정 주의</strong> ${esc(n.trap)}</div>`:""}
+   <div class="row">${rel.length?`<button type="button" class="btn primary" data-drill="${ci}.${ni}">관련 기출 ${rel.length}문제 풀기</button>`:""}<button type="button" class="btn" data-close>닫기</button></div>`;
+  $("#sheet").hidden=false;$("#scrim").hidden=false;$("#sheet").scrollTop=0;
+  $("#sheet").querySelector("button")?.focus();
+}
+function closeSheet(){$("#sheet").hidden=true;$("#scrim").hidden=true}
+$("#scrim").onclick=closeSheet;
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeSheet()});
+// swipe down to close
+(function(){let y0=null;const sh=$("#sheet");
+ sh.addEventListener("touchstart",e=>{if(sh.scrollTop<=0)y0=e.touches[0].clientY},{passive:true});
+ sh.addEventListener("touchmove",e=>{if(y0!==null&&e.touches[0].clientY-y0>90){y0=null;closeSheet()}},{passive:true});
+ sh.addEventListener("touchend",()=>{y0=null});})();
+
+document.addEventListener("click",e=>{
+  const b=e.target.closest("button");if(!b)return;
+  if(b.dataset.ch!==undefined){const nodes=b.nextElementSibling;const open=nodes.hidden;nodes.hidden=!open;b.setAttribute("aria-expanded",open);return}
+  if(b.dataset.node){const [c,n]=b.dataset.node.split(".").map(Number);openSheet(c,n);return}
+  if(b.hasAttribute("data-close")){closeSheet();return}
+  if(b.dataset.drill){
+    const [c,n]=b.dataset.drill.split(".").map(Number);
+    const ids=related(CH[c].n[n]).map(q=>q.id);
+    put("gc-drill",{label:CH[c].n[n].t,ids});
+    try{parent.location.hash="gc1"}catch(_){location.href="gichul.html"}
+    closeSheet();return}
+});
+
+/* ---------- 플래시카드 (간격 반복) ---------- */
+const CARDS=[
+ ["신고납부한 관세의 납부기한은?","수입신고 수리일부터 15일 이내","제9조"],
+ ["납부고지를 받은 관세의 납부기한은?","납부고지를 받은 날부터 15일 이내","제9조"],
+ ["수입신고전 즉시반출한 물품의 관세 납부기한은?","수입신고일부터 15일 이내","제9조"],
+ ["월별납부 승인의 유효기간은?","승인일부터 2년이 되는 날이 속하는 달의 말일까지","제9조"],
+ ["관세법상 기한이 공휴일이면?","그 다음 날이 기한","제8조"],
+ ["전산 장애로 기한까지 신고하지 못하면 기한은?","장애가 복구된 날의 다음 날","제8조"],
+ ["천재지변 등에 따른 기한연장 한도는?","1년을 넘지 않는 기간","제10조"],
+ ["과세물건 확정시기의 원칙은?","수입신고를 하는 때","제16조"],
+ ["우편물의 과세물건 확정시기는?","통관우체국에 도착한 때","제16조"],
+ ["도난·분실물품의 과세물건 확정시기는?","도난되거나 분실된 때","제16조"],
+ ["매각되는 물품의 과세물건 확정시기는?","해당 물품이 매각된 때","제16조"],
+ ["관세 부과에 적용하는 법령의 원칙은?","수입신고 당시의 법령","제17조"],
+ ["과세가격 환산 환율은?","수입신고일이 속하는 주의 전주 기준환율 평균을 기초로 관세청장이 정한 율","제18조"],
+ ["대행수입 물품의 화주가 불분명하면 납세의무자는?","수입을 위탁한 자","제19조"],
+ ["관세 부과 제척기간은?","5년 (부정한 방법이면 10년)","제21조"],
+ ["관세징수권 소멸시효는?","5억원 이상 10년, 그 외 5년","제22조"],
+ ["관세환급청구권 소멸시효는?","5년","제22조"],
+ ["법률 개정으로 환급하는 경우 환급청구권 소멸시효 기산일은?","그 법률의 시행일","영 제7조"],
+ ["보정신청 기간은?","신고납부한 날부터 6개월 이내","제38조의2"],
+ ["경정청구 기간은?","최초 신고납부한 날부터 5년 이내","제38조의3"],
+ ["징수금액의 최저한은?","1만원 미만 (수리일을 납부일로 봄)","영 제37조"],
+ ["과소신고 가산세율은?","부족세액의 10% + 이자상당액, 부정행위는 40%","제42조"],
+ ["세관장이 요청하면 언제든 지급한다는 내용이어야 하는 담보 2가지는?","납세보증보험증권, 보증인의 납세보증서","영 제10조"],
+ ["과세가격 결정방법 6가지 순서는?","거래가격 → 동종·동질 → 유사물품 → 국내판매가격 → 산정가격 → 합리적 기준","제30조~제35조"],
+ ["제4방법과 제5방법의 순서를 바꿀 수 있는 경우는?","납세의무자가 요청할 때","제35조"],
+ ["과세가격 가산요소 중 가산하지 않는 수수료는?","구매수수료","제30조"],
+ ["특수관계가 되는 주식 소유 비율은?","의결권 있는 주식 5% 이상","영 제23조"],
+ ["권리사용료 가산 요건 2가지는?","해당 물품에 관련 + 거래조건으로 지급","영 제19조"],
+ ["덤핑방지관세 부과 한도는?","정상가격과 덤핑가격의 차액 이하","제51조"],
+ ["덤핑방지조치·상계조치의 효력 기간은?","시행일부터 5년","제56조·제62조"],
+ ["긴급관세 부과기간과 총 적용기간은?","4년 이내, 연장 포함 총 8년 이내","제66조"],
+ ["잠정긴급관세 최대 기간은?","200일","제66조"],
+ ["할당관세 인하 폭은?","기본세율에서 100분의 40 범위","제71조"],
+ ["국제협력관세 양허 한도는?","기본관세율의 100분의 50 범위","제73조"],
+ ["합의세율은 어떤 세율을 적용?","일괄 신고 물품 중 가장 높은 세율","제82조"],
+ ["간이세율을 적용하지 않는 대표 물품은?","종량세 물품, 고가품, 감면·무세 물품, 수출용원재료","영 제96조"],
+ ["세율 적용 1순위 그룹은?","덤핑방지·상계·보복·긴급관세 등","제50조"],
+ ["품목분류 사전심사 결과 통지 기한은?","신청일부터 30일 이내","제86조"],
+ ["품목분류 재심사 신청 기한은?","통지를 받은 날부터 30일 이내","제86조"],
+ ["소액물품 면세 기준은?","물품가격 미화 150달러 이하 자가사용 물품","규칙 제45조"],
+ ["재수출면세 기간은?","수입신고 수리일부터 1년 범위","제97조"],
+ ["재수출감면 감면율(6개월/1년/2년/3년/4년)은?","85% / 70% / 55% / 40% / 30%","제98조"],
+ ["재수출면세 물품 미수출 가산세는?","관세의 20%, 500만원 한도","제97조"],
+ ["감면·분할납부 승인 물품의 설치장소 반입 기한은?","수입신고 수리일부터 1개월 이내","영 제129조"],
+ ["관세 감면 신청 시기의 원칙은?","수입신고 수리 전","영 제112조"],
+ ["관세조사 사전통지 기한은?","조사 시작 15일 전","제114조"],
+ ["과세전통지를 생략할 수 있는 제척기간 요건은?","통지하려는 날부터 3개월 이내에 제척기간 만료","제118조"],
+ ["심사청구·이의신청·심판청구 기간은?","처분을 안 날부터 90일 이내","제121조"],
+ ["심사청구 결정 기한은?","청구를 받은 날부터 90일 이내","제127조"],
+ ["심사청구서를 받은 세관장의 송부 기한은?","7일 이내 의견서 첨부해 관세청장에게","제122조"],
+ ["국제항 지정 기준(항구)은?","5천톤급 이상 국제무역선 연 50회 이상 입항","제133조·시행령"],
+ ["국제항 외 출입 허가수수료 총액 한도는?","50만원","제134조·시행규칙"],
+ ["국제무역선 규정을 준용하지 않는 것은?","군함·군용기, 국가원수 전용 선박·항공기","제146조"],
+ ["지정보세구역 2가지는?","지정장치장, 세관검사장","제154조"],
+ ["세관검사장 지정권자는?","세관장","제171조"],
+ ["지정장치장 장치기간은?","6개월 범위(3개월 연장)","제170조"],
+ ["특허보세구역 특허기간은?","10년 이내 (보세전시장·보세건설장 제외)","제176조"],
+ ["종합보세구역 지정권자는?","관세청장","제197조"],
+ ["장치기간경과물품 매각 방법 5가지는?","일반경쟁입찰, 지명경쟁입찰, 수의계약, 경매, 위탁판매","제210조"],
+ ["관세청장이 정한 보세구역 반입 물품의 신고 기한은?","반입일부터 30일 이내 (위반 시 과세가격 2% 범위 가산세)","제241조"],
+ ["여행자 휴대품 신고 불이행 가산세는?","납부세액의 40% (반복 60%)","제241조"],
+ ["입항전수입신고 시작 시점은?","선박 입항 5일 전, 항공기 1일 전","영 제249조"],
+ ["즉시반출 후 수입신고 기한은?","반출일부터 10일 이내","제253조"],
+ ["관세청장이 정한 보세구역 수리 물품의 반출 기한은?","수입신고 수리일부터 15일 이내","제157조의2"],
+ ["원산지증명서 유효 요건은?","제출일부터 소급해 1년 이내 발행","영 제236조"],
+ ["원산지증명서 제출 면제 과세가격은?","15만원 이하","영 제236조"],
+ ["우편물 통관 결정은 누구에게 통지?","통관우체국의 장","제259조"],
+ ["우편물이 반송되면 납세의무는?","소멸한다","제261조"],
+ ["밀수입죄 법정형은?","5년 이하 징역 또는 관세액 10배와 물품원가 중 높은 금액 이하 벌금","제269조"],
+ ["신고 없이 수출·반송한 자의 법정형은?","3년 이하 징역 또는 물품원가 이하 벌금","제269조"],
+ ["교사·방조·미수·예비를 모두 처벌하는 죄는?","밀수출입죄, 관세포탈죄 등","제271조"],
+ ["통고처분 벌금 상당액은?","벌금 최고액의 30% (자진납부 등은 50% 범위 감경)","영 제270조의2"],
+ ["사업 허가 제한 요건은?","관세 등 3회 이상 체납 + 합계 500만원 이상","제326조"],
+ ["출국금지 해제를 즉시 요청해야 하는 체납액 기준은?","5천만원 미만","영 제?"],
+ ["FTA 칠레 원산지증명서 유효기간은?","서명일부터 2년","FTA특례법 시행령"],
+ ["EFTA 회원국 4개국은?","스위스, 노르웨이, 아이슬란드, 리히텐슈타인","FTA특례법"],
+ ["FTA 협정관세 사후적용 신청 기한은?","수입신고 수리일부터 1년 이내","FTA특례법 제9조"]
+].map(([f,b,r],i)=>({id:"c"+i,f,b,r:r.replace("영 제?","관세법 시행령")}));
+const NEW_PER_DAY=20;
+const DAY=86400000;
+let srs=get("law-srs",{}); // id -> {due, ivl, ease, reps}
+let seenToday=get("law-srs-day",{d:"",n:0});
+const today=()=>new Date().toISOString().slice(0,10);
+if(seenToday.d!==today())seenToday={d:today(),n:0};
+let current=null, flipped=false;
+function queue(){
+  const now=Date.now();
+  const due=CARDS.filter(c=>srs[c.id]&&srs[c.id].due<=now).sort((a,b)=>srs[a.id].due-srs[b.id].due);
+  const fresh=CARDS.filter(c=>!srs[c.id]);
+  return {due,fresh,newLeft:Math.max(0,NEW_PER_DAY-seenToday.n)};
+}
+function stats(){
+  const q=queue();
+  $("#s-due").textContent=q.due.length;
+  $("#s-new").textContent=Math.min(q.newLeft,q.fresh.length);
+  $("#s-done").textContent=CARDS.filter(c=>srs[c.id]&&srs[c.id].ivl>=7).length;
+}
+function fmt(ivl){return ivl<1?"10분":ivl<30?Math.round(ivl)+"일":Math.round(ivl/30)+"달"}
+function next(c,grade){
+  const s=srs[c.id]||{ivl:0,ease:2.5,reps:0};
+  let ivl,ease=s.ease;
+  if(grade===1){ivl=0.007;ease=Math.max(1.3,ease-0.2)}
+  else if(grade===2){ivl=s.reps?Math.max(1,s.ivl*1.2):1;ease=Math.max(1.3,ease-0.15)}
+  else if(grade===3){ivl=s.reps?(s.ivl<1?1:s.ivl*ease):1}
+  else {ivl=s.reps?(s.ivl<1?3:s.ivl*ease*1.3):3;ease+=0.15}
+  return {ivl,ease,reps:grade===1?0:s.reps+1};
+}
+function pick(){
+  const q=queue();
+  current=q.due[0]||(q.newLeft>0?q.fresh[0]:null);flipped=false;render();
+}
+function render(){
+  stats();
+  const card=$("#card"),rate=$("#rate-in");
+  if(!current){
+    const q=queue();
+    card.innerHTML=`<div class="empty">오늘 볼 카드를 모두 마쳤어요.<br>${q.fresh.length?`새 카드 ${q.fresh.length}장은 내일 ${NEW_PER_DAY}장씩 열려요.`:"전체 카드를 한 번씩 익혔어요."}</div>`;
+    $("#rate").hidden=true;return}
+  const isNew=!srs[current.id];
+  card.innerHTML=`<span class="tag">${isNew?"새 카드":"복습"} · ${esc(current.r)}</span><div class="front">${esc(current.f)}</div>`+
+    (flipped?`<div class="back">${esc(current.b)}<span class="ref">${esc(current.r)}</span></div>`:`<div class="hint">눌러서 답 보기</div>`);
+  $("#rate").hidden=$("#cardv").hidden;
+  if(!flipped){rate.innerHTML=`<button type="button" class="show" data-flip>답 보기</button>`;return}
+  rate.innerHTML=[[1,"다시","r1"],[2,"어려움","r2"],[3,"알맞음","r3"],[4,"쉬움","r4"]].map(([g,l,c])=>
+    `<button type="button" class="${c}" data-grade="${g}">${l}<small>${fmt(next(current,g).ivl)}</small></button>`).join("");
+}
+function grade(g){
+  if(!current||!flipped)return;
+  const wasNew=!srs[current.id];
+  const n=next(current,g);
+  srs[current.id]={...n,due:Date.now()+n.ivl*DAY};
+  if(wasNew){seenToday.n++;put("law-srs-day",seenToday)}
+  put("law-srs",srs);pick();
+}
+$("#card").addEventListener("click",()=>{if(current){flipped=!flipped;render()}});
+$("#rate").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
+  if(b.hasAttribute("data-flip")){flipped=true;render()} else grade(+b.dataset.grade)});
+// swipe on card: left = 다시, right = 알맞음 (after flip)
+(function(){let x0=null;const c=$("#card");
+ c.addEventListener("touchstart",e=>{x0=e.touches[0].clientX},{passive:true});
+ c.addEventListener("touchend",e=>{if(x0===null)return;const dx=e.changedTouches[0].clientX-x0;x0=null;
+   if(Math.abs(dx)<70)return; if(!flipped){flipped=true;render();return} grade(dx<0?1:3)},{passive:true});})();
+document.addEventListener("keydown",e=>{
+  if($("#cardv").hidden)return;
+  if(e.key===" "||e.key==="Enter"){e.preventDefault();if(current){flipped=!flipped;render()}}
+  else if(/^[1-4]$/.test(e.key)&&flipped)grade(+e.key);
+});
+$("#reset").addEventListener("click",function(){
+  if(this.dataset.armed){srs={};seenToday={d:today(),n:0};put("law-srs",srs);put("law-srs-day",seenToday);this.dataset.armed="";this.textContent="카드 기록 초기화";pick()}
+  else{this.dataset.armed="1";this.textContent="한 번 더 누르면 초기화"}
+});
+
+/* ---------- 보기 전환 ---------- */
+function view(v){
+  const map=v!=="cards";
+  $("#v-map").setAttribute("aria-pressed",map);$("#v-card").setAttribute("aria-pressed",!map);
+  $("#mapv").hidden=!map;$("#cardv").hidden=map;$("#rate").hidden=map;
+  if(!map){if(!current)pick();else render()}
+  closeSheet();put("lawmap-view",v);
+}
+$("#v-map").onclick=()=>view("map");$("#v-card").onclick=()=>view("cards");
+window.addEventListener("hashchange",()=>{const h=location.hash.slice(1);if(h==="cards"||h==="map")view(h)});
+renderMap();
+view(location.hash.slice(1)==="cards"?"cards":get("lawmap-view","map"));
+</script>
+</body>
+</html>
