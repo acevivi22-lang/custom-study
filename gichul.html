@@ -37,7 +37,8 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);fo
   display:flex;flex-direction:column;gap:14px}
 .bar{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center}
 .label{font-size:.72rem;letter-spacing:.06em;color:var(--muted);font-weight:500}
-.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--surface)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow-x:auto;max-width:100%;background:var(--surface);-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.seg::-webkit-scrollbar{display:none}
 .seg button{font:inherit;font-size:.88rem;border:0;background:transparent;color:var(--muted);padding:6px 11px;cursor:pointer;white-space:nowrap}
 .seg button+button{border-left:1px solid var(--line)}
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
@@ -97,6 +98,22 @@ button:focus-visible,textarea:focus-visible,a:focus-visible{outline:2px solid va
 .ans label{font-weight:700;font-size:.92rem;display:flex;justify-content:space-between;gap:8px}
 .ans label span{font-weight:400;color:var(--muted);font-family:var(--f-mono);font-size:.78rem}
 textarea{width:100%;min-height:160px;font:inherit;line-height:1.7;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:10px 12px;resize:vertical}
+#year,#year2{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));flex:1 1 100%;overflow:hidden}
+#year button,#year2 button{border:0;box-shadow:inset -1px -1px 0 var(--line);padding:8px 6px}
+.opts.row{grid-template-columns:repeat(5,1fr)}
+.opts.row .opt{grid-template-columns:1fr;justify-items:center;padding:12px 0}
+.opts.row .opt .k{font-size:1.25rem}
+/* 기출 OX */
+.oxctx{font-size:.84rem;color:var(--muted);margin:0;word-break:keep-all}
+.oxst{font-size:1.08rem;font-weight:500;margin:0;word-break:keep-all;overflow-wrap:anywhere;line-height:1.7}
+.oxbtns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.oxbtns button{font:900 2rem var(--f-display);border:1.5px solid var(--line);background:var(--bg);color:var(--ink);border-radius:12px;padding:14px 0;cursor:pointer;touch-action:manipulation}
+.oxbtns button.right{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.oxbtns button.wrong{background:var(--stamp-soft);border-color:var(--stamp);color:var(--stamp)}
+.oxbtns button:disabled{cursor:default}
+.oxstat{display:flex;gap:14px;flex-wrap:wrap;font-family:var(--f-mono);font-size:.78rem;color:var(--muted)}
+.src{font-size:.8rem;color:var(--muted)}
+.src button{font:inherit;background:none;border:0;color:var(--accent);text-decoration:underline;cursor:pointer;padding:0}
 @media (max-width:520px){.omr-grid{grid-template-columns:repeat(8,1fr)}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -118,7 +135,23 @@ textarea{width:100%;min-height:160px;font:inherit;line-height:1.7;background:var
       <div class="drill" id="drillbar" hidden></div>
       <div class="omr" id="omr"></div>
       <div class="paper" id="paper"></div>
-      <p class="note">문제와 최종 정답은 큐넷에서 공개한 2024~2026년 1차 A형 기준이에요. 해설은 최종 정답을 바탕으로 Claude가 쓴 것이라, 조문 번호나 세부 수치는 기본서로 한 번 더 확인하세요. 표가 있는 문제는 원본 문제지를 그대로 잘라 보여 줘요.</p>
+      <p class="note">문제와 최종 정답은 큐넷에서 공개한 2020~2026년 1차 A형 기준이에요. 2021년은 원본이 스캔본이라 문제를 이미지로 보여 줘요. 해설은 최종 정답을 바탕으로 Claude가 쓴 것이라, 조문 번호나 세부 수치는 기본서로 한 번 더 확인하세요. 표가 있는 문제는 원본 문제지를 그대로 잘라 보여 줘요.</p>
+    </div>
+  </section>
+
+  <section id="p3" hidden>
+    <div class="wrap" style="padding:0;gap:12px">
+      <div class="bar">
+        <span class="label">과목</span>
+        <div class="seg" id="subj3"></div>
+      </div>
+      <div class="bar">
+        <span class="label">풀기</span>
+        <div class="seg" id="mode3"></div>
+      </div>
+      <div class="oxstat" id="oxstat"></div>
+      <div class="paper" id="oxcard"></div>
+      <p class="note">기출 선지를 한 문장씩 떼어 O·X로 바꾼 거예요. "옳은 것은?" 문제의 정답 선지는 O, 나머지는 X이고, "옳지 않은 것은?" 문제는 그 반대예요. 해설은 원래 문제 전체에 대한 해설이 나와요.</p>
     </div>
   </section>
 
@@ -149,7 +182,8 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",
 const get=(k,d)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}};
 const put=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 const SUBJ=[["law","관세법개론"],["trade","무역영어"],["nk","내국소비세법"],["acc","회계학"]];
-const YEARS=[[2026,"43회"],[2025,"42회"],[2024,"41회"]];
+const YEARS=[[2026,"43회"],[2025,"42회"],[2024,"41회"],[2023,"40회"],[2022,"39회"],[2021,"38회"],[2020,"37회"]];
+const YEARS2=[[2026,"43회"],[2025,"42회"],[2024,"41회"],[2023,"40회"],[2022,"39회"],[2021,"38회"],[2020,"37회"]];
 const KO={law:"관세법개론",trade:"무역영어",nk:"내국소비세법",acc:"회계학"};
 const CIRC="①②③④⑤";
 const Q=window.Q1||[];
@@ -174,7 +208,7 @@ function build(){
 }
 function renderControls(){
   seg($("#subj"),SUBJ,st.s,"s");
-  seg($("#year"),[...YEARS.map(([y,h])=>[y,`${y} ${h}`]),["all","3개년"]],st.y,"y");
+  seg($("#year"),[...YEARS.map(([y,h])=>[y,`${y} ${h}`]),["all","전체"]],st.y,"y");
   seg($("#mode"),[["seq","순서대로"],["shuf","섞기"],["new","안 푼 것"],["wrong","틀린 것"]],st.m,"m");
 }
 function renderOMR(){
@@ -217,7 +251,7 @@ function renderPaper(){
   const prev=r&&!ans?`<span class="note">지난번: ${CIRC[r.p-1]||"-"} ${r.ok?"맞힘":"틀림"}${r.w?` · 틀린 횟수 ${r.w}`:""}</span>`:"";
   const fb=ans?`<div class="verdict"><b class="${isRight(picked)?"r":"w"}">${isRight(picked)?"정답":"오답"}</b><span>${q.a===0?"이 문제는 최종 정답에서 전항 정답 처리됐어요.":`정답 ${CIRC[q.a-1]}`}</span></div>${q.x?`<div class="exp"><span class="tag">해설</span>${esc(q.x)}</div>`:""}`:"";
   p.innerHTML=`<div class="meta"><span><b>${q.y}</b> ${KO[q.s]} ${q.n}번</span><span>${idx+1} / ${list.length}</span></div>
-    <div class="stem">${stemHTML(q)}</div>${prev}<div class="opts">${opts}</div>${fb}
+    <div class="stem">${stemHTML(q)}</div>${prev}<div class="opts${q.o.every(o=>!o)?" row":""}">${opts}</div>${fb}
     <div class="nav"><button type="button" class="btn" data-prev ${idx===0?"disabled":""}>← 이전</button><button type="button" class="btn primary" data-next ${idx>=list.length-1?"disabled":""}>다음 →</button></div>`;
 }
 function render1(){
@@ -257,16 +291,16 @@ document.addEventListener("keydown",e=>{
 
 /* ---------- 2차 ---------- */
 const S2=[["1","관세법"],["2","관세율표·상품학"],["3","관세평가"],["4","무역실무"]];
-const PAGES={"2024-1":2,"2024-2":3,"2024-3":4,"2024-4":2,"2025-1":2,"2025-2":4,"2025-3":6,"2025-4":2,"2026-1":2,"2026-2":3,"2026-3":6,"2026-4":2};
+const PAGES={"2020-1":2,"2020-2":2,"2020-3":6,"2020-4":1,"2021-1":1,"2021-2":3,"2021-3":4,"2021-4":2,"2022-1":2,"2022-2":3,"2022-3":5,"2022-4":2,"2023-1":2,"2023-2":2,"2023-3":4,"2023-4":3,"2024-1":2,"2024-2":3,"2024-3":4,"2024-4":2,"2025-1":2,"2025-2":4,"2025-3":6,"2025-4":2,"2026-1":2,"2026-2":3,"2026-3":6,"2026-4":2};
 let st2=Object.assign({s:"1",y:2026},get("gc2-state",{}));
 let drafts=get("gc2-ans",{});
 let tLeft=80*60,tRun=null;
 function key2(){return st2.y+"-"+st2.s}
 function render2(){
   seg($("#subj2"),S2,st2.s,"s2");
-  seg($("#year2"),YEARS.map(([y,h])=>[y,`${y} ${h}`]),st2.y,"y2");
+  seg($("#year2"),YEARS2.map(([y,h])=>[y,`${y} ${h}`]),st2.y,"y2");
   const k=key2(),n=PAGES[k]||0;
-  $("#sheet").innerHTML=Array.from({length:n},(_,i)=>`<div class="figwrap"><img src="p2/${k}-${i+1}.png" alt="${st2.y}년 2차 ${S2.find(x=>x[0]===st2.s)[1]} 문제지 ${i+1}쪽" loading="lazy"></div>`).join("");
+  $("#sheet").innerHTML=n?Array.from({length:n},(_,i)=>`<div class="figwrap"><img src="p2/${k}-${i+1}.png" alt="${st2.y}년 2차 ${S2.find(x=>x[0]===st2.s)[1]} 문제지 ${i+1}쪽" loading="lazy"></div>`).join(""):`<div class="empty">${st2.y}년 ${S2.find(x=>x[0]===st2.s)[1]} 문제지는 아직 들어 있지 않아요.</div>`;
   $("#answers").innerHTML=`<div class="meta"><span><b>${st2.y}</b> 2차 ${S2.find(x=>x[0]===st2.s)[1]} 답안지</span><span id="cnt"></span></div>`+
     [1,2,3,4].map(i=>{const id=`a-${k}-${i}`,v=drafts[id]||"";
       return `<div class="ans"><label for="${id}">문제 ${i}<span id="c-${id}">${v.length}자</span></label><textarea id="${id}" data-draft="${id}" placeholder="목차를 먼저 잡고, 조문 근거를 붙여서 써 보세요.">${esc(v)}</textarea></div>`}).join("");
@@ -294,15 +328,80 @@ document.addEventListener("input",e=>{
   clearTimeout(saveT);saveT=setTimeout(()=>put("gc2-ans",drafts),400);
 });
 
+
+/* ---------- 기출 OX ---------- */
+function oxKind(t){
+  if(/모두 고른|개수|몇 개|옳은 것을 모두|옳지 않은 것을 모두|짝지어진|연결|순서|들어갈|해당하는 것은|해당하지 않는 것은|금액|얼마|계산|구하/.test(t))return 0;
+  if(/옳지 않은|틀린 것|잘못된|아닌 것|NOT|INCORRECT|incorrect|not correct|FALSE|false|least|LEAST|NOT true/.test(t))return -1;
+  if(/옳은 것은|맞는 것은|correct|CORRECT|true|TRUE/.test(t))return 1;
+  return 0;
+}
+const OX=[];
+for(const q of Q){
+  if(q.img||!q.a||!q.q[0]||q.q[0][0]!=="p"||q.q.length>1)continue;
+  const lead=q.q[0][1], k=oxKind(lead);if(!k)continue;
+  const ctx=lead.replace(/\s*(으로|로)?\s*(옳지 않은|옳은|틀린|맞는)\s*것은\s*\?.*$/,"").trim();
+  q.o.forEach((o,i)=>{
+    if(!o||o.length<18||/^[\d,.\s₩$%원㈜()]+$/.test(o))return;
+    const isAns=(i+1)===q.a;
+    OX.push({id:q.id+"-"+(i+1),q:q.id,s:q.s,y:q.y,n:q.n,i,ctx,t:o,v:k===1?isAns:!isAns,x:q.x||""});
+  });
+}
+let oxr=get("gox-v1",{});
+let st3=Object.assign({s:"law",m:"shuf"},get("gox-state",{}));
+let oxl=[],oxi=0,oxp=null;
+function build3(){
+  let p=OX.filter(o=>o.s===st3.s);
+  if(st3.m==="wrong")p=p.filter(o=>oxr[o.id]===0);
+  if(st3.m==="new")p=p.filter(o=>!(o.id in oxr));
+  p=p.slice();for(let i=p.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[p[i],p[j]]=[p[j],p[i]]}
+  oxl=p;oxi=0;oxp=null;
+}
+function render3(){
+  seg($("#subj3"),SUBJ,st3.s,"s3");
+  seg($("#mode3"),[["shuf","전체 섞기"],["new","안 푼 것"],["wrong","틀린 것"]],st3.m,"m3");
+  const all=OX.filter(o=>o.s===st3.s),done=all.filter(o=>o.id in oxr),ok=done.filter(o=>oxr[o.id]===1).length;
+  $("#oxstat").innerHTML=`<span>${KO[st3.s]} 기출 OX ${all.length}문항</span><span>푼 것 ${done.length}</span><span>맞힘 ${ok}${done.length?` (${Math.round(ok/done.length*100)}%)`:""}</span><span>틀린 것 ${done.length-ok}</span>`;
+  const c=$("#oxcard");
+  if(!oxl.length){c.innerHTML=`<div class="empty">${st3.m==="wrong"?"틀린 OX가 없어요.":st3.m==="new"?"이 과목 OX는 다 풀었어요.":"문항이 없어요."}</div>`;return}
+  const o=oxl[oxi],ans=oxp!==null,ok2=ans&&oxp===o.v;
+  const cls=v=>ans?(v===o.v?"right":(v===oxp?"wrong":"")):"";
+  c.innerHTML=`<div class="meta"><span><b>${o.y}</b> ${KO[o.s]} ${o.n}번 ${CIRC[o.i]}</span><span>${oxi+1} / ${oxl.length}</span></div>
+    ${o.ctx?`<p class="oxctx">${esc(o.ctx)}</p>`:""}<p class="oxst">${esc(o.t)}</p>
+    <div class="oxbtns"><button type="button" data-ox="1" class="${cls(true)}" ${ans?"disabled":""} aria-label="맞다">O</button><button type="button" data-ox="0" class="${cls(false)}" ${ans?"disabled":""} aria-label="틀리다">X</button></div>
+    ${ans?`<div class="verdict"><b class="${ok2?"r":"w"}">${ok2?"정답":"오답"}</b><span>이 문장은 ${o.v?"맞는(O)":"틀린(X)"} 문장이에요.</span></div>${o.x?`<div class="exp"><span class="tag">원래 문제 해설</span>${esc(o.x)}</div>`:""}<div class="src"><button type="button" data-orig="${o.q}">원래 문제로 풀어 보기 →</button></div>`:""}
+    <div class="nav"><button type="button" class="btn" data-oxprev ${oxi===0?"disabled":""}>← 이전</button><button type="button" class="btn primary" data-oxnext ${oxi>=oxl.length-1?"disabled":""}>다음 →</button></div>`;
+  put("gox-state",st3);
+}
+document.addEventListener("click",e=>{
+  const b=e.target.closest("button");if(!b||!$("#p3").contains(b))return;
+  if(b.dataset.s3){st3.s=b.dataset.s3;build3();render3();return}
+  if(b.dataset.m3){st3.m=b.dataset.m3;build3();render3();return}
+  if(b.dataset.ox&&oxp===null){const o=oxl[oxi];oxp=b.dataset.ox==="1";oxr[o.id]=oxp===o.v?1:0;put("gox-v1",oxr);render3();return}
+  if(b.hasAttribute("data-oxnext")){if(oxi<oxl.length-1){oxi++;oxp=null;render3()}return}
+  if(b.hasAttribute("data-oxprev")){if(oxi>0){oxi--;oxp=null;render3()}return}
+  if(b.dataset.orig){const q=Q.find(x=>x.id===b.dataset.orig);try{localStorage.removeItem("gc-drill")}catch(_){}
+    st.s=q.s;st.y=q.y;st.m="seq";save();build();idx=Math.max(0,list.findIndex(x=>x.id===q.id));location.hash="p1";return}
+});
+document.addEventListener("keydown",e=>{
+  if($("#p3").hidden)return;
+  const k=e.key.toLowerCase();
+  if((k==="o"||k==="1")&&oxp===null)document.querySelector('[data-ox="1"]')?.click();
+  else if((k==="x"||k==="2")&&oxp===null)document.querySelector('[data-ox="0"]')?.click();
+  else if(e.key==="ArrowRight"||e.key==="Enter")document.querySelector("[data-oxnext]")?.click();
+  else if(e.key==="ArrowLeft")document.querySelector("[data-oxprev]")?.click();
+});
+
 /* ---------- view switch ---------- */
 function view(){
   const h=location.hash.slice(1);
-  const two=h==="p2";
-  $("#p1").hidden=two;$("#p2").hidden=!two;
-  if(two)render2();else{const d=get("gc-drill",null);if(JSON.stringify(d)!==JSON.stringify(drill))build();render1();}
+  const two=h==="p2",ox=h==="ox";
+  $("#p1").hidden=two||ox;$("#p2").hidden=!two;$("#p3").hidden=!ox;
+  if(ox){if(!oxl.length)build3();render3()}
+  else if(two)render2();else{const d=get("gc-drill",null);if(JSON.stringify(d)!==JSON.stringify(drill))build();render1();}
 }
 window.addEventListener("hashchange",view);
-build();tick();view();
+build();build3();tick();view();
 </script>
 </body>
 </html>

@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>정리노트</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<script>(function(){if(window.self===window.top)return;var r=document.documentElement;try{var t=parent.document.documentElement.getAttribute("data-theme");if(t)r.setAttribute("data-theme",t)}catch(e){}})();</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@600;900&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: 단권화 노트 — 위에 과목·주제 칩과 가리기 스위치, 아래로 주제별 카드 */
+:root{
+  color-scheme:light;
+  --bg:#eef1f4; --surface:#ffffff; --ink:#18212b; --muted:#5b6876; --line:#d5dbe2;
+  --accent:#1f4e79; --accent-soft:#dbe6f1; --mark:#fff1a8; --mark-ink:#5a4a00; --stamp:#b3261e;
+  --f-display:"Noto Serif KR","Nanum Myeongjo",serif;
+  --f-body:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#11161c; --surface:#19212a; --ink:#e6ebf0; --muted:#97a3b0; --line:#2c3743;
+  --accent:#7fb0e0; --accent-soft:#1e3247; --mark:#4a3f10; --mark-ink:#ffe58a; --stamp:#f08a80; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#11161c; --surface:#19212a; --ink:#e6ebf0; --muted:#97a3b0; --line:#2c3743;
+  --accent:#7fb0e0; --accent-soft:#1e3247; --mark:#4a3f10; --mark-ink:#ffe58a; --stamp:#f08a80; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.65}
+[hidden]{display:none!important}
+.wrap{max-width:900px;margin:0 auto;padding-block:16px 64px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;flex-direction:column;gap:14px}
+.top{position:sticky;top:0;z-index:5;background:var(--bg);padding-block:8px;display:flex;flex-direction:column;gap:8px;border-bottom:1px solid var(--line)}
+.row{display:flex;flex-wrap:nowrap;gap:6px;align-items:center;overflow-x:auto;scrollbar-width:none}
+.row::-webkit-scrollbar{display:none}
+.chip{font:inherit;font-size:.86rem;border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:999px;padding:5px 12px;cursor:pointer;white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.toc{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.toc::-webkit-scrollbar{display:none}
+.toc a{font-size:.82rem;color:var(--accent);text-decoration:none;border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:4px 10px;white-space:nowrap}
+.tools{display:flex;gap:6px;align-items:center}
+.search{flex:1 1 140px;min-width:0;font:inherit;font-size:.9rem;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:6px;padding:6px 10px}
+.btn{font:inherit;font-size:.86rem;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:6px;padding:6px 12px;cursor:pointer}
+.btn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+section.note{display:flex;flex-direction:column;gap:12px;scroll-margin-top:150px}
+.head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.head .subj{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.06em;color:var(--stamp);border:1px solid var(--stamp);border-radius:4px;padding:0 6px}
+.head h2{font-family:var(--f-display);font-weight:900;font-size:1.35rem;margin:0}
+.intro{margin:0;color:var(--muted);font-size:.9rem;word-break:keep-all}
+.grp{background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.grp h3{margin:0;font-size:.95rem;padding:10px 14px;background:var(--accent-soft);color:var(--accent);font-weight:700;word-break:keep-all}
+.item{padding:10px 14px;border-top:1px solid var(--line);display:grid;grid-template-columns:minmax(120px,30%) 1fr;gap:4px 14px}
+.item:first-of-type{border-top:0}
+.item .t{font-weight:700;font-size:.92rem;word-break:keep-all}
+.item .d{font-size:.92rem;word-break:keep-all;overflow-wrap:anywhere}
+.item .d .f{display:block}
+.item .d .f + .f{margin-top:3px}
+.item .d .lab{font-family:var(--f-mono);font-size:.7rem;color:var(--muted);margin-right:6px}
+.k{background:var(--mark);color:var(--mark-ink);border-radius:3px;padding:0 3px;font-weight:700}
+.hide .k{color:transparent;background:var(--line);cursor:pointer;user-select:none}
+.hide .k.open{color:var(--mark-ink);background:var(--mark)}
+.warn{color:var(--stamp);font-size:.8em}
+.empty{color:var(--muted);text-align:center;padding:24px}
+.foot{font-size:.8rem;color:var(--muted);word-break:keep-all}
+@media (max-width:560px){.item{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="row" id="subjs"></div>
+    <nav class="toc" id="toc" aria-label="주제 바로가기"></nav>
+    <div class="tools">
+      <input class="search" id="q" type="search" placeholder="찾기: 제척, 15일, 위원장…" aria-label="정리노트에서 찾기">
+      <button class="btn" id="hide" type="button" aria-pressed="false">숫자 가리기</button>
+      <button class="btn" id="reveal" type="button" hidden>모두 펼치기</button>
+    </div>
+  </div>
+  <main id="notes"></main>
+  <p class="foot">노란 칸이 시험에 나오는 숫자·단어예요. '숫자 가리기'를 켜면 회색 칸이 되고, 눌러서 하나씩 확인할 수 있어요. ⚠ 표시는 최근 개정이 있었거나 자주 바뀌는 항목이니 시험 직전에 최신 법령으로 확인하세요. 위원회 인원은 관세법 시행령(2025년 기준)을 보고 정리했어요.</p>
+</div>
+<script src="jeongri-data.js"></script>
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const get=(k,d)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}};
+const put=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+const N=window.NOTES||[];
+const SUBJ=["전체",...[...new Set(N.map(n=>n.subj))]];
+let st=Object.assign({s:"전체",hide:false},get("jr-state",{}));
+let q="";
+function fmt(s){
+  return esc(s).replace(/\{\{(.+?)\}\}/g,'<span class="k">$1</span>').replace(/⚠/g,'<span class="warn" title="개정 확인">⚠</span>');
+}
+function plain(s){return String(s).replace(/[{}]/g,"")}
+function render(){
+  $("#subjs").innerHTML=SUBJ.map(s=>`<button type="button" class="chip" data-s="${esc(s)}" aria-pressed="${s===st.s}">${esc(s)}</button>`).join("");
+  const list=N.filter(n=>st.s==="전체"||n.subj===st.s);
+  $("#toc").innerHTML=list.map(n=>`<a href="#${n.id}">${esc(n.title)}</a>`).join("");
+  const ql=q.trim().toLowerCase();
+  let html="",hits=0;
+  for(const n of list){
+    let body="";
+    for(const g of n.groups){
+      const rows=g.rows.filter(r=>!ql||plain(r.join(" ")+" "+g.h+" "+n.title).toLowerCase().includes(ql));
+      if(!rows.length)continue;hits+=rows.length;
+      body+=`<div class="grp"><h3>${esc(g.h)}</h3>`+rows.map(r=>{
+        let d;
+        if(g.cols&&r.length>2){
+          d=r.slice(1).map((v,i)=>v?`<span class="f">${g.cols[i+1]?`<span class="lab">${esc(g.cols[i+1])}</span>`:""}${fmt(v)}</span>`:"").join("");
+        }else d=r.slice(1).filter(Boolean).map(v=>`<span class="f">${fmt(v)}</span>`).join("");
+        return `<div class="item"><div class="t">${fmt(r[0])}</div><div class="d">${d}</div></div>`}).join("")+`</div>`;
+    }
+    if(body)html+=`<section class="note" id="${n.id}"><div class="head"><span class="subj">${esc(n.subj)}</span><h2>${esc(n.title)}</h2></div>${n.intro?`<p class="intro">${fmt(n.intro)}</p>`:""}${body}</section>`;
+  }
+  const m=$("#notes");m.innerHTML=html||`<div class="empty">'${esc(q)}'에 맞는 항목이 없어요.</div>`;
+  m.classList.toggle("hide",st.hide);
+  $("#hide").setAttribute("aria-pressed",String(st.hide));$("#hide").textContent=st.hide?"숫자 보이기":"숫자 가리기";
+  $("#reveal").hidden=!st.hide;
+  put("jr-state",st);
+}
+document.addEventListener("click",e=>{
+  const c=e.target.closest("[data-s]");if(c){st.s=c.dataset.s;render();window.scrollTo(0,0);return}
+  const k=e.target.closest(".hide .k");if(k){k.classList.toggle("open");return}
+});
+$("#hide").onclick=()=>{st.hide=!st.hide;render()};
+$("#reveal").onclick=()=>document.querySelectorAll("#notes .k").forEach(k=>k.classList.add("open"));
+let t=null;$("#q").addEventListener("input",e=>{clearTimeout(t);t=setTimeout(()=>{q=e.target.value;render()},150)});
+render();
+</script>
+</body>
+</html>

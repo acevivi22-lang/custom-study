@@ -93,7 +93,7 @@ h2 .tag{font-family:var(--f-mono);font-size:.75rem;color:var(--stamp);border:1px
       <div class="hero">
         <div>
           <h1>오늘은 어느 서류철부터 펼칠까요</h1>
-          <p>기출 3개년과 지금까지 만든 연습장을 한곳에 모았어요. 위 탭이나 아래 카드에서 과목을 고르면 바로 문제로 들어가요.</p>
+          <p>2020~2026 기출과 지금까지 만든 연습장을 한곳에 모았어요. 위 탭이나 아래 카드에서 과목을 고르면 바로 문제로 들어가요.</p>
         </div>
         <span class="stamp">수험번호 2027</span>
       </div>
@@ -110,8 +110,9 @@ h2 .tag{font-family:var(--f-mono);font-size:.75rem;color:var(--stamp);border:1px
 
 <script>
 const MODS=[
- {id:"gc1",g:0,t:"1차 기출",src:"gichul.html#p1",d:"2024~2026 1차 4과목 480문제, 최종 정답 채점. 답안지 칸으로 진도 확인"},
- {id:"gc2",g:0,t:"2차 기출",src:"gichul.html#p2",d:"2024~2026 2차 4과목 문제지와 80분 타이머, 문제별 답안 작성 칸"},
+ {id:"gc1",g:0,t:"1차 기출",src:"gichul.html#p1",d:"2020~2026 1차 7개년 4과목 1,120문제, 최종 정답 채점. 답안지 칸으로 진도 확인"},
+ {id:"gox",g:0,t:"기출 OX",src:"gichul.html#ox",d:"1차 기출 선지를 한 문장씩 O·X로. 4과목, 틀린 문장만 다시 풀기"},
+ {id:"gc2",g:0,t:"2차 기출",src:"gichul.html#p2",d:"2020~2026 2차 문제지와 80분 타이머, 문제별 답안 작성 칸"},
  {id:"law",g:1,t:"관세법 OX",src:"amgi.html#law",d:"과세물건, 납세의무자, 제척기간, 탄력관세 등 조문 함정 OX"},
  {id:"lawmap",g:1,t:"관세법 지도·카드",src:"lawmap.html",d:"13개 장 구조 지도와 조문 시트, 77장 간격반복 플래시카드"},
  {id:"nk",g:1,t:"내국소비세",src:"nk.html",d:"부가세·개소세·주세 구조 지도, 돈 흐름, 수입 세금 계산, 왜? 카드, OX"},
@@ -120,6 +121,7 @@ const MODS=[
  {id:"hs",g:2,t:"관세율표",src:"amgi.html#hs",d:"류 번호 ↔ 품목명 양방향, 부별 범위 선택, 전체 표 보기"},
  {id:"tc",g:2,t:"통칙 타자",src:"tc.html",d:"표·미혼·구본마·유·케포·소 — 따라치기, 힌트, 백지 복원"},
  {id:"val",g:2,t:"관세평가",src:"amgi.html#val",d:"제1~6방법, 가산·공제 요소 사례 문제"},
+ {id:"jr",g:3,t:"정리노트",src:"jeongri.html",d:"관세법 위원회·날짜·금액, 관세평가, 부가세·개소세·주세 숫자, 무역규범 숫자, 회계 공식. 숫자 가리기"},
  {id:"wrong",g:3,t:"오답노트",src:"amgi.html#wrong",d:"관세법·관세평가·무역영어·관세율표에서 틀린 문제만 다시"}
 ];
 const $=s=>document.querySelector(s);
@@ -135,8 +137,10 @@ function stats(){
     per:{law:pre("law-"),trade:pre("inco-"),hs:pre("hs-"),val:pre("val-")}};
 }
 function prog(m,s){
-  if(m.id==="gc1")return `푼 문제 ${s.gDone} / 480 · 맞힘 ${s.gOk}`;
-  if(m.id==="gc2")return "2024 · 2025 · 2026 · 과목별 4문제";
+  if(m.id==="gc1")return `푼 문제 ${s.gDone} / 1120 · 맞힘 ${s.gOk}`;
+  if(m.id==="jr")return "8개 주제 · 숫자 가리기로 복습";
+  if(m.id==="gox"){const r=get("gox-v1",{}),k=Object.keys(r);return k.length?`푼 문장 ${k.length} · 맞힘 ${k.filter(x=>r[x]===1).length}`:"과목별 기출 선지 OX"}
+  if(m.id==="gc2")return "2020~2026 · 4과목 문제지";
   if(m.id==="lawmap"){const c=get("law-srs",{});return `플래시카드 학습 ${Object.keys(c).length} / 77장`}
   if(m.id==="trademap"){const g=get("inco-score",{ok:0,n:0});return g.n?`규칙 맞히기 ${g.ok}/${g.n}`:"인코텀즈 11개 규칙"}
   if(m.id==="nk")return `OX 푼 문제 ${s.nkDone} · 틀린 문제 ${s.nkWrong}`;
@@ -157,7 +161,7 @@ function renderNav(){
 function renderHome(){
   const s=stats(), pct=s.solved?Math.round(s.correct/s.solved*100):0;
   $("#tally").innerHTML=
-   `<div><div class="k">1차 기출 푼 문제</div><div class="v">${s.gDone}<small> / 480</small></div></div>`+
+   `<div><div class="k">1차 기출 푼 문제</div><div class="v">${s.gDone}<small> / 1120</small></div></div>`+
    `<div><div class="k">기출 정답률</div><div class="v">${s.gDone?Math.round(s.gOk/s.gDone*100):"–"}<small>${s.gDone?" %":""}</small></div></div>`+
    `<div><div class="k">암기장 푼 문제</div><div class="v">${s.solved}</div></div>`+
    `<div><div class="k">암기장 정답률</div><div class="v">${s.solved?pct:"–"}<small>${s.solved?" %":""}</small></div></div>`+
