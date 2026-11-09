@@ -1,6 +1,6 @@
 // 관세사 공부방 오프라인 캐시. 파일을 고치면 VERSION 값을 바꿔 주세요.
 // 페이지와 데이터는 설치할 때 미리 받아 두고, 문제 이미지는 처음 열 때 저장해 둡니다.
-const VERSION = "v4-2026-11-09";
+const VERSION = "v5-2026-11-09";
 const CORE = ["./","index.html","amgi.html","nk.html","tc.html","gichul.html","lawmap.html","trademap.html","jeongri.html","jeongri-data.js","gichul-data.js","manifest.webmanifest","icons/icon-192.png","icons/icon-512.png","icons/apple-touch-icon.png","icons/icon-maskable-512.png"];
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(VERSION).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));
