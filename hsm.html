@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>관세율표 암기식</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<script>(function(){if(window.self===window.top)return;var r=document.documentElement;try{var t=parent.document.documentElement.getAttribute("data-theme");if(t)r.setAttribute("data-theme",t)}catch(e){}})();</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@600;900&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: 암기 수첩 — 위 모드 칩(지도·읽기·복습·퀴즈·사용법), 아래 한 화면씩. 굵은 첫 글자가 암기식 */
+:root{
+  color-scheme:light;
+  --bg:#edf0f3; --surface:#ffffff; --ink:#18212b; --muted:#5b6876; --line:#d6dce3; --hair:#e6eaef;
+  --accent:#1f4e79; --accent-soft:#dde7f1; --mark:#fff1a8; --mark-ink:#5a4a00;
+  --ok:#1d6b45; --ok-soft:#dcefe4; --bad:#b3261e; --bad-soft:#f7e2df;
+  --l0:#e6eaef; --l1:#f6dba0; --l2:#cfe3a8; --l3:#93c9a2; --l4:#4f9f78; --l5:#1d6b45;
+  --f-display:"Noto Serif KR","Nanum Myeongjo",serif;
+  --f-body:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#10151b; --surface:#18202a; --ink:#e6ebf0; --muted:#98a4b1; --line:#2b3644; --hair:#222c38;
+  --accent:#86b4e4; --accent-soft:#1d3044; --mark:#4a3f10; --mark-ink:#ffe58a;
+  --ok:#7fd1a4; --ok-soft:#173226; --bad:#f08a80; --bad-soft:#3b2120;
+  --l0:#222c38; --l1:#5a4714; --l2:#4b5a22; --l3:#2f6446; --l4:#2f8a62; --l5:#5fc493; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#10151b; --surface:#18202a; --ink:#e6ebf0; --muted:#98a4b1; --line:#2b3644; --hair:#222c38;
+  --accent:#86b4e4; --accent-soft:#1d3044; --mark:#4a3f10; --mark-ink:#ffe58a;
+  --ok:#7fd1a4; --ok-soft:#173226; --bad:#f08a80; --bad-soft:#3b2120;
+  --l0:#222c38; --l1:#5a4714; --l2:#4b5a22; --l3:#2f6446; --l4:#2f8a62; --l5:#5fc493; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6}
+button,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:980px;margin:0 auto;padding-block:14px 64px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;flex-direction:column;gap:14px}
+.modes{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.modes::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:999px;padding:6px 13px;font-size:.88rem;cursor:pointer;white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg);font-weight:700}
+.chip .n{font-family:var(--f-mono);font-size:.78rem;margin-left:4px;opacity:.75}
+h1{font-family:var(--f-display);font-weight:900;font-size:1.35rem;margin:0;text-wrap:balance}
+h2{font-family:var(--f-display);font-weight:900;font-size:1.2rem;margin:0;text-wrap:balance}
+.lede{margin:0;color:var(--muted);font-size:.88rem;max-width:64ch;word-break:keep-all}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:7px 13px;font-size:.88rem;cursor:pointer}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--surface);font-weight:700}
+.btn.ok{background:var(--ok-soft);border-color:var(--ok);color:var(--ok);font-weight:700}
+.btn.bad{background:var(--bad-soft);border-color:var(--bad);color:var(--bad);font-weight:700}
+.btn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.btn:disabled{opacity:.4;cursor:default}
+.muted{color:var(--muted);font-size:.84rem}
+select{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:7px 10px;font-size:.9rem;max-width:100%}
+.sp{flex:1}
+
+/* 마크다운 본문 */
+.md{word-break:keep-all;overflow-wrap:anywhere;font-size:.93rem;min-width:0}
+.md p{margin:.45em 0}
+.md ul,.md ol{margin:.4em 0;padding-left:1.3em}
+.md li{margin:.2em 0}
+.md h4{font-size:1rem;margin:1em 0 .3em;color:var(--accent)}
+.md b{color:var(--ink);font-weight:700}
+.md .tw{overflow-x:auto;border:1px solid var(--line);border-radius:10px;margin:.6em 0;-webkit-overflow-scrolling:touch}
+.md table{border-collapse:collapse;width:100%;font-size:.88rem}
+.md th,.md td{border-bottom:1px solid var(--hair);padding:7px 10px;text-align:left;vertical-align:top}
+.md th{background:var(--accent-soft);color:var(--accent);font-size:.78rem;white-space:nowrap}
+.md tr:last-child td{border-bottom:0}
+.md td.code{font-family:var(--f-mono);font-size:.82rem;color:var(--muted);white-space:nowrap}
+.md td b,.cue b{background:var(--mark);color:var(--mark-ink);border-radius:3px;padding:0 2px}
+.hide .md td.cue{cursor:pointer}
+.hide .md td.cue .r{color:transparent;background:var(--hair);border-radius:3px}
+.hide .md td.cue.open .r{color:inherit;background:none}
+
+/* 지도 */
+.bus{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.bu{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:9px 11px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:2px}
+.bu .no{font-family:var(--f-mono);font-size:.74rem;color:var(--accent)}
+.bu .nm{font-weight:700;font-size:.92rem;word-break:keep-all}
+.bu .rg{font-size:.76rem;color:var(--muted)}
+.bu .pb{height:4px;border-radius:2px;background:var(--hair);overflow:hidden;margin-top:4px}
+.bu .pb i{display:block;height:100%;background:var(--ok)}
+.grp-h{font-family:var(--f-display);font-weight:900;font-size:1rem;margin:6px 0 0;color:var(--muted)}
+.grid{display:flex;flex-direction:column;gap:5px}
+.grow{display:grid;grid-template-columns:42px 1fr;gap:6px;align-items:center}
+.grow .lab{font-family:var(--f-mono);font-size:.74rem;color:var(--muted);text-align:right}
+.cells{display:flex;flex-wrap:wrap;gap:4px}
+.cell{width:34px;height:30px;border-radius:6px;border:0;background:var(--l0);font-family:var(--f-mono);font-size:.78rem;cursor:pointer;color:var(--ink)}
+.cell[data-l="1"]{background:var(--l1)}.cell[data-l="2"]{background:var(--l2)}.cell[data-l="3"]{background:var(--l3)}
+.cell[data-l="4"]{background:var(--l4);color:#fff}.cell[data-l="5"]{background:var(--l5);color:var(--surface)}
+.cell.void{opacity:.35;cursor:default}
+.legend{display:flex;gap:10px;flex-wrap:wrap;font-size:.78rem;color:var(--muted);align-items:center}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-2px;margin-right:4px}
+.stat{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.stat div{display:flex;flex-direction:column}
+.stat b{font-family:var(--f-display);font-size:1.5rem;line-height:1.1}
+.stat span{font-size:.76rem;color:var(--muted);word-break:keep-all;line-height:1.35}
+
+/* 읽기 */
+#art{scroll-margin-top:120px}
+.sticky{position:sticky;top:0;z-index:5;background:var(--bg);padding-block:8px;display:flex;flex-direction:column;gap:8px;border-bottom:1px solid var(--line)}
+.rnav{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.rnav::-webkit-scrollbar{display:none}
+.amgi{font-family:var(--f-display);font-weight:900;font-size:1.35rem;line-height:1.45;word-break:keep-all;color:var(--accent)}
+.amgi.sm{font-size:1.05rem}
+.amgi b{background:var(--mark);color:var(--mark-ink);border-radius:3px;padding:0 2px}
+.amgi:has(b){font-weight:600}
+.amgi .lb{display:block;font-family:var(--f-body);font-size:.74rem;font-weight:500;color:var(--muted)}
+.scene{border-left:3px solid var(--mark);padding:2px 0 2px 10px;color:var(--muted);font-size:.9rem;word-break:keep-all}
+details{border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+details>summary{cursor:pointer;padding:10px 14px;font-weight:700;font-size:.92rem;list-style:none;display:flex;gap:8px;align-items:center}
+details>summary::-webkit-details-marker{display:none}
+details>summary::before{content:"▸";color:var(--muted);transition:transform .15s}
+details[open]>summary::before{transform:rotate(90deg)}
+details>.md{padding:0 14px 12px}
+.badge{font-family:var(--f-mono);font-size:.72rem;border:1px solid var(--line);border-radius:4px;padding:0 5px;color:var(--muted);font-weight:500}
+.lvl{font-size:.8rem;color:var(--muted)}
+
+/* 복습 카드 */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.card .ttl{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.card .ttl .rn{font-family:var(--f-display);font-weight:900;font-size:1.6rem}
+.holist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.holist li{display:grid;grid-template-columns:52px 1fr;gap:8px;padding:6px 10px;border-top:1px solid var(--hair);font-size:.9rem;word-break:keep-all}
+.holist li:first-child{border-top:0}
+.holist .c{font-family:var(--f-mono);font-size:.8rem;color:var(--muted)}
+.holist b{background:var(--mark);color:var(--mark-ink);border-radius:3px;padding:0 2px}
+.queue{display:flex;gap:6px;flex-wrap:wrap}
+.queue span{font-family:var(--f-mono);font-size:.76rem;border:1px solid var(--line);border-radius:4px;padding:1px 6px;background:var(--surface)}
+
+/* 퀴즈 */
+.q{font-size:1.05rem;font-weight:700;word-break:keep-all}
+.q .big{font-family:var(--f-display);font-weight:900;font-size:1.7rem;display:block}
+.opts{display:grid;grid-template-columns:1fr;gap:8px}
+@media (min-width:600px){.opts{grid-template-columns:1fr 1fr}}
+.opt{border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:11px 13px;text-align:left;cursor:pointer;word-break:keep-all;font-size:.93rem}
+.opt.right{background:var(--ok-soft);border-color:var(--ok);color:var(--ok);font-weight:700}
+.opt.wrong{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.opt:disabled{cursor:default}
+.ord{display:flex;flex-wrap:wrap;gap:6px}
+.ord button{border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:8px 11px;cursor:pointer;font-size:.88rem;word-break:keep-all;text-align:left}
+.ord button:disabled{opacity:.3}
+.ord.done button{opacity:1}
+.olist{margin:0;padding-left:1.6em;font-size:.9rem}
+.olist li.x{color:var(--bad)}
+.olist li.o{color:var(--ok)}
+.score{font-family:var(--f-mono);font-size:.84rem;color:var(--muted)}
+.fb{font-size:.88rem;word-break:keep-all}
+.fb.okk{color:var(--ok)}.fb.ng{color:var(--bad)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div>
+    <h1>관세율표 암기식</h1>
+    <p class="lede">21부 97류, 류별 호와 주. 노란 칸의 굵은 글자를 이으면 암기식이에요. 원문 없이 정리한 자료라 호 번호와 숫자는 교재와 대조하세요.</p>
+  </div>
+  <nav class="modes" id="modes" aria-label="모드"></nav>
+  <main id="view"></main>
+</div>
+<script src="hsm-data.js"></script>
+<script>
+const D=window.HSM;
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const get=(k,d)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}};
+const put=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const plain=s=>String(s).replace(/\*\*/g,"");
+const inl=s=>esc(s).replace(/\*\*(.+?)\*\*/g,"<b>$1</b>");
+
+const RY={};D.ryu.forEach(r=>RY[r.n]=r);
+const PART={};D.parts.forEach(p=>PART[p.bu]=p);
+const BUS={};D.bus.forEach(b=>{for(let n=b.n;n<=b.n2;n++)BUS[n]=b});
+const buOf=n=>D.BU.find(b=>n>=b.r[0]&&n<=b.r[1]);
+const UNITS=D.units, UID={};UNITS.forEach(u=>UID[u.id]=u);
+const unitsOf=n=>UNITS.filter(u=>u.n===n);
+const rtitle=n=>plain(D.RT[n]||RY[n]?.t||"");
+
+/* ---------- 마크다운 ---------- */
+function md(src){
+  const L=String(src||"").split("\n");let h="",i=0;
+  while(i<L.length){
+    let l=L[i];
+    if(!l.trim()){i++;continue}
+    if(/^#{3,4} /.test(l)){h+=`<h4>${inl(l.replace(/^#+ /,""))}</h4>`;i++;continue}
+    if(l.trim().startsWith("|")){
+      const rows=[];
+      while(i<L.length&&L[i].trim().startsWith("|")){const t=L[i].trim();if(!/^\|\s*-/.test(t))rows.push(t.replace(/^\||\|$/g,"").split("|").map(c=>c.trim()));i++}
+      h+=`<div class="tw"><table><thead><tr>${rows[0].map(c=>`<th>${inl(c)}</th>`).join("")}</tr></thead><tbody>`+
+        rows.slice(1).map(r=>"<tr>"+r.map(c=>{
+          if(/^\d{4}([·~]\d{4})*$/.test(c)||/^\d{2}~\d{2}$/.test(c))return `<td class="code">${esc(c)}</td>`;
+          if(c.includes("**")){const parts=c.split(/(\*\*.+?\*\*)/);return `<td class="cue">${parts.map(p=>p.startsWith("**")?`<b>${esc(p.slice(2,-2))}</b>`:p?`<span class="r">${esc(p)}</span>`:"").join("")}</td>`}
+          return `<td>${inl(c)}</td>`}).join("")+"</tr>").join("")+`</tbody></table></div>`;
+      continue;
+    }
+    if(/^\s*(- |\d+\. )/.test(l)){
+      const ord=/^\d+\. /.test(l.trim());let items=[];
+      while(i<L.length&&/^\s*(- |\d+\. )/.test(L[i])){
+        const ind=/^\s{2,}/.test(L[i]);const t=L[i].trim().replace(/^(- |\d+\. )/,"");
+        if(ind&&items.length)items[items.length-1].sub.push(t);else items.push({t,sub:[]});i++}
+      h+=`<${ord?"ol":"ul"}>`+items.map(x=>`<li>${inl(x.t)}${x.sub.length?`<ul>${x.sub.map(s=>`<li>${inl(s)}</li>`).join("")}</ul>`:""}</li>`).join("")+`</${ord?"ol":"ul"}>`;
+      continue;
+    }
+    let p=[];while(i<L.length&&L[i].trim()&&!/^(#{3,4} |\s*\||\s*- |\d+\. )/.test(L[i])){p.push(L[i]);i++}
+    if(!p.length){p.push(l);i++}
+    h+=`<p>${inl(p.join(" "))}</p>`;
+  }
+  return h;
+}
+
+/* ---------- 간격 복습 ---------- */
+// 당일 밤 → 다음 날 → 3일 → 7일 → 2주 → 한 달
+const GAP=[0,1,3,7,14,30];
+const today=()=>{const t=new Date();return `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,"0")}-${String(t.getDate()).padStart(2,"0")}`};
+const addDays=(d,n)=>{const [y,m,dd]=d.split("-").map(Number);const x=new Date(y,m-1,dd+n);return `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,"0")}-${String(x.getDate()).padStart(2,"0")}`};
+let SRS=get("hsm-srs",{});
+const saveSRS=()=>put("hsm-srs",SRS);
+const lvl=id=>SRS[id]?SRS[id].b:0;
+function isDue(id){const s=SRS[id];if(!s)return false;if(s.b===0)return true;if(s.d>today())return false;return s.d<today()||Date.now()-s.t>3*3600e3}
+function grade(id,ok){
+  const s=SRS[id]||{b:0,d:today(),t:0};
+  if(ok){s.b=Math.min(5,s.b+1);s.d=addDays(today(),GAP[s.b-1])}
+  else{s.b=1;s.d=today()}
+  s.t=Date.now();SRS[id]=s;saveSRS();
+}
+function ryuLevel(n){const us=unitsOf(n);if(!us.length)return -1;return Math.min(...us.map(u=>lvl(u.id)))}
+
+/* ---------- 상태 ---------- */
+let st=Object.assign({mode:"map",bu:1,n:1,hide:false,qt:"ryu",qs:"all",qr:1,newBu:1},get("hsm-state",{}));
+const saveSt=()=>put("hsm-state",st);
+const MODES=[["map","지도"],["read","읽기"],["rev","복습"],["quiz","퀴즈"],["guide","사용법"]];
+function renderModes(){
+  const due=UNITS.filter(u=>isDue(u.id)).length;
+  $("#modes").innerHTML=MODES.map(([k,t])=>`<button type="button" class="chip" data-mode="${k}" aria-pressed="${st.mode===k}">${t}${k==="rev"&&due?`<span class="n">${due}</span>`:""}</button>`).join("");
+}
+function go(mode,extra){Object.assign(st,{mode},extra||{});saveSt();render();window.scrollTo(0,0)}
+
+/* ---------- 지도 ---------- */
+function vMap(){
+  const total=UNITS.length,seen=UNITS.filter(u=>lvl(u.id)>0).length,firm=UNITS.filter(u=>lvl(u.id)>=4).length,due=UNITS.filter(u=>isDue(u.id)).length;
+  const grps=[];D.BU.forEach(b=>{let g=grps.find(x=>x.g===b.g);if(!g)grps.push(g={g:b.g,list:[]});g.list.push(b)});
+  const buProg=b=>{const us=UNITS.filter(u=>u.n>=b.r[0]&&u.n<=b.r[1]);return us.length?us.filter(u=>lvl(u.id)>=3).length/us.length:0};
+  let h=`<section class="panel">
+    <div class="stat"><div><b>${seen}</b><span>익힌 묶음 / ${total}</span></div><div><b>${firm}</b><span>단단해진 묶음 (7일 이상)</span></div><div><b>${due}</b><span>오늘 복습</span></div></div>
+    <div class="bar"><button class="btn primary" type="button" data-go="rev">${due?`오늘 복습 ${due}개 하기`:"새 류 익히기"}</button><button class="btn" type="button" data-go="quiz">퀴즈</button></div>
+  </section>
+  <section class="panel"><h2>21부</h2><p class="lede">동식유식 / 광화플 / 가목종 / 섬신 / 돌귀비 / 기운정 / 무잡예. 누르면 그 부를 읽어요.</p>`;
+  for(const g of grps){
+    h+=`<div class="grp-h">${esc(g.g)}</div><div class="bus">`+g.list.map(b=>`<button type="button" class="bu" data-bu="${b.n}"><span class="no">${b.n}부 · ${b.r[0]===b.r[1]?b.r[0]:b.r[0]+"~"+b.r[1]}류</span><span class="nm">${esc(b.name)}</span><span class="rg">${inl(b.assoc)}</span><span class="pb"><i style="width:${(buProg(b)*100).toFixed(0)}%"></i></span></button>`).join("")+`</div>`;
+  }
+  h+=`</section><section class="panel"><h2>97류 익힘 지도</h2>
+    <div class="legend"><span><i style="background:var(--l0)"></i>안 봄</span><span><i style="background:var(--l1)"></i>오늘 익힘</span><span><i style="background:var(--l2)"></i>1~3일</span><span><i style="background:var(--l3)"></i>7일</span><span><i style="background:var(--l4)"></i>2주</span><span><i style="background:var(--l5)"></i>한 달</span></div>
+    <div class="grid">`+D.BU.map(b=>{
+      let c="";for(let n=b.r[0];n<=b.r[1];n++){const l=ryuLevel(n);c+=l<0?`<button class="cell void" type="button" disabled title="${n}류 유보">${n}</button>`:`<button class="cell" type="button" data-l="${Math.min(5,l)}" data-ryu="${n}" title="${n}류 ${esc(rtitle(n))}">${n}</button>`}
+      return `<div class="grow"><span class="lab">${b.n}부</span><div class="cells">${c}</div></div>`}).join("")+`</div>
+    <p class="muted">84·85류는 호 묶음(A~I, A~E)별로 따로 복습해요. 칸 색은 그 류에서 가장 약한 묶음 기준이에요.</p></section>`;
+  return h;
+}
+
+/* ---------- 읽기 ---------- */
+function vRead(){
+  const b=D.BU.find(x=>x.n===st.bu)||D.BU[0];
+  if(st.n<b.r[0]||st.n>b.r[1])st.n=b.r[0];
+  const r=RY[st.n],bs=BUS[b.n],p=PART[b.n];
+  const opts=D.BU.map(x=>`<option value="${x.n}"${x.n===b.n?" selected":""}>${x.n}부 ${esc(x.name)} (${x.r[0]===x.r[1]?x.r[0]:x.r[0]+"~"+x.r[1]}류)</option>`).join("");
+  let chips="";for(let n=b.r[0];n<=b.r[1];n++)chips+=`<button type="button" class="chip" data-n="${n}" aria-pressed="${n===st.n}">${n}류<span class="n">${esc(rtitle(n).slice(0,8))}</span></button>`;
+  let h=`<div class="sticky"><div class="bar" style="flex-wrap:nowrap"><select id="busel" style="flex:1;min-width:0" aria-label="부 고르기">${opts}</select><button type="button" class="btn" id="hidebtn" aria-pressed="${st.hide}">${st.hide?"보이기":"가리기"}</button></div><div class="rnav">${chips}</div></div>`;
+  if(bs)h+=`<details><summary>${esc(bs.h)}</summary><div class="md">${md(bs.md)}</div></details>`;
+  if(p&&(p.md||p.extra.length))h+=`<details><summary>${b.n}부 공통: 구조·부의 주<span class="badge">${p.extra.length+(p.md?1:0)}</span></summary><div class="md">${md(p.md)}${p.extra.map(e=>`<h4>${esc(e.h)}</h4>${md(e.md)}`).join("")}</div></details>`;
+  if(r){
+    const us=unitsOf(r.n);
+    const lv=us.length?`<span class="lvl">${us.map(u=>`${u.lab?u.lab.split(" ")[0]+" ":""}${["안 봄","오늘","1일","3일","7일","2주"][lvl(u.id)]}`).join(" · ")}</span>`:"";
+    h+=`<article class="panel ${st.hide?"hide":""}" id="art">
+      <div class="bar"><h2>${r.n}류 ${esc(r.t)}</h2>${r.codes?`<span class="badge">${esc(r.codes)}</span>`:""}</div>
+      ${(am=>am.length?`<div>${am.map(a=>`<div class="amgi ${am.length>1||/\*\*/.test(a[1])?"sm":""}">${a[0]?`<span class="lb">${esc(a[0])}</span>`:""}${inl(a[1])}</div>`).join("")}</div>`:"")(r.am.filter(a=>!a[0]||!r.subs.some(s=>s.h.includes(a[0]))))}
+      ${r.sc&&r.am.some(x=>!x[0])?`<div class="scene">${inl(r.sc)}</div>`:""}
+      <div class="md">${md(["암기식","절 순서 암기식","끊어 읽기","장면"].reduce((m,k)=>(r.am.some(x=>!x[0]))?m.replace(new RegExp("^\\*\\*"+k+"\\*\\*:.*$","m"),""):m,r.md))}</div>
+      ${r.subs.map(s=>`<h4 style="margin:4px 0 0;font-size:1.02rem">${esc(s.h)}</h4><div class="md">${md(s.md)}</div>`).join("")}
+      <div class="bar">${us.length?`<button type="button" class="btn primary" data-learn="${r.n}">이 류 복습 시작</button>`:""}<button type="button" class="btn" data-quizryu="${r.n}"${r.ho.length<4?" disabled":""}>이 류 호 퀴즈</button>${lv}</div>
+      <div class="bar"><button type="button" class="btn" data-n="${r.n-1}"${r.n<=1?" disabled":""}>← ${r.n-1}류</button><span class="sp"></span><button type="button" class="btn" data-n="${r.n+1}"${r.n>=97?" disabled":""}>${r.n+1}류 →</button></div>
+    </article>`;
+  }
+  return h;
+}
+
+/* ---------- 복습 ---------- */
+let rv=null; // {queue:[ids], cur, open}
+function buildQueue(){
+  const due=UNITS.filter(u=>isDue(u.id)).sort((a,b)=>SRS[a.id].d.localeCompare(SRS[b.id].d)||a.n-b.n).map(u=>u.id);
+  return due;
+}
+function vRev(){
+  if(!rv)rv={queue:buildQueue(),open:false,done:0};
+  const id=rv.queue[0];
+  const nb=D.BU.find(x=>x.n===st.newBu)||D.BU[0];
+  const fresh=UNITS.filter(u=>u.n>=nb.r[0]&&u.n<=nb.r[1]&&!SRS[u.id]);
+  const opts=D.BU.map(x=>{const k=UNITS.filter(u=>u.n>=x.r[0]&&u.n<=x.r[1]&&!SRS[u.id]).length;return `<option value="${x.n}"${x.n===nb.n?" selected":""}>${x.n}부 ${esc(x.name)} · 새 ${k}</option>`}).join("");
+  let h="";
+  if(id){
+    const u=UID[id],r=RY[u.n];
+    h+=`<section class="card ${st.hide?"hide":""}">
+      <div class="ttl"><span class="rn">${u.n}류</span><span>${esc(r.t)}${u.lab?` · ${esc(u.lab)}`:""}</span><span class="sp"></span><span class="badge">${["새로","오늘","1일","3일","7일","2주"][lvl(id)]}</span></div>
+      ${u.am.length?u.am.map(a=>`<div class="amgi sm">${inl(a)}</div>`).join(""):`<div class="muted">암기식 없이 호 순서만 떠올려 보세요.</div>`}
+      <p class="muted">${u.ho.length}개 호를 번호 순서대로 말해 본 뒤 펼치세요.</p>
+      ${rv.open?`<ol class="holist">${u.ho.map(([c,t])=>`<li><span class="c">${c}</span><span>${inl(t)}</span></li>`).join("")}</ol>
+        <div class="bar"><button type="button" class="btn ok" data-grade="1">다 말했어요</button><button type="button" class="btn bad" data-grade="0">헷갈렸어요</button><span class="sp"></span><button type="button" class="btn" data-readryu="${u.n}">읽기에서 보기</button></div>`
+      :`<div class="bar"><button type="button" class="btn primary" id="flip">펼치기</button></div>`}
+    </section>
+    <p class="muted">남은 카드 ${rv.queue.length}개${rv.done?` · 이번에 ${rv.done}개 끝`:""}. '헷갈렸어요'는 몇 시간 뒤 오늘 안에 다시 나와요.</p>`;
+  }else{
+    h+=`<section class="panel"><h2>${rv.done?"오늘 복습 끝":"오늘 복습할 카드가 없어요"}</h2><p class="lede">${rv.done?`${rv.done}개를 꺼내 봤어요. `:""}새 류를 익히려면 아래에서 부를 고르세요. 한 번에 4개 안팎만 넣는 게 좋아요.</p></section>`;
+  }
+  const nextDue=UNITS.filter(u=>SRS[u.id]&&!isDue(u.id)).map(u=>SRS[u.id].d).sort()[0];
+  h+=`<section class="panel"><h2>새로 익히기</h2>
+    <div class="bar"><select id="newbu" aria-label="새로 익힐 부">${opts}</select></div>
+    ${fresh.length?`<div class="queue">${fresh.slice(0,12).map(u=>`<span>${u.n}${u.lab?u.lab[0]:""}류</span>`).join("")}${fresh.length>12?`<span>…${fresh.length-12}개 더</span>`:""}</div>
+      <div class="bar"><button type="button" class="btn primary" data-addnew="4">4개 넣기</button><button type="button" class="btn" data-addnew="99">이 부 전부 넣기</button></div>`
+      :`<p class="muted">이 부는 모두 복습 중이에요.</p>`}
+    <p class="muted">넣은 카드는 오늘 바로 한 번 보고, 맞히면 다음 날 → 3일 → 7일 → 2주 → 한 달 뒤에 다시 나와요.${nextDue?` 다음 예정: ${nextDue}`:""}</p>
+  </section>`;
+  return h;
+}
+
+/* ---------- 퀴즈 ---------- */
+const QT=[["bu","부 ↔ 표제"],["ryu","류 ↔ 품목"],["ho","호 ↔ 품목"],["ord","순서 맞히기"]];
+let qz=null;
+function scopeRyu(){ // 퀴즈 범위의 류 번호
+  if(st.qs==="all")return D.ryu.filter(r=>r.n!==77).map(r=>r.n);
+  const b=D.BU.find(x=>x.n===+st.qs);const a=[];for(let n=b.r[0];n<=b.r[1];n++)if(n!==77)a.push(n);return a;
+}
+function pick(arr,k,not){return shuffle(arr.filter(x=>x!==not)).slice(0,k)}
+function makeQ(){
+  const t=st.qt;
+  if(t==="bu"){
+    const b=D.BU[Math.random()*21|0];
+    if(Math.random()<.5){const ds=pick(D.BU,3,b);return {q:`<span class="big">${b.n}부</span>표제는?`,opts:shuffle([b,...ds]).map(x=>({t:x.name,ok:x===b})),fb:`${b.n}부 ${b.name} (${b.r[0]}~${b.r[1]}류) · ${plain(b.assoc)}`}}
+    const ds=pick(D.BU.filter(x=>Math.abs(x.n-b.n)<=4),3,b);return {q:`<span class="big">${esc(b.name)}</span>몇 부?`,opts:shuffle([b,...ds]).map(x=>({t:x.n+"부",ok:x===b})),fb:`${b.n}부 · ${plain(b.assoc)}`};
+  }
+  if(t==="ryu"){
+    const sc=scopeRyu();const n=sc[Math.random()*sc.length|0];
+    const near=D.ryu.map(r=>r.n).filter(x=>x!==77&&x!==n&&Math.abs(x-n)<=6);
+    const ds=pick(near,3);
+    if(Math.random()<.5)return {q:`<span class="big">${n}류</span>품목은?`,opts:shuffle([n,...ds]).map(x=>({t:rtitle(x),ok:x===n})),fb:`${n}류 ${inl(D.RT[n]||"")}`,key:"r"+n};
+    return {q:`<span class="big" style="font-size:1.25rem">${esc(rtitle(n))}</span>몇 류?`,opts:shuffle([n,...ds]).map(x=>({t:x+"류",ok:x===n})),fb:`${n}류 ${inl(D.RT[n]||"")}`,key:"r"+n};
+  }
+  if(t==="ho"){
+    const sc=st.qs==="ryu"?[st.qr]:scopeRyu();
+    const pool=[];sc.forEach(n=>RY[n].ho.forEach(h=>pool.push([n,...h])));
+    if(pool.length<4)return null;
+    const it=pool[Math.random()*pool.length|0];const same=RY[it[0]].ho.filter(h=>h[0]!==it[1]);
+    let ds=shuffle(same.slice()).slice(0,3).map(h=>[it[0],...h]);
+    if(ds.length<3)ds=ds.concat(pick(pool.filter(p=>p[1]!==it[1]&&!ds.includes(p)),3-ds.length));
+    if(Math.random()<.5)return {q:`<span class="big">${it[1]}</span>${it[0]}류 ${esc(RY[it[0]].t)}`,opts:shuffle([it,...ds]).map(x=>({t:plain(x[2]),ok:x===it})),fb:`${it[1]} ${inl(it[2])}`,key:"h"+it[1]};
+    return {q:`<span class="big" style="font-size:1.15rem">${esc(plain(it[2]))}</span>몇 호?`,opts:shuffle([it,...ds]).map(x=>({t:x[1],ok:x===it})),fb:`${it[1]} ${inl(it[2])}`,key:"h"+it[1]};
+  }
+  if(t==="ord"){
+    // 부 안의 류 순서, 또는 류 안의 호 순서
+    if(st.qs==="ryu"||(st.qs!=="all"&&Math.random()<.6)){
+      const n=st.qs==="ryu"?st.qr:(()=>{const c=scopeRyu().filter(x=>RY[x].ho.length>=3);return c[Math.random()*c.length|0]})();
+      const u=unitsOf(n);const unit=u[Math.random()*u.length|0];
+      let ho=unit.ho;if(ho.length>8){const s=Math.random()*(ho.length-7)|0;ho=ho.slice(s,s+8)}
+      return {ord:true,title:`${n}류${unit.lab?" "+unit.lab:""}: 호를 번호 순서대로 누르세요`,items:ho.map(h=>({k:h[0],t:plain(h[1])})),hint:unit.am[0]||""};
+    }
+    const b=st.qs==="all"?D.BU.filter(x=>x.r[1]-x.r[0]>=2)[Math.random()*15|0]||D.BU[1]:D.BU.find(x=>x.n===+st.qs);
+    const items=[];for(let n=b.r[0];n<=b.r[1];n++)items.push({k:n+"류",t:rtitle(n)});
+    if(items.length<3){const all=[];D.BU.forEach(x=>all.push({k:x.n+"부",t:x.name}));const s=Math.random()*14|0;return {ord:true,title:"부를 번호 순서대로 누르세요",items:all.slice(s,s+7),hint:""}}
+    return {ord:true,title:`${b.n}부 ${b.name}: 류를 번호 순서대로 누르세요`,items:items.slice(0,14),hint:BUS[b.n]?.am||""};
+  }
+}
+function newQ(){qz.cur=makeQ();qz.ans=null;qz.picked=[];}
+function vQuiz(){
+  if(!qz){qz={ok:0,n:0};newQ()}
+  const bsel=`<option value="all"${st.qs==="all"?" selected":""}>전체</option>`+D.BU.map(x=>`<option value="${x.n}"${String(st.qs)===String(x.n)?" selected":""}>${x.n}부 ${esc(x.name)}</option>`).join("")+(st.qt!=="bu"&&st.qt!=="ryu"?`<option value="ryu"${st.qs==="ryu"?" selected":""}>한 류만: ${st.qr}류 ${esc(rtitle(st.qr))}</option>`:"");
+  let h=`<div class="bar">${QT.map(([k,t])=>`<button type="button" class="chip" data-qt="${k}" aria-pressed="${st.qt===k}">${t}</button>`).join("")}</div>
+    <div class="bar">${st.qt==="bu"?"":`<select id="qscope" aria-label="범위">${bsel}</select>`}<span class="sp"></span><span class="score">${qz.n?`${qz.ok} / ${qz.n} 맞힘`:""}</span></div>`;
+  const q=qz.cur;
+  if(!q){h+=`<section class="panel"><p class="muted">이 범위에는 문제를 만들 호가 부족해요. 범위를 넓혀 주세요.</p></section>`;return h}
+  if(q.ord){
+    const done=qz.picked.length===q.items.length;
+    if(!qz.order)qz.order=shuffle(q.items.map((_,i)=>i));
+    h+=`<section class="panel"><div class="q">${esc(q.title)}</div>${q.hint?`<div class="amgi sm">${inl(q.hint)}</div>`:""}
+      <ol class="olist">${qz.picked.map(([i,ok])=>`<li class="${ok?"o":"x"}">${esc(q.items[i].k)} ${esc(q.items[i].t)}</li>`).join("")}</ol>
+      <div class="ord ${done?"done":""}">${qz.order.map(i=>`<button type="button" data-ordi="${i}"${qz.picked.some(p=>p[0]===i)?" disabled":""}>${esc(q.items[i].t)}</button>`).join("")}</div>
+      ${done?`<div class="fb ${qz.picked.every(p=>p[1])?"okk":"ng"}">${qz.picked.every(p=>p[1])?"순서 그대로 꺼냈어요.":"빨간 줄이 틀린 자리예요. 정답 순서: "+q.items.map(x=>esc(x.k)).join(" → ")}</div><div class="bar"><button type="button" class="btn primary" id="nextq">다음</button></div>`:`<p class="muted">틀리면 빨간색으로 표시되고, 그 자리의 정답으로 채워져요.</p>`}
+    </section>`;
+    return h;
+  }
+  h+=`<section class="panel"><div class="q">${q.q}</div><div class="opts">${q.opts.map((o,i)=>{
+      let c="";if(qz.ans!==null){if(o.ok)c="right";else if(i===qz.ans)c="wrong"}
+      return `<button type="button" class="opt ${c}" data-opt="${i}"${qz.ans!==null?" disabled":""}>${esc(o.t)}</button>`}).join("")}</div>
+    ${qz.ans!==null?`<div class="fb ${q.opts[qz.ans].ok?"okk":"ng"}">${q.opts[qz.ans].ok?"맞아요. ":"틀렸어요. "}${q.fb}</div><div class="bar"><button type="button" class="btn primary" id="nextq">다음</button></div>`:""}
+  </section>`;
+  return h;
+}
+
+/* ---------- 사용법 ---------- */
+function vGuide(){
+  return `<section class="panel"><p class="lede">${inl(D.lead)}</p></section>`+
+    D.guide.map((g,i)=>`<details${i===0?" open":""}><summary>${esc(g.t)}</summary><div class="md">${md(g.md)}</div></details>`).join("");
+}
+
+/* ---------- 그리기 ---------- */
+function render(){
+  renderModes();
+  const v=$("#view");
+  v.innerHTML=st.mode==="map"?vMap():st.mode==="read"?vRead():st.mode==="rev"?vRev():st.mode==="quiz"?vQuiz():vGuide();
+  v.style.display="flex";v.style.flexDirection="column";v.style.gap="14px";
+  const bs=$("#busel");if(bs)bs.onchange=e=>{st.bu=+e.target.value;st.n=D.BU.find(x=>x.n===st.bu).r[0];saveSt();render()};
+  const nb=$("#newbu");if(nb)nb.onchange=e=>{st.newBu=+e.target.value;saveSt();render()};
+  const qs=$("#qscope");if(qs)qs.onchange=e=>{st.qs=e.target.value==="all"||e.target.value==="ryu"?e.target.value:+e.target.value;saveSt();qz=null;render()};
+  const fl=$("#flip");if(fl)fl.onclick=()=>{rv.open=true;render()};
+  const nx=$("#nextq");if(nx)nx.onclick=()=>{newQ();qz.order=null;render()};
+}
+document.addEventListener("click",e=>{
+  const t=e.target;let x;
+  if(x=t.closest("[data-mode]")){if(x.dataset.mode==="rev")rv=null;go(x.dataset.mode);return}
+  if(x=t.closest("[data-go]")){rv=null;go(x.dataset.go);return}
+  if(x=t.closest("[data-bu]")){const n=+x.dataset.bu;go("read",{bu:n,n:D.BU.find(b=>b.n===n).r[0]});return}
+  if(x=t.closest("[data-ryu]")){const n=+x.dataset.ryu;go("read",{bu:buOf(n).n,n});return}
+  if(x=t.closest("[data-readryu]")){const n=+x.dataset.readryu;go("read",{bu:buOf(n).n,n});return}
+  if(x=t.closest("[data-n]")){const n=+x.dataset.n;if(n<1||n>97)return;st.n=n;st.bu=buOf(n).n;saveSt();render();const a=$("#art");if(a)a.scrollIntoView({block:"start"});return}
+  if(t.closest("#hidebtn")){st.hide=!st.hide;saveSt();render();return}
+  if(x=t.closest(".hide td.cue")){x.classList.toggle("open");return}
+  if(x=t.closest("[data-learn]")){const n=+x.dataset.learn;unitsOf(n).forEach(u=>{if(!SRS[u.id])SRS[u.id]={b:0,d:today(),t:0}});saveSRS();rv=null;go("rev");return}
+  if(x=t.closest("[data-quizryu]")){st.qt="ho";st.qs="ryu";st.qr=+x.dataset.quizryu;qz=null;go("quiz");return}
+  if(x=t.closest("[data-grade]")){const id=rv.queue.shift();grade(id,x.dataset.grade==="1");if(x.dataset.grade==="0"&&SRS[id].b<=1&&!rv.queue.includes(id))rv.queue.push(id);rv.open=false;rv.done++;render();return}
+  if(x=t.closest("[data-addnew]")){const nb=D.BU.find(b=>b.n===st.newBu);const fresh=UNITS.filter(u=>u.n>=nb.r[0]&&u.n<=nb.r[1]&&!SRS[u.id]).slice(0,+x.dataset.addnew);
+    fresh.forEach(u=>SRS[u.id]={b:0,d:today(),t:0});saveSRS();rv=null;render();return}
+  if(x=t.closest("[data-qt]")){st.qt=x.dataset.qt;if(st.qt==="bu"||(st.qt==="ryu"&&st.qs==="ryu"))st.qs="all";saveSt();qz=null;render();return}
+  if(x=t.closest("[data-opt]")){if(qz.ans!==null)return;qz.ans=+x.dataset.opt;qz.n++;const ok=qz.cur.opts[qz.ans].ok;if(ok)qz.ok++;
+    if(qz.cur.key){const w=get("hsm-wrong",{});if(ok){if(w[qz.cur.key])w[qz.cur.key]--;if(w[qz.cur.key]<=0)delete w[qz.cur.key]}else w[qz.cur.key]=(w[qz.cur.key]||0)+1;put("hsm-wrong",w)}
+    put("hsm-score",{ok:(get("hsm-score",{ok:0,n:0}).ok+(ok?1:0)),n:get("hsm-score",{ok:0,n:0}).n+1});render();return}
+  if(x=t.closest("[data-ordi]")){const i=+x.dataset.ordi,q=qz.cur,pos=qz.picked.length;const ok=i===pos;
+    if(ok)qz.picked.push([i,true]);else{qz.picked.push([pos,false])}
+    if(qz.picked.length===q.items.length){qz.n++;if(qz.picked.every(p=>p[1]))qz.ok++}
+    render();return}
+});
+render();
+</script>
+</body>
+</html>

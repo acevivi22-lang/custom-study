@@ -174,6 +174,7 @@ const MODS=[
  {id:"trade",g:1,t:"무역영어",ic:"E",src:"amgi.html#inco",d:"인코텀즈 2020, UCP 600, CISG, 무역 용어"},
  {id:"trademap",g:1,t:"무역영어 지도",ic:"航",src:"trademap.html",d:"인코텀즈 11개 규칙 항로, 규칙 맞히기, 국제규범 카드"},
  {id:"hs",g:2,t:"관세율표",ic:"HS",src:"amgi.html#hs",d:"류 번호 ↔ 품목명 양방향, 부별 범위 선택, 전체 표"},
+ {id:"hsm",g:2,t:"관세율표 암기식",ic:"暗",src:"hsm.html",d:"21부 97류 암기식과 류별 호·주, 품목 가리기, 간격 복습, 순서 맞히기"},
  {id:"tc",g:2,t:"통칙 타자",ic:"則",src:"tc.html",d:"통칙 1~6 따라치기, 키워드 힌트, 백지 복원"},
  {id:"val",g:2,t:"관세평가",ic:"價",src:"amgi.html#val",d:"제1~6방법, 가산·공제 요소 사례 문제"},
  {id:"jr",g:3,t:"정리노트",ic:"抄",src:"jeongri.html",d:"위원회·날짜·금액, 부가세 숫자, 무역규범 숫자, 회계 공식. 숫자 가리기"},
@@ -212,6 +213,7 @@ function prog(m,s){
     case "nk":return {t:`OX 푼 문제 ${s.nkDone} · 틀림 ${s.nkWrong}`};
     case "tc":return {t:`백지 복원 90% 이상 ${s.tcDone} / 10`,p:s.tcDone/10};
     case "sy":{const g=get("sy-score",{ok:0,n:0});return {t:g.n?`칸 맞히기 ${g.ok}/${g.n}`:"탄력관세 12종 비교"}}
+    case "hsm":{const r=get("hsm-srs",{}),k=Object.keys(r),t=new Date(),td=`${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,"0")}-${String(t.getDate()).padStart(2,"0")}`,due=k.filter(x=>r[x].b===0||r[x].d<td||(r[x].d===td&&Date.now()-r[x].t>108e5)).length;return {t:k.length?`익힌 묶음 ${k.length} / 108${due?` · 오늘 복습 ${due}`:""}`:"21부 97류 · 호와 주",p:k.length/108}}
     case "jr":return {t:"8개 주제 · 숫자 가리기"};
     case "wrong":return {t:s.wrongA?`모인 오답 ${s.wrongA}개`:"아직 오답 없음"};
   }
