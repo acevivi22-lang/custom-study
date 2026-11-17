@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>관세법 세율</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<script>(function(){if(window.self===window.top)return;var r=document.documentElement;try{var t=parent.document.documentElement.getAttribute("data-theme");if(t)r.setAttribute("data-theme",t)}catch(e){}})();</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@600;900&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: 세율 비교 장부 — 위 모드 칩(우선순위·비교표·카드 퀴즈·기타 세율), 아래 한 화면씩 */
+:root{
+  color-scheme:light;
+  --bg:#edf0f3; --surface:#ffffff; --ink:#18212b; --muted:#5b6876; --line:#d6dce3; --hair:#e6eaef;
+  --accent:#1f4e79; --accent-soft:#dde7f1; --mark:#fff1a8; --mark-ink:#5a4a00;
+  --ok:#1d6b45; --ok-soft:#dcefe4; --bad:#b3261e; --bad-soft:#f7e2df;
+  --f-display:"Noto Serif KR","Nanum Myeongjo",serif;
+  --f-body:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#10151b; --surface:#18202a; --ink:#e6ebf0; --muted:#98a4b1; --line:#2b3644; --hair:#222c38;
+  --accent:#86b4e4; --accent-soft:#1d3044; --mark:#4a3f10; --mark-ink:#ffe58a;
+  --ok:#7fd1a4; --ok-soft:#173226; --bad:#f08a80; --bad-soft:#3b2120; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#10151b; --surface:#18202a; --ink:#e6ebf0; --muted:#98a4b1; --line:#2b3644; --hair:#222c38;
+  --accent:#86b4e4; --accent-soft:#1d3044; --mark:#4a3f10; --mark-ink:#ffe58a;
+  --ok:#7fd1a4; --ok-soft:#173226; --bad:#f08a80; --bad-soft:#3b2120; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:980px;margin:0 auto;padding-block:14px 56px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;flex-direction:column;gap:14px}
+.modes{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.modes::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:999px;padding:6px 13px;font-size:.88rem;cursor:pointer;white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg);font-weight:700}
+h1{font-family:var(--f-display);font-weight:900;font-size:1.35rem;margin:0;text-wrap:balance}
+.lede{margin:0;color:var(--muted);font-size:.9rem;max-width:62ch;word-break:keep-all}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:7px 13px;font-size:.88rem;cursor:pointer}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--surface);font-weight:700}
+.btn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.muted{color:var(--muted);font-size:.84rem}
+.k{background:var(--mark);color:var(--mark-ink);border-radius:3px;padding:0 3px;font-weight:700}
+.hide .k{color:transparent;background:var(--line);cursor:pointer;user-select:none}
+.hide .k.open{color:var(--mark-ink);background:var(--mark)}
+
+/* 우선순위 */
+.tiers{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.tier{display:grid;grid-template-columns:44px minmax(0,1fr);gap:12px;align-items:start;border:1px solid var(--line);border-radius:10px;padding:12px;background:var(--surface)}
+.tier .n{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-family:var(--f-display);font-weight:900;font-size:1.25rem;background:var(--accent-soft);color:var(--accent)}
+.tier .t{font-weight:700}
+.tier .d{font-size:.86rem;color:var(--muted);word-break:keep-all}
+.pick{display:flex;flex-wrap:wrap;gap:8px}
+.pick button{border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:9px 12px;cursor:pointer;text-align:left;font-size:.9rem}
+.pick button:disabled{opacity:.35;cursor:default}
+.slot{min-height:44px}
+
+/* 비교표 */
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+table{border-collapse:collapse;min-width:900px;width:100%;font-size:.86rem}
+th,td{border-bottom:1px solid var(--hair);padding:10px 12px;text-align:left;vertical-align:top;word-break:keep-all}
+thead th{position:sticky;top:0;background:var(--accent-soft);color:var(--accent);font-size:.78rem;letter-spacing:.03em;white-space:nowrap}
+tbody th{position:sticky;left:0;background:var(--surface);font-weight:700;white-space:nowrap;border-right:1px solid var(--hair)}
+.cell{display:inline}
+.hide td .cell{color:transparent;background:var(--hair);border-radius:4px;cursor:pointer;user-select:none;display:block;min-height:1.4em}
+.hide td .cell.open{color:inherit;background:none}
+.hide .cell:not(.open) .k{color:transparent;background:transparent}
+.hide .cell.open .k{color:var(--mark-ink);background:var(--mark)}
+
+/* 카드형 (폰) */
+.cards{display:flex;flex-direction:column;gap:10px}
+.dcard{border:1px solid var(--line);border-radius:12px;background:var(--surface);overflow:hidden}
+.dcard h3{margin:0;padding:10px 14px;background:var(--accent-soft);color:var(--accent);font-size:1rem;display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.dcard h3 small{font-family:var(--f-mono);font-size:.72rem;font-weight:500}
+.dl{display:grid;grid-template-columns:84px minmax(0,1fr);gap:0}
+.dl dt,.dl dd{margin:0;padding:8px 14px;border-top:1px solid var(--hair);font-size:.88rem;word-break:keep-all}
+.dl dt{color:var(--muted);font-size:.78rem;padding-right:0}
+.hide .dl dd .cell{color:transparent;background:var(--hair);border-radius:4px;cursor:pointer;user-select:none;display:block;min-height:1.4em}
+.hide .dl dd .cell.open{color:inherit;background:none}
+@media (min-width:760px){.cards{display:none}}
+@media (max-width:759px){.tablewrap{display:none}}
+
+/* 퀴즈 */
+.qhead{display:flex;justify-content:space-between;font-family:var(--f-mono);font-size:.78rem;color:var(--muted)}
+.qtext{font-size:1.08rem;font-weight:500;margin:0;word-break:keep-all;line-height:1.7}
+.qtext b{color:var(--accent)}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{text-align:left;border:1.5px solid var(--line);background:var(--bg);border-radius:10px;padding:12px 14px;cursor:pointer;font-size:.92rem;word-break:keep-all;touch-action:manipulation}
+.opt.right{border-color:var(--ok);background:var(--ok-soft)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.opt:disabled{cursor:default}
+.verdict{font-weight:700}
+.verdict.r{color:var(--ok)} .verdict.w{color:var(--bad)}
+.score{font-family:var(--f-mono);font-size:.8rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.foot{font-size:.78rem;color:var(--muted);margin:0;word-break:keep-all}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="modes" id="modes"></div>
+  <section id="v-order"></section>
+  <section id="v-table" hidden></section>
+  <section id="v-quiz" hidden></section>
+  <section id="v-etc" hidden></section>
+  <p class="foot">관세법 제49조~제83조 내용을 시험용으로 줄인 정리예요. 조문 번호와 숫자는 시험 전에 최신 기본서로 한 번 더 확인하세요.</p>
+</div>
+<script>
+/* ---------- 데이터 ---------- */
+const TIERS=[
+ {t:"덤핑방지·상계·보복·긴급·특정국물품긴급·농림축산물특별긴급관세, 조정관세(공중도덕·생명·환경 등 제69조 2호)",d:"무역구제·보호 목적. 무조건 최우선"},
+ {t:"국제협력관세·편익관세",d:"3~6순위 세율보다 '낮은 경우에만' 우선. 농림축산물 시장접근물량 안의 양허세율은 기본·잠정세율보다 우선"},
+ {t:"조정관세(제69조 1·3·4호)·할당관세·계절관세",d:"할당관세는 4순위 일반특혜관세보다 '낮은 경우에만' 우선"},
+ {t:"일반특혜관세",d:"개발도상국(특혜대상국) 원산 물품"},
+ {t:"잠정세율",d:"관세율표(별표)에 기본세율과 함께 있음. 기본세율보다 우선"},
+ {t:"기본세율",d:"마지막 순위"}
+];
+const COLS=[["law","근거"],["why","부과 요건"],["how","얼마까지"],["who","정하는 법령"],["temp","잠정조치"],["term","기간"]];
+const DUTIES=[
+ {n:"덤핑방지관세",law:"51~56조",why:"정상가격 이하로 수입(덤핑)되어 국내산업에 {{실질적 피해}}(우려·확립 지연 포함)",how:"{{덤핑차액}}(정상가격 − 덤핑가격) 이하",who:"{{기획재정부령}}",temp:"{{있음}} · 잠정관세 또는 담보",term:"{{5년}} 이내 · 재심사로 변경"},
+ {n:"상계관세",law:"57~62조",why:"수출국에서 {{보조금}}을 받은 물품 수입으로 실질적 피해",how:"{{보조금 등의 금액}} 이하",who:"{{기획재정부령}}",temp:"{{있음}}",term:"{{5년}} 이내 · 재심사로 변경"},
+ {n:"보복관세",law:"63~64조",why:"교역상대국이 우리 수출물품 등에 {{차별·불리한 대우}} → 우리 무역이익 침해",how:"{{피해상당액}} 범위",who:"{{기획재정부령}}",temp:"{{없음}}",term:"따로 정함 없음"},
+ {n:"긴급관세",law:"65~67조",why:"특정물품 {{수입 증가}}로 국내산업에 {{심각한 피해}}(우려)",how:"피해 구제·산업구조 조정에 필요한 범위",who:"{{기획재정부령}}",temp:"{{있음}} · 잠정긴급관세 {{200일}} 이내",term:"{{4년}} 이내, 연장 포함 총 {{8년}}"},
+ {n:"특정국물품 긴급관세",law:"67조의2",why:"조약에 따라 {{특정국}} 물품 수입 증가로 {{시장 교란}}(우려)",how:"피해 구제에 필요한 범위",who:"{{기획재정부령}}",temp:"{{있음}}",term:"필요한 범위"},
+ {n:"농림축산물 특별긴급관세",law:"68조",why:"국내외 가격차 상당률로 양허한 농림축산물 {{수입량 급증}} 또는 {{가격 하락}}",how:"양허세율을 {{초과}}해 부과",who:"{{기획재정부령}}",temp:"–",term:"대통령령으로 정함"},
+ {n:"조정관세",law:"69~70조",why:"①세율 불균형 시정 ②공중도덕·생명·환경 보호 ③국내 개발 초기 물품 보호 ④경쟁력 취약 농림축수산물 등 수입 증가로 시장 교란",how:"{{100%}} − 기본세율 범위에서 기본세율에 {{더함}} (농림축수산물은 국내외 가격차 상당률)",who:"{{대통령령}}",temp:"–",term:"필요한 기간"},
+ {n:"할당관세",law:"71조",why:"물자 수급 원활, 수입가격 급등 물품 가격 안정, 유사물품 세율 불균형 시정 등",how:"기본세율에서 {{40%p}} 빼기 · 일정 수량 초과분은 {{40%p}} 더하기",who:"{{대통령령}}",temp:"–",term:"시행 실적 다음 해 {{1월 31일}}까지 국회 보고"},
+ {n:"계절관세",law:"72조",why:"{{계절}}에 따라 가격 차이가 큰 물품의 수입으로 국내시장 교란 우려",how:"국내외 가격차 상당률 범위에서 높이거나 {{40%p}} 범위에서 낮춤",who:"{{기획재정부령}}",temp:"–",term:"계절 구분"},
+ {n:"국제협력관세",law:"73조",why:"국제기구·특정국과 관세 {{협상}}",how:"기본세율의 {{50%}} 범위에서 양허 (특정국과 협상 시 50% 초과 불가)",who:"{{대통령령}}",temp:"–",term:"–"},
+ {n:"편익관세",law:"74~75조",why:"조약에 따른 편익을 받지 않는 나라의 생산물",how:"이미 체결된 조약의 편익 {{한도}}에서",who:"{{대통령령}}",temp:"–",term:"적용 정지 가능"},
+ {n:"일반특혜관세",law:"76~77조",why:"{{개발도상국}}(특혜대상국) 원산 물품",how:"기본세율보다 낮게 · {{최빈개발도상국}}은 더 우대",who:"{{대통령령}}",temp:"–",term:"적용 정지·배제 가능"}
+];
+const ETC=[
+ {h:"간이세율 (81조)",rows:["대상: 여행자·승무원 {{휴대품}}, {{우편물}}, {{탁송품·별송품}}","관세·내국세를 합쳐 하나의 세율로 · {{대통령령}}","제외: {{종량세}} 물품, 수입신고 대상 우편물, 감면 물품, 고가품 등"]},
+ {h:"합의세율 (82조)",rows:["일괄 수입신고된 물품 중 세율이 다른 물품이 섞이면","신고인이 신청하면 그중 {{가장 높은}} 세율을 일괄 적용","이에 대해서는 {{심사·심판청구를 할 수 없다}}"]},
+ {h:"용도세율 (83조)",rows:["용도에 따라 세율이 다른 물품을 {{낮은}} 세율로 적용받으려면 {{세관장 승인}}","수입신고 수리일부터 {{3년}} 범위 안에서 용도 외 사용·양도하면 차액 징수"]},
+ {h:"잠정세율 (50조)",rows:["별표에 기본세율과 함께 규정 · 기본세율보다 {{우선}}","{{대통령령}}으로 적용 정지하거나 기본세율과의 차이를 좁힐 수 있음"]},
+ {h:"정하는 법령 한 줄 암기",rows:["{{기획재정부령}}: 덤핑·상계·보복·긴급·특정국물품긴급·농림축산물특별긴급·{{계절}}","{{대통령령}}: {{조정}}·{{할당}}·국제협력·편익·일반특혜·간이"]}
+];
+/* ---------- 공통 ---------- */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmt=s=>esc(s).replace(/\{\{(.+?)\}\}/g,'<span class="k">$1</span>');
+const plain=s=>String(s).replace(/[{}]/g,"");
+const get=(k,d)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}};
+const put=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const MODES=[["order","적용 순서"],["table","탄력관세 비교표"],["quiz","칸 맞히기"],["etc","그 밖의 세율"]];
+let st=Object.assign({m:"order",hide:false},get("sy-state",{}));
+function save(){put("sy-state",st)}
+
+/* ---------- 우선순위 ---------- */
+let ord={on:false,picked:[],order:[],miss:0};
+function renderOrder(){
+  const v=$("#v-order");
+  if(!ord.on){
+    v.innerHTML=`<div class="panel"><h1>세율 적용 순서</h1><p class="lede">같은 물품에 여러 세율이 걸리면 위에서부터 적용해요. '낮은 경우에만'이 붙는 단서 두 개가 단골 함정이에요.</p>
+      <div class="bar"><button class="btn primary" type="button" id="ordstart">순서 맞히기</button><button class="btn" type="button" id="hidebtn" aria-pressed="${st.hide}">${st.hide?"단어 보이기":"핵심 단어 가리기"}</button></div>
+      <ol class="tiers ${st.hide?"hide":""}">${TIERS.map((t,i)=>`<li class="tier"><span class="n">${i+1}</span><div><div class="t">${esc(t.t)}</div><div class="d">${fmt(t.d.replace("'낮은 경우에만'","{{낮은 경우에만}}"))}</div></div></li>`).join("")}</ol></div>`;
+    $("#ordstart").onclick=()=>{ord={on:true,picked:[],order:shuffle(TIERS.map((_,i)=>i)),miss:0};renderOrder()};
+    $("#hidebtn").onclick=()=>{st.hide=!st.hide;save();renderOrder()};
+    return;
+  }
+  const done=ord.picked.length===TIERS.length;
+  v.innerHTML=`<div class="panel"><h1>순서 맞히기</h1><p class="lede">${done?`다 맞췄어요. 틀린 횟수 ${ord.miss}번.`:`${ord.picked.length+1}순위를 고르세요.`}</p>
+    <ol class="tiers slot">${ord.picked.map((i,k)=>`<li class="tier"><span class="n">${k+1}</span><div><div class="t">${esc(TIERS[i].t)}</div></div></li>`).join("")}</ol>
+    <div class="pick">${ord.order.map(i=>`<button type="button" data-ti="${i}" ${ord.picked.includes(i)?"disabled":""}>${esc(TIERS[i].t)}</button>`).join("")}</div>
+    <p class="muted" id="ordmsg" aria-live="polite"></p>
+    <div class="bar"><button class="btn" type="button" id="ordback">정리로 돌아가기</button>${done?'<button class="btn primary" type="button" id="ordagain">다시</button>':""}</div></div>`;
+  v.querySelectorAll("[data-ti]").forEach(b=>b.onclick=()=>{
+    const i=+b.dataset.ti;
+    if(i===ord.picked.length){ord.picked.push(i);renderOrder()}
+    else{ord.miss++;b.style.borderColor="var(--bad)";$("#ordmsg").textContent=`아니에요. ${ord.picked.length+1}순위는 다른 거예요.`}
+  });
+  $("#ordback").onclick=()=>{ord.on=false;renderOrder()};
+  if(done)$("#ordagain").onclick=()=>{ord={on:true,picked:[],order:shuffle(TIERS.map((_,i)=>i)),miss:0};renderOrder()};
+}
+
+/* ---------- 비교표 ---------- */
+function renderTable(){
+  const v=$("#v-table");
+  const cell=s=>`<span class="cell">${fmt(s)}</span>`;
+  v.innerHTML=`<div class="panel"><h1>탄력관세 비교표</h1><p class="lede">칸 가리기를 켜고, 칸을 하나씩 떠올린 다음 눌러서 확인하세요. 노란 글씨가 시험에 나오는 차이예요.</p>
+    <div class="bar"><button class="btn" type="button" id="tbhide" aria-pressed="${st.hide}">${st.hide?"칸 보이기":"칸 가리기"}</button><button class="btn" type="button" id="tbopen" ${st.hide?"":"hidden"}>모두 펼치기</button></div></div>
+    <div class="tablewrap ${st.hide?"hide":""}"><table><thead><tr><th scope="col">관세</th>${COLS.map(c=>`<th scope="col">${c[1]}</th>`).join("")}</tr></thead>
+    <tbody>${DUTIES.map(d=>`<tr><th scope="row">${esc(d.n)}</th>${COLS.map(c=>`<td>${cell(d[c[0]])}</td>`).join("")}</tr>`).join("")}</tbody></table></div>
+    <div class="cards ${st.hide?"hide":""}">${DUTIES.map(d=>`<article class="dcard"><h3>${esc(d.n)}<small>${esc(d.law)}</small></h3><dl class="dl">${COLS.slice(1).map(c=>`<dt>${c[1]}</dt><dd>${cell(d[c[0]])}</dd>`).join("")}</dl></article>`).join("")}</div>`;
+  $("#tbhide").onclick=()=>{st.hide=!st.hide;save();renderTable()};
+  $("#tbopen").onclick=()=>v.querySelectorAll(".cell").forEach(c=>c.classList.add("open"));
+}
+
+/* ---------- 칸 맞히기 ---------- */
+let qz=null;
+const QCOLS=["why","how","who","temp","term"];
+function newQ(){
+  const d=DUTIES[Math.floor(Math.random()*DUTIES.length)];
+  const col=QCOLS[Math.floor(Math.random()*QCOLS.length)];
+  const right=plain(d[col]);
+  const pool=[...new Set(DUTIES.map(x=>plain(x[col])).filter(x=>x!==right&&x!=="–"))];
+  if(right==="–"||pool.length<2)return newQ();
+  const opts=shuffle([right,...shuffle(pool).slice(0,3)]);
+  return {d,col,right,opts,picked:null};
+}
+function renderQuiz(){
+  const sc=get("sy-score",{ok:0,n:0});
+  if(!qz)qz=newQ();
+  const lab=COLS.find(c=>c[0]===qz.col)[1];
+  const v=$("#v-quiz");
+  v.innerHTML=`<div class="panel"><div class="qhead"><span>${esc(qz.d.law)}</span><span class="score">맞힘 ${sc.ok} / ${sc.n}</span></div>
+    <p class="qtext"><b>${esc(qz.d.n)}</b>의 <b>${lab}</b>은(는)?</p>
+    <div class="opts">${qz.opts.map((o,i)=>{let c="";if(qz.picked!==null){if(o===qz.right)c="right";else if(i===qz.picked)c="wrong"}
+      return `<button class="opt ${c}" type="button" data-oi="${i}" ${qz.picked!==null?"disabled":""}>${esc(o)}</button>`}).join("")}</div>
+    ${qz.picked!==null?`<p class="verdict ${qz.opts[qz.picked]===qz.right?"r":"w"}">${qz.opts[qz.picked]===qz.right?"정답":"오답"}</p><div class="bar"><button class="btn primary" type="button" id="qnext">다음 문제</button><button class="btn" type="button" id="qreset">점수 지우기</button></div>`:""}</div>`;
+  v.querySelectorAll("[data-oi]").forEach(b=>b.onclick=()=>{
+    qz.picked=+b.dataset.oi;const s=get("sy-score",{ok:0,n:0});s.n++;if(qz.opts[qz.picked]===qz.right)s.ok++;put("sy-score",s);renderQuiz()});
+  if(qz.picked!==null){$("#qnext").onclick=()=>{qz=newQ();renderQuiz()};$("#qreset").onclick=()=>{put("sy-score",{ok:0,n:0});renderQuiz()}}
+}
+
+/* ---------- 그 밖의 세율 ---------- */
+function renderEtc(){
+  const v=$("#v-etc");
+  v.innerHTML=`<div class="panel"><h1>그 밖의 세율</h1><div class="bar"><button class="btn" type="button" id="ethide" aria-pressed="${st.hide}">${st.hide?"단어 보이기":"핵심 단어 가리기"}</button></div></div>
+   <div class="cards-etc ${st.hide?"hide":""}" style="display:flex;flex-direction:column;gap:10px">${ETC.map(g=>`<article class="dcard"><h3>${esc(g.h)}</h3><dl class="dl" style="grid-template-columns:1fr">${g.rows.map(r=>`<dd>${fmt(r)}</dd>`).join("")}</dl></article>`).join("")}</div>`;
+  $("#ethide").onclick=()=>{st.hide=!st.hide;save();renderEtc()};
+}
+
+/* ---------- 모드 ---------- */
+function render(){
+  $("#modes").innerHTML=MODES.map(([k,t])=>`<button class="chip" type="button" data-m="${k}" aria-pressed="${st.m===k}">${t}</button>`).join("");
+  for(const [k] of MODES)$("#v-"+k).hidden=st.m!==k;
+  ({order:renderOrder,table:renderTable,quiz:renderQuiz,etc:renderEtc})[st.m]();
+  save();
+}
+document.addEventListener("click",e=>{
+  const m=e.target.closest("[data-m]");if(m){st.m=m.dataset.m;render();return}
+  const k=e.target.closest(".hide .cell")||e.target.closest(".hide .k");if(k)k.classList.toggle("open");
+});
+render();
+</script>
+</body>
+</html>

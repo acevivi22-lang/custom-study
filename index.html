@@ -169,6 +169,7 @@ const MODS=[
  {id:"gc2",g:0,t:"2차 기출",ic:"2",src:"gichul.html#p2",d:"2020~2026 2차 문제지, 80분 타이머, 문제별 답안 칸"},
  {id:"law",g:1,t:"관세법 OX",ic:"法",src:"amgi.html#law",d:"과세물건, 납세의무자, 제척기간, 탄력관세 등 조문 함정 OX"},
  {id:"lawmap",g:1,t:"관세법 지도·카드",ic:"圖",src:"lawmap.html",d:"13개 장 구조 지도와 조문 시트, 간격반복 플래시카드"},
+ {id:"sy",g:1,t:"관세법 세율",ic:"率",src:"seyul.html",d:"세율 적용 순서 맞히기, 탄력관세 12종 비교표(칸 가리기), 칸 맞히기 퀴즈"},
  {id:"nk",g:1,t:"내국소비세",ic:"稅",src:"nk.html",d:"부가세·개소세·주세 구조 지도, 돈 흐름, 수입 세금 계산, OX"},
  {id:"trade",g:1,t:"무역영어",ic:"E",src:"amgi.html#inco",d:"인코텀즈 2020, UCP 600, CISG, 무역 용어"},
  {id:"trademap",g:1,t:"무역영어 지도",ic:"航",src:"trademap.html",d:"인코텀즈 11개 규칙 항로, 규칙 맞히기, 국제규범 카드"},
@@ -210,6 +211,7 @@ function prog(m,s){
     case "trademap":{const g=get("inco-score",{ok:0,n:0});return {t:g.n?`규칙 맞히기 ${g.ok}/${g.n}`:"인코텀즈 11개 규칙"}}
     case "nk":return {t:`OX 푼 문제 ${s.nkDone} · 틀림 ${s.nkWrong}`};
     case "tc":return {t:`백지 복원 90% 이상 ${s.tcDone} / 10`,p:s.tcDone/10};
+    case "sy":{const g=get("sy-score",{ok:0,n:0});return {t:g.n?`칸 맞히기 ${g.ok}/${g.n}`:"탄력관세 12종 비교"}}
     case "jr":return {t:"8개 주제 · 숫자 가리기"};
     case "wrong":return {t:s.wrongA?`모인 오답 ${s.wrongA}개`:"아직 오답 없음"};
   }
