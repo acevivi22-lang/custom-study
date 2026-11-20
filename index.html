@@ -18,7 +18,7 @@
    PICTURE 홈 첫 화면 검은 띠: D-day, 11/16~2차 시험일까지 주 단위 수련 기록 격자
    COLOUR 돌빛 바탕, 세관 도장 군청(주색), 주홍 도장(시험일·기출), 청록·황토는 묶음 구분 — 값은 theme.css
    TYPE   Noto Sans KR 900(숫자·제목) / 400·500(본문), IBM Plex Mono(작은 숫자)
-   LAYOUT 폰: 머리줄 + 연습장 + 아래 엄지 탭 6개(홈·계획·기출·1차·2차·복습). 900px 이상은 탭이 왼쪽 레일 */
+   LAYOUT 폰: 머리줄 + 연습장 + 아래 엄지 탭 7개(홈·계획·기출·1차·2차·복습·기숙사). 900px 이상은 탭이 왼쪽 레일 */
 *{box-sizing:border-box;min-width:0}
 [hidden]{display:none!important}
 html,body{height:100%;margin:0}
@@ -48,7 +48,7 @@ main{grid-area:main;min-height:0;position:relative}
 iframe{border:0;width:100%;height:100%;display:block;background:var(--bg)}
 #home{height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch}
 
-.tabs{grid-area:tabs;display:grid;grid-template-columns:repeat(6,1fr);background:var(--surface);border-top:1px solid var(--line);
+.tabs{grid-area:tabs;display:grid;grid-template-columns:repeat(7,1fr);background:var(--surface);border-top:1px solid var(--line);
   padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
 .tabs button{all:unset;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 0 8px;color:var(--muted);font-size:.7rem;font-weight:500;position:relative;-webkit-tap-highlight-color:transparent}
 .tabs button svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
@@ -64,6 +64,7 @@ iframe{border:0;width:100%;height:100%;display:block;background:var(--bg)}
 [data-g="3"]{--gc:var(--g3);--gs:var(--g3-soft)}
 [data-g="p"]{--gc:var(--gp);--gs:var(--gp-soft)}
 [data-g="h"]{--gc:var(--accent);--gs:var(--accent-soft)}
+[data-g="d"]{--gc:var(--accent);--gs:var(--accent-soft)}
 
 @media (min-width:900px){
   body{grid-template-columns:88px 1fr;grid-template-rows:auto auto 1fr;grid-template-areas:"tabs top" "tabs sub" "tabs main"}
@@ -220,6 +221,7 @@ iframe{border:0;width:100%;height:100%;display:block;background:var(--bg)}
 <nav class="tabs" id="tabs" aria-label="묶음"></nav>
 
 <script src="plan-core.js"></script>
+<script src="dorm-core.js"></script>
 <script>
 {
 const P=window.PLAN;
@@ -243,7 +245,8 @@ const MODS=[
  {id:"tc",g:2,t:"통칙 타자",ic:"則",src:"tc.html",d:"통칙 1~6 따라치기, 키워드 힌트, 백지 복원"},
  {id:"val",g:2,t:"관세평가",ic:"價",src:"amgi.html#val",d:"제1~6방법, 가산·공제 요소 사례 문제"},
  {id:"jr",g:3,t:"정리노트",ic:"抄",src:"jeongri.html",d:"위원회·날짜·금액, 부가세 숫자, 무역규범 숫자, 회계 공식. 숫자 가리기"},
- {id:"wrong",g:3,t:"오답노트",ic:"×",src:"amgi.html#wrong",d:"관세법·관세평가·무역영어·관세율표에서 틀린 문제만 다시"}
+ {id:"wrong",g:3,t:"오답노트",ic:"×",src:"amgi.html#wrong",d:"관세법·관세평가·무역영어·관세율표에서 틀린 문제만 다시"},
+ {id:"dorm",g:"d",t:"기숙사",ic:"舍",src:"dorm.html",d:"공부 기록으로 동료가 입주하는 방, 호감도와 업적"}
 ];
 const GROUPS=[
  {g:"h",t:"홈",svg:'<path d="M4 11.5 12 5l8 6.5"/><path d="M6 10v9h4.5v-5h3v5H18v-9"/>'},
@@ -251,9 +254,10 @@ const GROUPS=[
  {g:0,t:"기출",svg:'<path d="M7 3.5h7l4 4V20a.5.5 0 0 1-.5.5h-10A.5.5 0 0 1 6 20V4a.5.5 0 0 1 .5-.5Z"/><path d="M13.5 3.5V8H18"/><path d="M9 12h6M9 15.5h6"/>'},
  {g:1,t:"1차",svg:'<circle cx="12" cy="12" r="8.5"/><text x="12" y="15.8" text-anchor="middle">1</text>'},
  {g:2,t:"2차",svg:'<circle cx="12" cy="12" r="8.5"/><text x="12" y="15.8" text-anchor="middle">2</text>'},
- {g:3,t:"복습",svg:'<path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3"/><path d="M4.5 4.5v3.7h3.7"/><path d="M12 8.5V12l2.5 2"/>'}
+ {g:3,t:"복습",svg:'<path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3"/><path d="M4.5 4.5v3.7h3.7"/><path d="M12 8.5V12l2.5 2"/>'},
+ {g:"d",t:"기숙사",svg:'<circle cx="9" cy="8.5" r="3"/><path d="M3.5 19.5c.6-3.3 2.8-5.3 5.5-5.3s4.9 2 5.5 5.3"/><circle cx="16.5" cy="9.5" r="2.4"/><path d="M15.5 14.4c2.6-.4 4.5 1.4 5 4.6"/>'}
 ];
-const GNAME={p:"계획",0:"기출",1:"1차",2:"2차",3:"복습"};
+const GNAME={p:"계획",0:"기출",1:"1차",2:"2차",3:"복습",d:"기숙사"};
 const $=s=>document.querySelector(s);
 const get=(k,d)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}};
 const put=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
@@ -357,7 +361,8 @@ function renderChrome(){
   const s=stats(),id=current(),g=curGroup();
   document.body.dataset.g=String(g);
   $("#tabs").innerHTML=GROUPS.map(G=>{
-    const badge=G.g===3&&s.wrongA?`<span class="badge">${s.wrongA>99?"99+":s.wrongA}</span>`:"";
+    const nu=G.g==="d"&&window.DORM?DORM.unseen().length:0;
+    const badge=G.g===3&&s.wrongA?`<span class="badge">${s.wrongA>99?"99+":s.wrongA}</span>`:nu?`<span class="badge">${nu}</span>`:"";
     return `<button type="button" data-tab="${G.g}" data-g="${G.g}" ${String(G.g)===String(g)?'aria-current="page"':""}><svg viewBox="0 0 24 24" aria-hidden="true">${G.svg}</svg>${G.t}${badge}</button>`}).join("");
   const sub=$("#sub");
   if(g==="h"){sub.hidden=true;$("#crumb").innerHTML="";}
@@ -371,7 +376,7 @@ function renderChrome(){
 function renderHome(){
   const s=stats(),S=P.load(),T=P.today();
   renderHero(S,T);renderToday(S,T);renderLec(S,T);
-  const lastId=raw("hub-last"),last=MODS.find(m=>m.id===lastId&&m.g!=="p");
+  const lastId=raw("hub-last"),last=MODS.find(m=>m.id===lastId&&m.g!=="p"&&m.g!=="d");
   const r=$("#resume"),m=last||MODS.find(x=>x.id==="gc1");
   r.dataset.g=String(m.g);r.href="#"+m.id;
   const acc=s.gDone?Math.round(s.gOk/s.gDone*100):null;
@@ -419,7 +424,7 @@ function syncTheme(){
 new MutationObserver(syncTheme).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
 window.addEventListener("hashchange",route);
 window.addEventListener("focus",()=>{if(current()==="home")renderHome();renderChrome()});
-window.addEventListener("storage",()=>{if(current()==="home")renderHome()});
+window.addEventListener("storage",()=>{if(current()==="home")renderHome();renderChrome()});
 setInterval(()=>{renderChrome();renderDday();if(current()==="home")renderHome()},60000);
 route();
 }
