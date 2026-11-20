@@ -105,6 +105,7 @@ iframe{border:0;width:100%;height:100%;display:block;background:var(--bg)}
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:26px}
 .lead{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:12px}
 @media (max-width:760px){.lead{grid-template-columns:minmax(0,1fr)}}
+.lead.one{grid-template-columns:minmax(0,1fr)}
 .panel{background:var(--surface);border:1px solid var(--line);border-radius:2px;padding:18px;display:flex;flex-direction:column;gap:10px}
 .panel h2{margin:0;font-family:var(--f-mono);font-size:.74rem;font-weight:500;letter-spacing:.02em;color:var(--muted);display:flex;justify-content:space-between;gap:8px}
 .panel h2 a{color:var(--ink);text-decoration:underline;text-underline-offset:3px;font-weight:500}
@@ -119,12 +120,6 @@ iframe{border:0;width:100%;height:100%;display:block;background:var(--bg)}
 .daybar .bar{flex:1}
 .bar i{display:block;height:100%;background:var(--ink);min-width:2px}
 .bar u{position:absolute;top:-2px;bottom:-2px;width:3px;background:var(--stamp);border-radius:2px}
-.why p{margin:0;font-size:1.08rem;font-weight:700;line-height:1.5}
-.why textarea{width:100%;min-height:110px;font:16px/1.5 var(--f-body);border:1px solid var(--line);border-radius:2px;padding:10px;background:var(--bg);color:var(--ink)}
-.why .meta{font-size:.84rem;color:var(--muted)}
-.why .meta b{color:var(--ink)}
-.linkbtn{all:unset;cursor:pointer;color:var(--ink);text-decoration:underline;text-underline-offset:3px;font-size:.74rem}
-.linkbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
 .lec{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 @media (max-width:600px){.lec{gap:8px}.lec .panel{padding:12px}.lec .big{font-size:1.5rem}.lec .due{display:none}.lec .st{font-size:.76rem}}
@@ -186,18 +181,12 @@ iframe{border:0;width:100%;height:100%;display:block;background:var(--bg)}
       </div>
     </div>
     <div class="wrap">
-      <div class="lead">
+      <div class="lead one">
         <div class="panel" data-g="p">
           <h2><span id="todaylbl">오늘의 계획</span><a href="#pt">전체 보기</a></h2>
           <a class="nextb" id="nextb" href="#pt"></a>
           <div class="daybar"><div class="bar"><i id="daybar"></i></div><b id="daypct"></b></div>
           <a class="go" href="#pt">오늘 계획 열기 →</a>
-        </div>
-        <div class="panel why" id="why">
-          <h2><span>내가 이 길을 가는 이유</span><button class="linkbtn" id="whyedit" type="button">고치기</button></h2>
-          <p id="whytext"></p>
-          <textarea id="whyarea" hidden aria-label="이 길을 가는 이유"></textarea>
-          <div class="meta" id="wildmeta"></div>
         </div>
       </div>
 
@@ -265,7 +254,6 @@ const GROUPS=[
  {g:3,t:"복습",svg:'<path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3"/><path d="M4.5 4.5v3.7h3.7"/><path d="M12 8.5V12l2.5 2"/>'}
 ];
 const GNAME={p:"계획",0:"기출",1:"1차",2:"2차",3:"복습"};
-const WHY_DEFAULT="관세사 자격으로 물류·무역·유통에서 일하고, 영어·일본어·스페인어로 사업 기회를 찾아, 그동안 모은 돈으로 내 사업을 연다.";
 const $=s=>document.querySelector(s);
 const get=(k,d)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}};
 const put=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
@@ -351,14 +339,6 @@ function renderToday(S,T){
   $("#daypct").textContent=`${pct}% · ${Math.floor(dm/60)}시간 ${dm%60}분 / ${Math.floor(tot/60)}시간 ${tot%60}분`;
 }
 
-function renderWhy(T){
-  const w=raw("hub-why")||WHY_DEFAULT;
-  $("#whytext").textContent=w;
-  const day=P.diffDays(P.parse(P.wildStart()),T)+1;
-  const to66=66-day;
-  $("#wildmeta").innerHTML=day<1?"광야 시작일 전이다.":to66>0?`광야 <b>${day}일째</b> · 66일 수련까지 <b>${to66}일</b>`:`광야 <b>${day}일째</b> · 66일을 넘었다. 이제는 습관이다.`;
-}
-
 function renderLec(S,T){
   const rows=[
     {n:"회계학",ks:["jm","wg"],max:69,u:"강",due:"12/15 완강"},
@@ -390,7 +370,7 @@ function renderChrome(){
 }
 function renderHome(){
   const s=stats(),S=P.load(),T=P.today();
-  renderHero(S,T);renderToday(S,T);renderWhy(T);renderLec(S,T);
+  renderHero(S,T);renderToday(S,T);renderLec(S,T);
   const lastId=raw("hub-last"),last=MODS.find(m=>m.id===lastId&&m.g!=="p");
   const r=$("#resume"),m=last||MODS.find(x=>x.id==="gc1");
   r.dataset.g=String(m.g);r.href="#"+m.id;
@@ -430,11 +410,6 @@ $("#homebtn").onclick=()=>{location.hash="home"};
 $("#ddaybtn").onclick=()=>{if(current()!=="home")location.hash="home";setTimeout(()=>{$("#datepanel").scrollIntoView({behavior:"smooth",block:"center"});$("#examdate").focus()},80)};
 const onDate=(id,k)=>$(id).addEventListener("change",e=>{if(e.target.value){setRaw(k,e.target.value)}renderHome()});
 onDate("#examdate","hub-exam");onDate("#examdate2","hub-exam2");onDate("#wilddate","hub-wild");
-$("#whyedit").onclick=()=>{
-  const a=$("#whyarea"),t=$("#whytext"),b=$("#whyedit");
-  if(a.hidden){a.value=raw("hub-why")||WHY_DEFAULT;a.hidden=false;t.hidden=true;b.textContent="저장";a.focus()}
-  else{const v=a.value.trim();setRaw("hub-why",v||WHY_DEFAULT);a.hidden=true;t.hidden=false;b.textContent="고치기";renderWhy(P.today())}
-};
 
 $("#frame").addEventListener("load",syncTheme);
 function syncTheme(){
