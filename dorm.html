@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<script>(function(){if(window.self===window.top)return;var r=document.documentElement;r.classList.add("embed");try{var t=parent.document.documentElement.getAttribute("data-theme");if(t)r.setAttribute("data-theme",t)}catch(e){}})();</script>
+<title>광야 · 기숙사</title>
+<style>
+/* 기숙사: 공부 기록으로 동료가 입주하는 방. UI는 광야 흑백 그대로, 색은 도트 방 안에만 낮은 채도로 */
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 var(--f-body);overflow-x:clip;padding-bottom:env(safe-area-inset-bottom,0px)}
+button{font:inherit;color:inherit}
+[hidden]{display:none!important}
+main{padding:16px max(16px,4vw) 60px;max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+.room{position:relative;border:2px solid var(--ink);background:#e4e1da;line-height:0;user-select:none;-webkit-user-select:none}
+.room canvas{width:100%;height:auto;image-rendering:pixelated;image-rendering:crisp-edges;display:block;cursor:pointer;touch-action:manipulation}
+.bub{position:absolute;transform:translate(-50%,-100%);background:#f6f5f1;color:#111;border:1.5px solid #111;padding:5px 9px;font-size:13px;line-height:1.4;max-width:min(70%,260px);width:max-content;pointer-events:none;z-index:2;animation:pop .18s ease-out}
+.bub::after{content:"";position:absolute;left:calc(50% + var(--ax,0px));bottom:-6px;width:8px;height:8px;background:#f6f5f1;border-right:1.5px solid #111;border-bottom:1.5px solid #111;transform:translateX(-50%) rotate(45deg)}
+.bub b{display:block;font-family:var(--f-mono);font-size:10px;font-weight:600;opacity:.6}
+@keyframes pop{from{opacity:0;transform:translate(-50%,-90%)}to{opacity:1;transform:translate(-50%,-100%)}}
+.status{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-family:var(--f-mono);font-size:12px;color:var(--muted);margin-top:8px}
+.status b{color:var(--ink);font-weight:600}
+.toast{border:2px solid var(--ink);background:var(--surface);padding:12px 14px;display:flex;flex-direction:column;gap:2px}
+.toast small{font-family:var(--f-mono);font-size:11px;color:var(--stamp);font-weight:600}
+.toast b{font-size:17px}
+h2{margin:0 0 4px;padding-top:12px;border-top:2px solid var(--ink);font-size:18px;font-weight:900;display:flex;align-items:baseline;gap:10px}
+h2 span{font-family:var(--f-mono);font-size:12px;font-weight:500;color:var(--muted)}
+.sub{color:var(--muted);font-size:13px;margin:0 0 6px}
+.mate{border-bottom:1px solid var(--line)}
+.mate summary{list-style:none;display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:2px 14px;align-items:center;padding:12px 0;cursor:pointer}
+.mate summary::-webkit-details-marker{display:none}
+.mate canvas{width:48px;height:66px;image-rendering:pixelated;grid-row:span 3}
+.mate .nm{font-weight:700;font-size:16px}
+.mate .nm small{font-weight:400;color:var(--muted);font-size:13px;margin-left:6px}
+.mate .lv{font-family:var(--f-poster);font-size:22px;grid-row:span 3;font-variant-numeric:tabular-nums}
+.mate .meta{font-family:var(--f-mono);font-size:11.5px;color:var(--muted)}
+.bar{height:5px;background:var(--hair);position:relative;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ink)}
+.mate.lock .nm,.mate.lock .lv{color:var(--muted)}
+.mate .body{padding:0 0 14px 62px;display:flex;flex-direction:column;gap:6px;font-size:14px}
+.mate .intro{color:var(--muted);margin:0}
+.mate ol{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:5px}
+.mate li{display:grid;grid-template-columns:34px minmax(0,1fr);gap:8px}
+.mate li i{font-style:normal;font-family:var(--f-mono);font-size:11px;color:var(--muted);padding-top:2px}
+.mate li.off{color:var(--muted)}
+.ach{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0 20px}
+.a{display:grid;grid-template-columns:22px minmax(0,1fr);gap:0 10px;padding:10px 0;border-bottom:1px solid var(--line);align-items:start}
+.a .bx{width:18px;height:18px;border:1.5px solid var(--ink);margin-top:3px;display:grid;place-items:center}
+.a.on .bx{background:var(--ink)}
+.a.on .bx::after{content:"";width:8px;height:5px;border:2.5px solid var(--bg);border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px)}
+.a b{font-size:15px}
+.a span{display:block;font-size:12.5px;color:var(--muted)}
+.a em{font-style:normal;font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+.a.on em{color:var(--ink)}
+.note{font-size:12.5px;color:var(--muted);margin:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+<link rel="stylesheet" href="theme.css">
+</head>
+<body>
+<main>
+  <div id="toast" hidden></div>
+  <section>
+    <div class="room" id="room"><canvas id="cv" width="160" height="100" aria-label="기숙사 방. 동료를 누르면 말을 건다"></canvas></div>
+    <div class="status"><span id="st1"></span><span id="st2"></span></div>
+  </section>
+  <section>
+    <h2>동료 <span id="cnt"></span></h2>
+    <p class="sub">호감도는 그 동료가 맡은 과목을 실제로 공부한 시간이다. 계획 탭에서 체크한 블록만 센다.</p>
+    <div id="mates"></div>
+  </section>
+  <section>
+    <h2>업적 <span id="acnt"></span></h2>
+    <div class="ach" id="ach"></div>
+  </section>
+  <p class="note">한 번 얻은 업적과 입주한 동료는 기록이 줄어도 그대로 남는다. 모든 기록은 이 기기 브라우저에만 저장된다.</p>
+</main>
+<script src="plan-core.js"></script>
+<script src="dorm-core.js"></script>
+<script>
+{
+const P=window.PLAN,D=window.DORM,$=s=>document.querySelector(s);
+const cv=$("#cv"),ctx=cv.getContext("2d"),W=160,H=100;
+let data=null,agents=[],items=new Set(),mode={sit:null,wait:false,night:false};
+
+// ── 방 그리기 ──
+const C={wall:"#e4e1da",wallLine:"#d6d2c9",base:"#b9b3a8",floor:"#cfc9be",plank:"#c2bcb0",frame:"#8d877d",
+  glassD:"#d6dde0",glassN:"#2c313a",star:"#e8e5de",shelf:"#8b7d6b",shelfD:"#6f6355",desk:"#8b7d6b",deskD:"#6f6355",
+  books:["#6b5d7a","#3f4a5b","#a8925f","#76505a","#4d6e6c","#6c7a68","#2f3542"],paper:"#f4f2ec",red:"#9e1f17"};
+function R(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(x,y,w,h)}
+function room(){
+  const n=mode.night;
+  R(0,0,W,62,n?"#cfcac0":C.wall);
+  for(let y=6;y<60;y+=8)R(0,y,W,1,n?"#c6c1b6":C.wallLine);
+  R(0,60,W,3,C.base);R(0,63,W,H-63,n?"#c4beb3":C.floor);
+  for(let y=70;y<H;y+=7)R(0,y,W,1,C.plank);
+  // 창문
+  R(12,10,36,30,C.frame);R(14,12,32,26,n?C.glassN:C.glassD);R(29,12,2,26,C.frame);R(14,24,32,2,C.frame);
+  if(n){[[18,15],[24,19],[38,14],[42,21],[35,30],[19,31]].forEach(([x,y])=>R(x,y,1,1,C.star));R(40,28,3,3,"#e8e5de");R(41,28,2,2,C.glassN)}
+  else{R(16,14,6,1,"#e8edef");R(33,15,8,1,"#e8edef")}
+  R(10,40,40,2,C.frame);
+  // 책장
+  R(56,16,22,46,C.shelf);R(58,18,18,42,C.shelfD);
+  [20,31,42,53].forEach((y,i)=>{let x=59;for(let b=0;b<5;b++){const w=b%2?3:2,h=7-(b+i)%3;R(x,y+(8-h),w,h,C.books[(b+i*2)%7]);x+=w+1}R(58,y+8,18,2,C.shelf)});
+  // 달력: 시험일 빨간 표시
+  R(92,18,14,16,C.paper);R(92,18,14,3,"#3b3836");for(let i=0;i<9;i++)R(94+(i%3)*4,23+Math.floor(i/3)*3,2,2,i===7?C.red:"#cfccc4");
+  // 책상
+  R(108,63,46,4,C.desk);R(110,67,3,22,C.deskD);R(149,67,3,22,C.deskD);R(113,67,36,7,C.desk);R(113,74,36,1,C.deskD);
+}
+function deskTop(){
+  // 책상 위 (앉은 동료 앞에 그림)
+  R(108,63,46,4,C.desk);R(110,67,3,22,C.deskD);R(149,67,3,22,C.deskD);R(113,67,36,7,C.desk);R(113,74,36,1,C.deskD);
+  R(122,60,12,3,C.paper);R(127,60,1,3,"#cfccc4");R(122,62,12,1,"#3f4a5b"); // 펼친 책
+  if(items.has("lamp")){R(141,52,1,11,"#3b3836");R(138,50,7,3,"#3b3836");R(140,62,5,1,"#3b3836");if(mode.night){ctx.fillStyle="rgba(232,223,180,.16)";for(let i=0;i<10;i++)ctx.fillRect(140-i,53+i,3+i*2,1)}}
+  if(items.has("calc")){R(112,60,6,3,"#5f5d58");R(113,61,1,1,"#cfccc4");R(115,61,1,1,"#cfccc4")}
+}
+function extras(){
+  if(items.has("globe")){R(63,10,7,6,"#4d6e6c");R(64,11,2,2,"#6c7a68");R(67,13,2,1,"#6c7a68");R(66,16,1,1,C.frame);R(64,17,5,1,C.frame)}
+  if(items.has("plant")){R(82,80,8,8,"#a8674c");R(81,79,10,2,"#8c5540");[[84,70,2,9],[80,73,4,2],[88,72,4,2],[86,68,2,4],[79,76,3,2],[89,75,3,2]].forEach(a=>R(a[0],a[1],a[2],a[3],"#5c6858"))}
+}
+const CAT=[".k...k.....",".kk.kk.....",".kkkkk.....",".kekek..k..",".kkkkkkkkk.","kkkkkkkkkkk",".kkkkkkkkk."];
+function cat(x,y){CAT.forEach((r,j)=>{for(let i=0;i<r.length;i++){const k=r[i];if(k===".")continue;R(x+i,y+j,1,1,k==="e"?(blinkCat?"#5f5d58":"#e8dfb4"):"#5f5d58")}})}
+let blinkCat=false;
+
+// ── 동료 움직임 ──
+const rnd=(a,b)=>a+Math.random()*(b-a);
+function spawn(ch,i){return{ch,x:Math.round(rnd(8,92)),y:Math.round(rnd(52,72)),tx:0,ty:0,st:"idle",t:Math.round(rnd(5,40)),f:0,flip:Math.random()<.5,blink:0}}
+function syncAgents(){
+  const live=D.CHARS.filter(c=>data.got[ACHOF[c.id]]);
+  agents=agents.filter(a=>live.includes(a.ch));
+  live.forEach((c,i)=>{if(!agents.some(a=>a.ch===c))agents.push(spawn(c,i))});
+}
+const ACHOF={};D.ACH.forEach(a=>{if(a.char)ACHOF[a.char]=a.id});
+function think(a,i){
+  if(mode.sit===a.ch.subj){a.st="sit";a.x=120;a.y=46;return}
+  if(a.st==="sit"){a.st="idle";a.x=96;a.y=60;a.t=10}
+  if(mode.wait){const wx=14+i*7;if(a.st!=="waitIdle"){a.st="walk";a.tx=wx;a.ty=50+(i%2)*3;a.w=true}}
+  else if(a.st==="waitIdle"){a.st="idle";a.t=5}
+  if(a.st==="idle"&&--a.t<=0){a.st="walk";a.tx=Math.round(rnd(4,98));a.ty=Math.round(rnd(52,74));}
+  if(a.st==="walk"){
+    const dx=a.tx-a.x,dy=a.ty-a.y;
+    if(!dx&&!dy){a.st=a.w&&mode.wait?"waitIdle":"idle";a.w=false;a.t=Math.round(rnd(25,80));a.f=0;return}
+    if(dx){a.x+=Math.sign(dx);a.flip=dx<0}
+    if(dy&&(Math.random()<.5||!dx))a.y+=Math.sign(dy);
+    a.f++;
+  }
+  if(a.blink>0)a.blink--;else if(Math.random()<.02)a.blink=2;
+}
+let tick=0;
+function frame(){
+  tick++;
+  if(tick%2===0)agents.forEach(think);
+  blinkCat=(tick%60)<3;
+  room();extras();
+  if(items.has("cat"))cat(64,88);
+  const order=agents.slice().sort((a,b)=>a.y-b.y);
+  order.filter(a=>a.st!=="sit").forEach(a=>{
+    const fr=a.st==="walk"?(Math.floor(a.f/2)%2?"w1":"w2"):"idle";
+    D.draw(ctx,a.ch,a.x,a.y,{frame:fr,flip:a.flip,blink:a.blink>0})});
+  const s=agents.find(a=>a.st==="sit");
+  if(s)D.draw(ctx,s.ch,s.x,s.y+(tick%40<20?0:1),{blink:s.blink>0,cut:17});
+  deskTop();
+}
+setInterval(frame,120);
+
+// ── 말풍선 ──
+let bubT=0;
+function say(a,txt){
+  const old=$(".bub");if(old)old.remove();
+  const b=document.createElement("div");b.className="bub";
+  b.innerHTML=`<b>${a.ch.name}</b>${txt}`;
+  const ty=a.st==="sit"?a.y+1:a.y;
+  const raw=(a.x+8)/W*100,rw=$("#room").clientWidth,half=Math.min(130,rw*.35)/rw*100,cl=Math.max(half,Math.min(100-half,raw));
+  b.style.left=cl+"%";b.style.top=(ty/H*100)+"%";b.style.setProperty("--ax",((raw-cl)/100*rw)+"px");
+  $("#room").appendChild(b);clearTimeout(bubT);bubT=setTimeout(()=>b.remove(),3800);
+}
+function lineFor(a){
+  if(a.st==="sit")return a.ch.study;
+  if(mode.wait)return a.ch.wait;
+  const lv=D.level(data.s.min[a.ch.subj]);return a.ch.lines[Math.floor(Math.random()*lv)];
+}
+cv.addEventListener("click",e=>{
+  const r=cv.getBoundingClientRect(),x=(e.clientX-r.left)/r.width*W,y=(e.clientY-r.top)/r.height*H;
+  const hit=agents.slice().sort((a,b)=>b.y-a.y).find(a=>x>=a.x+1&&x<=a.x+15&&y>=a.y&&y<=a.y+22);
+  if(hit){say(hit,lineFor(hit));if(hit.st!=="sit"){hit.st="idle";hit.t=30;hit.flip=x<hit.x+8?false:hit.flip}}
+  else if(items.has("cat")&&x>=64&&x<=75&&y>=88)say({ch:{name:"고양이"},x:62,y:88,st:""},"냥.");
+});
+setInterval(()=>{if(!agents.length||$(".bub"))return;const a=agents[Math.floor(Math.random()*agents.length)];say(a,lineFor(a))},14000);
+
+// ── 지금 상태 ──
+function nowMode(){
+  const S=data.s.S,T=P.today(),k=P.key(T),done=S.done[k]||{},sc=P.sched(T,S);
+  const n=new Date(),nm=n.getHours()*60+n.getMinutes(),h=n.getHours();
+  mode.night=h>=19||h<6;
+  const cur=sc.b.find(b=>b.t&&!done[b.id]&&(()=>{const[hh,mm]=b.t.split(":").map(Number);const s=hh*60+mm;return nm>=s&&nm<s+b.m})());
+  const parts=cur?D.subjOf(cur.title):[];
+  mode.sit=parts.length?parts.sort((a,b)=>b[1]-a[1])[0][0]:null;
+  const todayR=P.dayRatio(T,S),yR=P.dayRatio(P.add(T,-1),S);
+  mode.wait=!mode.sit&&todayR===0&&yR<.6&&h>=10&&P.key(P.add(T,-1))>=P.PLAN_START;
+  const who=mode.sit&&agents.find(a=>a.ch.subj===mode.sit);
+  $("#st1").innerHTML=cur?`지금 <b>${cur.title}</b>${who?` · ${who.ch.name}가 책상에 앉았다`:""}`
+    :mode.wait?`어제도 오늘도 비어 있다 · 다들 창가에서 기다리는 중`
+    :todayR>=1?`오늘 계획 끝 · <b>쉬는 시간</b>`:`오늘 <b>${Math.round(todayR*100)}%</b>`;
+  $("#st2").innerHTML=`누적 <b>${(data.s.total/60).toFixed(1)}</b>시간 · 연속 <b>${data.s.streak}</b>일`;
+}
+
+// ── 목록 ──
+function mini(c,lock){
+  const m=document.createElement("canvas");m.width=16;m.height=22;
+  D.draw(m.getContext("2d"),c,0,0,lock?{sil:getComputedStyle(document.body).getPropertyValue("--line").trim()||"#cfccc4"}:{});
+  return m;
+}
+function renderLists(){
+  const {s,got}=data;
+  const box=$("#mates");box.innerHTML="";
+  let live=0;
+  D.CHARS.forEach(c=>{
+    const a=D.ACH.find(x=>x.char===c.id),on=!!got[a.id];if(on)live++;
+    const min=s.min[c.subj],lv=D.level(min),nx=D.LV[lv],pv=D.LV[lv-1];
+    const det=document.createElement("details");det.className="mate"+(on?"":" lock");
+    det.innerHTML=`<summary><span class="cvs"></span><span class="nm">${on?c.name:"???"}<small>${D.SUBJ[c.subj]}</small></span><span class="lv">${on?"Lv"+lv:"—"}</span>
+      <span class="meta">${on?`${(min/60).toFixed(1)}시간${nx?` · 다음 ${(nx/60)}시간`:" · 최대"}`:`입주 조건: ${a.d}`}</span>
+      <div class="bar"><i style="width:${on?(nx?Math.min(100,(min-pv)/(nx-pv)*100):100):Math.min(100,a.p(s)[0]/a.p(s)[1]*100)}%"></i></div></summary>
+      <div class="body">${on?`<p class="intro">${c.intro} (${c.age}세)</p><ol>${c.lines.map((l,i)=>i<lv?`<li><i>Lv${i+1}</i><span>${l}</span></li>`:`<li class="off"><i>Lv${i+1}</i><span>${(D.LV[i]/60)}시간에 열림</span></li>`).join("")}</ol>`:`<p class="intro">${D.SUBJ[c.subj]} 담당. 업적 '${a.t}'을 달성하면 입주한다.</p>`}</div>`;
+    det.querySelector(".cvs").replaceWith(mini(c,!on));
+    box.appendChild(det);
+  });
+  $("#cnt").textContent=`${live} / ${D.CHARS.length}`;
+  const n=D.ACH.filter(a=>got[a.id]).length;$("#acnt").textContent=`${n} / ${D.ACH.length}`;
+  $("#ach").innerHTML=D.ACH.map(a=>{const on=!!got[a.id],[c,m]=a.p(s);
+    const rw=a.char?`입주: ${D.CHARS.find(x=>x.id===a.char).name}`:a.item?`방 소품: ${D.ITEMS[a.item]}`:"";
+    return`<div class="a${on?" on":""}"><span class="bx"></span><div><b>${a.t}</b><span>${a.d}${rw?` · ${rw}`:""}</span><em>${on?`${got[a.id].slice(5).replace("-","/")} 달성`:`${Math.floor(Math.min(c,m)*10)/10} / ${m}`}</em></div></div>`}).join("");
+}
+function toast(){
+  const ids=D.unseen();if(!ids.length)return;
+  const as=ids.map(id=>D.ACH.find(a=>a.id===id)).filter(Boolean);
+  const chars=as.filter(a=>a.char).map(a=>D.CHARS.find(c=>c.id===a.char).name);
+  const t=$("#toast");t.className="toast";t.hidden=false;
+  t.innerHTML=`<small>새 업적 ${as.length}개</small><b>${chars.length?`${chars.join(", ")} 입주`:as.map(a=>a.t).join(", ")}</b><span class="sub" style="margin:0">${as.map(a=>a.t).join(" · ")}</span>`;
+  D.markSeen();
+  setTimeout(()=>{const a=agents.find(x=>chars.includes(x.ch.name));if(a)say(a,a.ch.lines[0])},600);
+}
+function refresh(){
+  data=D.sync();
+  items=new Set(D.ACH.filter(a=>a.item&&data.got[a.id]).map(a=>a.item));
+  syncAgents();nowMode();renderLists();
+}
+refresh();toast();
+window.addEventListener("focus",refresh);
+window.addEventListener("storage",refresh);
+setInterval(nowMode,30000);
+}
+</script>
+</body>
+</html>
