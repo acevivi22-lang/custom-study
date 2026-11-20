@@ -15,7 +15,7 @@
 <style>
 /* VOICE  광야 — 매일 여는 수련 책상. 흑백, 군더더기 없이, 숫자는 거칠고 크게
    IDEA   광야의 책상 — 시험일까지 남은 모든 날이 한 장의 수련 기록표로 펼쳐지고, 끝낸 날이 하나씩 채워진다
-   PICTURE 홈 첫 화면 군청 띠: 오늘의 문장, D-day, 11/16~2차 시험일까지 주 단위 수련 기록 격자
+   PICTURE 홈 첫 화면 검은 띠: D-day, 11/16~2차 시험일까지 주 단위 수련 기록 격자
    COLOUR 돌빛 바탕, 세관 도장 군청(주색), 주홍 도장(시험일·기출), 청록·황토는 묶음 구분 — 값은 theme.css
    TYPE   Noto Sans KR 900(숫자·제목) / 400·500(본문), IBM Plex Mono(작은 숫자)
    LAYOUT 폰: 머리줄 + 연습장 + 아래 엄지 탭 6개(홈·계획·기출·1차·2차·복습). 900px 이상은 탭이 왼쪽 레일 */
@@ -78,12 +78,9 @@ iframe{border:0;width:100%;height:100%;display:block;background:var(--bg)}
 @media (max-width:760px){.hero-in{grid-template-columns:minmax(0,1fr)}}
 .dayline{margin:0;font-family:var(--f-mono);font-size:.78rem;opacity:.7;letter-spacing:.02em}
 .dayline b{font-weight:700;opacity:1}
-.motto{all:unset;display:block;cursor:pointer;margin:14px 0 0;font-family:var(--f-poster);font-size:clamp(1.55rem,5.6vw,2.3rem);line-height:1.22;letter-spacing:0;text-wrap:balance;word-break:keep-all}
-.motto small{display:block;margin-top:10px;font-family:var(--f-mono);font-size:.74rem;opacity:.6;letter-spacing:0}
-.motto:focus-visible{outline:2px solid #fff;outline-offset:4px;border-radius:4px}
-.dds{display:flex;flex-wrap:wrap;gap:6px 24px;margin-top:18px}
+.dds{display:flex;flex-wrap:wrap;gap:6px 28px;margin-top:14px}
 .dds div{display:flex;align-items:baseline;gap:8px}
-.dds b{font-family:var(--f-poster);font-weight:400;font-size:clamp(2.2rem,9vw,3.2rem);line-height:1;letter-spacing:0;font-variant-numeric:tabular-nums;white-space:nowrap}
+.dds b{font-family:var(--f-poster);font-weight:400;font-size:clamp(2.8rem,12vw,4.4rem);line-height:1;letter-spacing:0;font-variant-numeric:tabular-nums;white-space:nowrap}
 .dds span{font-family:var(--f-mono);font-size:.74rem;opacity:.65;white-space:nowrap}
 .rec h2{margin:0 0 10px;font-family:var(--f-mono);font-size:.76rem;font-weight:500;letter-spacing:.02em;opacity:.85;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
 .rec h2 span{opacity:.7}
@@ -178,7 +175,6 @@ iframe{border:0;width:100%;height:100%;display:block;background:var(--bg)}
       <div class="hero-in">
         <div>
           <p class="dayline" id="dayline"></p>
-          <button class="motto" id="motto" type="button" aria-label="다음 문장 보기"></button>
           <div class="dds" id="dds"></div>
         </div>
         <div class="rec">
@@ -269,25 +265,6 @@ const GROUPS=[
  {g:3,t:"복습",svg:'<path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3"/><path d="M4.5 4.5v3.7h3.7"/><path d="M12 8.5V12l2.5 2"/>'}
 ];
 const GNAME={p:"계획",0:"기출",1:"1차",2:"2차",3:"복습"};
-// 하루 한 문장. 스토아·수도원 전통의 생각을 이 시험에 맞게 옮겨 쓴 것
-const MOTTOS=[
- ["오늘은 오늘의 블록만.",""],
- ["내가 정할 수 있는 건 오늘의 7시간 반이다. 합격선은 그다음 일이다.","스토아: 내 힘 안에 있는 것과 없는 것을 나눈다"],
- ["덜어낸다. 끝낸다. 그게 전부다.",""],
- ["기분은 기다리지 않는다. 첫 블록부터 누른다.",""],
- ["회계 한 문제는 2.5점이다. 오늘 푼 예제 하나가 과락선을 민다.",""],
- ["밀렸다면 규칙대로 줄이고, 줄인 만큼은 반드시 끝낸다.",""],
- ["같은 류를 세 번 보면 네 번째는 쉬워진다.",""],
- ["고독하지만 외롭지 않게. 이 책상에는 나와 오늘의 일만 있다.",""],
- ["남에게 보이려고가 아니라, 내가 정한 방향이라서 간다.",""],
- ["일어나기 싫은 아침엔, 나는 사람으로서 할 일을 하러 일어난다고 생각한다.","마르쿠스 아우렐리우스 『명상록』의 뜻을 옮김"],
- ["남들은 시간을 빼앗기고도 모른다. 내 시간은 내가 지킨다.","세네카 『편지』의 뜻을 옮김"],
- ["지금 외우는 관세율표는 나중에 내 사업의 통관 지도가 된다.",""],
- ["완벽한 하루보다 끊기지 않는 하루. 최소 2시간 버전도 하루다.",""],
- ["어제의 나보다 한 강 앞서면 된다.",""],
- ["불편함을 일부러 고른 사람은 시험장의 불편함에 흔들리지 않는다.",""],
- ["작은 일을 매일 하는 사람이 큰일을 한 번 해낸다.",""]
-];
 const WHY_DEFAULT="관세사 자격으로 물류·무역·유통에서 일하고, 영어·일본어·스페인어로 사업 기회를 찾아, 그동안 모은 돈으로 내 사업을 연다.";
 const $=s=>document.querySelector(s);
 const get=(k,d)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}};
@@ -334,10 +311,6 @@ function renderDday(){
 function renderHero(S,T){
   const wild=P.diffDays(P.parse(P.wildStart()),T)+1;
   $("#dayline").innerHTML=`${P.fmt(T)}${wild>0?` · <b>광야 ${wild}일째</b>`:""}`;
-  const off=Number(raw("hub-motto-off")||0);
-  const idx=((P.diffDays(P.parse("2026-01-01"),T)+off)%MOTTOS.length+MOTTOS.length)%MOTTOS.length;
-  const m=MOTTOS[idx];
-  $("#motto").innerHTML=`${m[0]}${m[1]?`<small>${m[1]}</small>`:""}`;
   const e1=P.exam1(),e2=P.exam2();
   $("#dds").innerHTML=`<div><b>${dd(P.diffDays(T,P.parse(e1)))}</b><span>1차 ${md(e1)}</span></div><div><b>${dd(P.diffDays(T,P.parse(e2)))}</b><span>2차 ${md(e2)}</span></div>`;
   // 수련 기록 격자: 계획 시작 주 월요일부터 2차 시험일까지
@@ -455,7 +428,6 @@ document.addEventListener("click",e=>{
 });
 $("#homebtn").onclick=()=>{location.hash="home"};
 $("#ddaybtn").onclick=()=>{if(current()!=="home")location.hash="home";setTimeout(()=>{$("#datepanel").scrollIntoView({behavior:"smooth",block:"center"});$("#examdate").focus()},80)};
-$("#motto").onclick=()=>{setRaw("hub-motto-off",String(Number(raw("hub-motto-off")||0)+1));renderHero(P.load(),P.today())};
 const onDate=(id,k)=>$(id).addEventListener("change",e=>{if(e.target.value){setRaw(k,e.target.value)}renderHome()});
 onDate("#examdate","hub-exam");onDate("#examdate2","hub-exam2");onDate("#wilddate","hub-wild");
 $("#whyedit").onclick=()=>{
