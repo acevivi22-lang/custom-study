@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <script>(function(){if(window.self===window.top)return;var r=document.documentElement;r.classList.add("embed");try{var t=parent.document.documentElement.getAttribute("data-theme");if(t)r.setAttribute("data-theme",t)}catch(e){}})();</script>
-<title>관세사 계획</title>
+<title>광야 · 계획</title>
 <style>
 /* 계획: 공부방 공통 테마(theme.css)의 색을 그대로 씁니다. 공부방 안에서 열리면 자체 머리줄·탭을 숨기고 공부방 탭을 씁니다. */
 *{box-sizing:border-box;min-width:0}
@@ -12,8 +12,8 @@ html,body{margin:0}
 body{background:var(--bg);color:var(--ink);font:16px/1.55 var(--f-body);overflow-x:clip;padding-bottom:env(safe-area-inset-bottom,0px)}
 button{font:inherit;color:inherit}
 [hidden]{display:none!important}
-.top{background:var(--band);color:var(--band-ink);padding:calc(16px + env(safe-area-inset-top,0px)) max(16px,4vw) 16px}
-.top h1{margin:0;font-size:26px;font-weight:900;line-height:1.1}
+.top{background:var(--band) var(--grain);color:var(--band-ink);padding:calc(16px + env(safe-area-inset-top,0px)) max(16px,4vw) 16px}
+.top h1{margin:0;font-family:var(--f-poster);font-weight:400;font-size:28px;line-height:1.1}
 .top p{margin:6px 0 0;opacity:.85;font-size:14px}
 nav{position:sticky;top:0;z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
 nav .in{display:flex;overflow-x:auto;padding:0 max(8px,2vw);max-width:800px;margin:0 auto}
@@ -26,31 +26,31 @@ h3{font-size:17px;margin:22px 0 8px}
 .sub{color:var(--muted);font-size:14px;margin:0 0 14px}
 .daynav{display:flex;align-items:center;gap:8px;margin-bottom:4px}
 .daynav h2{flex:1}
-.ib{width:44px;height:44px;border:1px solid var(--line);background:var(--surface);border-radius:10px;font-size:20px;cursor:pointer;flex:none}
+.ib{width:44px;height:44px;border:1px solid var(--line);background:var(--surface);border-radius:2px;font-size:20px;cursor:pointer;flex:none}
 :focus-visible{outline:3px solid var(--accent);outline-offset:2px}
-.btn{min-height:44px;padding:0 16px;border:1px solid var(--line);background:var(--surface);border-radius:10px;font-weight:700;cursor:pointer}
-.btn.on{background:var(--stamp);border-color:var(--stamp);color:#fff}
+.btn{min-height:44px;padding:0 16px;border:1px solid var(--line);background:var(--surface);border-radius:2px;font-weight:700;cursor:pointer}
+.btn.on{background:var(--stamp);border-color:var(--stamp);color:#f6f5f1}
 .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-.sum{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 16px;align-items:center;margin:16px 0;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
-.sum .pct{grid-row:span 2;font-size:clamp(34px,9vw,44px);font-weight:900;color:var(--accent);font-variant-numeric:tabular-nums;line-height:1}
+.sum{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 16px;align-items:center;margin:16px 0;background:var(--surface);border:1px solid var(--line);border-radius:2px;padding:14px 16px}
+.sum .pct{grid-row:span 2;font-family:var(--f-poster);font-size:clamp(36px,10vw,48px);color:var(--ink);font-variant-numeric:tabular-nums;line-height:1}
 .sum b{font-variant-numeric:tabular-nums}
-.track{height:10px;background:var(--hair);border-radius:5px;overflow:hidden;position:relative}
-.track i{display:block;height:100%;background:var(--accent);border-radius:5px;transition:width .3s}
+.track{height:6px;background:var(--hair);border-radius:0;overflow:hidden;position:relative}
+.track i{display:block;height:100%;background:var(--ink);border-radius:0;transition:width .3s}
 .track u{position:absolute;top:-3px;bottom:-3px;width:3px;background:var(--stamp);border-radius:2px}
 .list{border-top:2px solid var(--ink)}
 .row{display:grid;grid-template-columns:70px minmax(0,1fr) auto;gap:4px 14px;align-items:start;padding:14px 4px;border:0;border-bottom:1px solid var(--line);cursor:pointer;background:none;width:100%;text-align:left}
-.row .t{font-size:22px;font-weight:900;font-variant-numeric:tabular-nums;line-height:1.1;white-space:nowrap}
-.row .t small{display:block;font-size:13px;font-weight:500;color:var(--muted)}
+.row .t{font-family:var(--f-mono);font-size:20px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.1;white-space:nowrap}
+.row .t small{display:block;font-size:12px;font-weight:400;color:var(--muted);line-height:1.4;margin-top:4px}
 .row .w b{display:block;font-size:17px}
 .row .w span{display:block;color:var(--muted);font-size:14px}
 .row.next{background:var(--accent-soft)}
 .row.next .t{color:var(--accent)}
-.box{width:28px;height:28px;border:2px solid var(--line);border-radius:8px;display:grid;place-items:center;margin-top:2px;background:var(--surface)}
-.row.done .box{background:var(--accent);border-color:var(--accent)}
-.row.done .box::after{content:"";width:10px;height:6px;border:3px solid #fff;border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px)}
+.box{width:26px;height:26px;border:1.5px solid var(--ink);border-radius:0;display:grid;place-items:center;margin-top:2px;background:var(--surface)}
+.row.done .box{background:var(--ink);border-color:var(--ink)}
+.row.done .box::after{content:"";width:10px;height:6px;border:3px solid var(--bg);border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px)}
 .row.done .w,.row.done .t{opacity:.45}
 .row.done .w b{text-decoration:line-through}
-.note{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:14px;margin:12px 0}
+.note{background:var(--surface);border:1px solid var(--line);border-radius:2px;padding:12px 14px;font-size:14px;margin:12px 0}
 .note.bad{border-color:var(--stamp);background:var(--stamp-soft)}
 .prog{border-top:2px solid var(--ink)}
 .pr{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 12px;padding:14px 2px;border-bottom:1px solid var(--line)}
@@ -60,7 +60,7 @@ h3{font-size:17px;margin:22px 0 8px}
 .pr .st em.bad{color:var(--stamp)}
 .pr .st em.good{color:var(--ok)}
 .pr .ctl{display:flex;gap:6px;align-items:center}
-.pr .ctl input{width:72px;height:44px;border:1px solid var(--line);border-radius:10px;background:var(--surface);text-align:center;font:700 16px var(--f-body);color:var(--ink);font-variant-numeric:tabular-nums}
+.pr .ctl input{width:72px;height:44px;border:1px solid var(--line);border-radius:2px;background:var(--surface);text-align:center;font:700 16px var(--f-body);color:var(--ink);font-variant-numeric:tabular-nums}
 .pr .track{grid-column:1/-1}
 .scroll{overflow-x:auto}
 table{border-collapse:collapse;width:100%;font-size:14px;background:var(--surface)}
@@ -68,11 +68,11 @@ th,td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left;vertic
 th{font-size:13px;color:var(--muted);white-space:nowrap}
 tr.cur td{background:var(--accent-soft)}
 tr.cur td:first-child{box-shadow:inset 3px 0 var(--accent)}
-.cp{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.cp{background:var(--surface);border:1px solid var(--line);border-radius:2px;padding:16px;margin-bottom:14px}
 .cp.now{border-color:var(--accent);box-shadow:inset 4px 0 var(--accent)}
 .cp header{display:flex;justify-content:space-between;gap:10px;align-items:baseline;flex-wrap:wrap}
 .cp header b{font-size:19px;font-weight:900}
-.cp header span{font-weight:900;color:var(--accent);font-variant-numeric:tabular-nums}
+.cp header span{font-family:var(--f-mono);font-weight:600;color:var(--stamp);font-variant-numeric:tabular-nums}
 .cp header span.past{color:var(--muted)}
 .cp .cnt{font-size:13px;color:var(--muted)}
 .ck{display:flex;gap:10px;align-items:center;min-height:44px;cursor:pointer}
@@ -81,7 +81,7 @@ tr.cur td:first-child{box-shadow:inset 3px 0 var(--accent)}
 ol,ul{padding-left:1.3em}
 li{margin:4px 0}
 .set label{display:block;font-size:14px;color:var(--muted);margin:12px 0 4px}
-.set input[type=date],textarea{font:16px var(--f-body);height:44px;padding:0 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink)}
+.set input[type=date],textarea{font:16px var(--f-body);height:44px;padding:0 10px;border:1px solid var(--line);border-radius:2px;background:var(--surface);color:var(--ink)}
 textarea{width:100%;height:90px;padding:10px}
 @media(max-width:600px){table{font-size:13px}th,td{padding:6px 4px}.row{grid-template-columns:60px minmax(0,1fr) auto}.row .t{font-size:19px}}
 @media(prefers-reduced-motion:reduce){.track i{transition:none}}
@@ -89,7 +89,7 @@ textarea{width:100%;height:90px;padding:10px}
 <link rel="stylesheet" href="theme.css">
 </head>
 <body>
-<header class="top"><h1>관세사 계획</h1><p id="topline"></p></header>
+<header class="top"><h1>광야 · 계획</h1><p id="topline"></p></header>
 <nav><div class="in" id="tabs"><a href="#today">오늘</a><a href="#progress">진도</a><a href="#week">주간표</a><a href="#checkpoints">체크포인트</a><a href="#rules">밀렸을 때</a></div></nav>
 <main>
 <section id="v-today">
@@ -105,7 +105,7 @@ textarea{width:100%;height:90px;padding:10px}
 <h2>진도</h2>
 <p class="sub" id="psub"></p>
 <div class="prog" id="prog"></div>
-<p class="sub" style="margin-top:12px">파란 막대는 실제 진도, 빨간 눈금은 오늘까지 계획한 누적치다. 관세율표는 외운 마지막 류 번호, 관세법은 11/20 이후 읽은 쪽수를 적는다.</p>
+<p class="sub" style="margin-top:12px">검은 막대는 실제 진도, 빨간 눈금은 오늘까지 계획한 누적치다. 관세율표는 외운 마지막 류 번호, 관세법은 11/20 이후 읽은 쪽수를 적는다.</p>
 </section>
 
 <section id="v-week" hidden>

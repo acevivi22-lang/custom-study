@@ -1,60 +1,58 @@
-@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=IBM+Plex+Mono:wght@500;600&display=swap");
-/* 관세사 공부방 공통 테마 — '광야의 책상'
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Black+Han+Sans&family=IBM+Plex+Mono:wght@400;500;600&display=swap");
+/* 광야 공통 테마 — 흑백, 거친 종이, 피 같은 붉은색은 시험일·틀림·밀림에만
    모든 연습장이 같은 색과 글꼴을 쓰도록 각 페이지의 변수를 여기서 덮어씁니다.
-   선택자를 :root:root 로 한 단계 강하게 써서, 페이지 안 <style> 순서와 상관없이 이 값이 이깁니다.
-   색: 돌빛 바탕, 세관 도장 군청(주색), 주홍 도장(기출·틀림), 관세율표 청록(맞음·2차), 형광펜 황토(복습) */
+   선택자를 :root:root 로 한 단계 강하게 써서, 페이지 안 <style> 순서와 상관없이 이 값이 이깁니다. */
 :root:root{
   color-scheme:light;
-  --bg:#f4f4f1; --surface:#ffffff; --ink:#15172e; --muted:#5d6078; --line:#dcdce4; --hair:#ececf0;
-  --accent:#1d2bd8; --accent-soft:#e6e8fd;
-  --stamp:#d6361f; --stamp-soft:#fbe5e0; --bad:#d6361f; --bad-soft:#fbe5e0; --seller:#d6361f; --seller-soft:#fbe5e0;
-  --ok:#0b7a5c; --ok-soft:#dcf1e9; --good:#0b7a5c; --good-soft:#dcf1e9; --buyer:#0b7a5c; --buyer-soft:#dcf1e9;
-  --warn:#a86400; --warn-soft:#f8ead3; --gold:#a86400; --gold-soft:#f8ead3;
-  --mark:#ffec8a; --mark-ink:#4f4100; --hl:#ffec8a;
-  --omr:#fbe5e0; --omr-ink:#b52a17;
-  /* 내국소비세·통칙 페이지용 이름 */
-  --paper:#f4f4f1; --sheet:#ffffff; --rule:#dcdce4; --red:#d6361f; --red-soft:#fbe5e0; --blue:#1d2bd8; --blue-soft:#e6e8fd; --soft:#e6e8fd;
-  /* 홈 묶음 색 */
-  --g0:#d6361f; --g0-soft:#fbe5e0;
-  --g1:#1d2bd8; --g1-soft:#e6e8fd;
-  --g2:#0b7a5c; --g2-soft:#dcf1e9;
-  --g3:#a86400; --g3-soft:#f8ead3;
-  --gp:#15172e; --gp-soft:#e4e4ec;
-  --band:#1d2bd8; --band-ink:#ffffff;
+  --bg:#ecebe6; --surface:#f6f5f1; --ink:#111111; --muted:#5f5d58; --line:#cfccc4; --hair:#e0ddd6;
+  --accent:#111111; --accent-soft:#e2e0da;
+  --stamp:#9e1f17; --stamp-soft:#efdcd8; --bad:#9e1f17; --bad-soft:#efdcd8; --seller:#9e1f17; --seller-soft:#efdcd8;
+  --ok:#3f5a3a; --ok-soft:#dfe5da; --good:#3f5a3a; --good-soft:#dfe5da; --buyer:#3f5a3a; --buyer-soft:#dfe5da;
+  --warn:#6e5a2a; --warn-soft:#e9e2cf; --gold:#6e5a2a; --gold-soft:#e9e2cf;
+  --mark:#e8dfb4; --mark-ink:#3a3210; --hl:#e8dfb4;
+  --omr:#efdcd8; --omr-ink:#9e1f17;
+  --paper:#ecebe6; --sheet:#f6f5f1; --rule:#cfccc4; --red:#9e1f17; --red-soft:#efdcd8; --blue:#111111; --blue-soft:#e2e0da; --soft:#e2e0da;
+  --g0:#111111; --g0-soft:#e2e0da; --g1:#111111; --g1-soft:#e2e0da; --g2:#111111; --g2-soft:#e2e0da; --g3:#111111; --g3-soft:#e2e0da; --gp:#111111; --gp-soft:#e2e0da;
+  --band:#111111; --band-ink:#ecebe6;
+  --f-poster:"Black Han Sans","Noto Sans KR",sans-serif;
   --f-display:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
   --f-body:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
   --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
   --display:var(--f-display); --body:var(--f-body); --mono:var(--f-mono);
+  --grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 @media (prefers-color-scheme:dark){
   :root:root:not([data-theme="light"]){
     color-scheme:dark;
-    --bg:#0d0f22; --surface:#161936; --ink:#eceefe; --muted:#a3a7d0; --line:#2a2e55; --hair:#20244a;
-    --accent:#9aa3ff; --accent-soft:#232968;
-    --stamp:#ff7a62; --stamp-soft:#3d1d1a; --bad:#ff7a62; --bad-soft:#3d1d1a; --seller:#ff7a62; --seller-soft:#3d1d1a;
-    --ok:#5fd0a6; --ok-soft:#123629; --good:#5fd0a6; --good-soft:#123629; --buyer:#5fd0a6; --buyer-soft:#123629;
-    --warn:#f0b65a; --warn-soft:#3a2b12; --gold:#f0b65a; --gold-soft:#3a2b12;
-    --mark:#4d4310; --mark-ink:#ffe58a; --hl:#5a4d10;
-    --omr:#3d1d1a; --omr-ink:#ff9a86;
-    --paper:#0d0f22; --sheet:#161936; --rule:#2a2e55; --red:#ff7a62; --red-soft:#3d1d1a; --blue:#9aa3ff; --blue-soft:#232968; --soft:#232968;
-    --g0:#ff7a62; --g0-soft:#3d1d1a; --g1:#9aa3ff; --g1-soft:#232968; --g2:#5fd0a6; --g2-soft:#123629; --g3:#f0b65a; --g3-soft:#3a2b12; --gp:#eceefe; --gp-soft:#2a2e55;
-    --band:#1a22a8; --band-ink:#ffffff;
+    --bg:#0b0b0b; --surface:#141414; --ink:#e8e5de; --muted:#8e8a82; --line:#2b2b2b; --hair:#1e1e1e;
+    --accent:#e8e5de; --accent-soft:#232323;
+    --stamp:#d0453b; --stamp-soft:#2c1412; --bad:#d0453b; --bad-soft:#2c1412; --seller:#d0453b; --seller-soft:#2c1412;
+    --ok:#93ad8c; --ok-soft:#18201a; --good:#93ad8c; --good-soft:#18201a; --buyer:#93ad8c; --buyer-soft:#18201a;
+    --warn:#c4ad74; --warn-soft:#241f12; --gold:#c4ad74; --gold-soft:#241f12;
+    --mark:#3a3418; --mark-ink:#efe2a6; --hl:#3a3418;
+    --omr:#2c1412; --omr-ink:#e8857c;
+    --paper:#0b0b0b; --sheet:#141414; --rule:#2b2b2b; --red:#d0453b; --red-soft:#2c1412; --blue:#e8e5de; --blue-soft:#232323; --soft:#232323;
+    --g0:#e8e5de; --g0-soft:#232323; --g1:#e8e5de; --g1-soft:#232323; --g2:#e8e5de; --g2-soft:#232323; --g3:#e8e5de; --g3-soft:#232323; --gp:#e8e5de; --gp-soft:#232323;
+    --band:#000000; --band-ink:#e8e5de;
   }
 }
 :root:root[data-theme="dark"]{
   color-scheme:dark;
-  --bg:#0d0f22; --surface:#161936; --ink:#eceefe; --muted:#a3a7d0; --line:#2a2e55; --hair:#20244a;
-  --accent:#9aa3ff; --accent-soft:#232968;
-  --stamp:#ff7a62; --stamp-soft:#3d1d1a; --bad:#ff7a62; --bad-soft:#3d1d1a; --seller:#ff7a62; --seller-soft:#3d1d1a;
-  --ok:#5fd0a6; --ok-soft:#123629; --good:#5fd0a6; --good-soft:#123629; --buyer:#5fd0a6; --buyer-soft:#123629;
-  --warn:#f0b65a; --warn-soft:#3a2b12; --gold:#f0b65a; --gold-soft:#3a2b12;
-  --mark:#4d4310; --mark-ink:#ffe58a; --hl:#5a4d10;
-  --omr:#3d1d1a; --omr-ink:#ff9a86;
-  --paper:#0d0f22; --sheet:#161936; --rule:#2a2e55; --red:#ff7a62; --red-soft:#3d1d1a; --blue:#9aa3ff; --blue-soft:#232968; --soft:#232968;
-  --g0:#ff7a62; --g0-soft:#3d1d1a; --g1:#9aa3ff; --g1-soft:#232968; --g2:#5fd0a6; --g2-soft:#123629; --g3:#f0b65a; --g3-soft:#3a2b12; --gp:#eceefe; --gp-soft:#2a2e55;
-  --band:#1a22a8; --band-ink:#ffffff;
+  --bg:#0b0b0b; --surface:#141414; --ink:#e8e5de; --muted:#8e8a82; --line:#2b2b2b; --hair:#1e1e1e;
+  --accent:#e8e5de; --accent-soft:#232323;
+  --stamp:#d0453b; --stamp-soft:#2c1412; --bad:#d0453b; --bad-soft:#2c1412; --seller:#d0453b; --seller-soft:#2c1412;
+  --ok:#93ad8c; --ok-soft:#18201a; --good:#93ad8c; --good-soft:#18201a; --buyer:#93ad8c; --buyer-soft:#18201a;
+  --warn:#c4ad74; --warn-soft:#241f12; --gold:#c4ad74; --gold-soft:#241f12;
+  --mark:#3a3418; --mark-ink:#efe2a6; --hl:#3a3418;
+  --omr:#2c1412; --omr-ink:#e8857c;
+  --paper:#0b0b0b; --sheet:#141414; --rule:#2b2b2b; --red:#d0453b; --red-soft:#2c1412; --blue:#e8e5de; --blue-soft:#232323; --soft:#232323;
+  --g0:#e8e5de; --g0-soft:#232323; --g1:#e8e5de; --g1-soft:#232323; --g2:#e8e5de; --g2-soft:#232323; --g3:#e8e5de; --g3-soft:#232323; --gp:#e8e5de; --gp-soft:#232323;
+  --band:#000000; --band-ink:#e8e5de;
 }
-/* 모든 연습장 공통 마감 */
+/* 모든 연습장 공통 마감: 종이 결, 각진 모서리 */
 :root:root body{font-family:var(--f-body)}
+:root:root body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:2147483000;background-image:var(--grain);opacity:.07;mix-blend-mode:multiply}
+@media (prefers-color-scheme:dark){:root:root:not([data-theme="light"]) body::after{mix-blend-mode:screen;opacity:.05}}
+:root:root[data-theme="dark"] body::after{mix-blend-mode:screen;opacity:.05}
 :root:root h1,:root:root h2,:root:root h3{letter-spacing:-.02em}
-:root:root ::selection{background:var(--accent-soft)}
+:root:root ::selection{background:var(--ink);color:var(--bg)}

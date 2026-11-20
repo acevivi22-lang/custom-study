@@ -1,13 +1,13 @@
 {
- "name": "관세사 공부방",
- "short_name": "관세사",
+ "name": "광야 · 관세사 수련장",
+ "short_name": "광야",
  "description": "관세사 1차·2차 기출과 관세법·무역영어·내국소비세·관세율표 연습장",
  "lang": "ko",
  "start_url": "./",
  "scope": "./",
  "display": "standalone",
- "background_color": "#f4f4f1",
- "theme_color": "#1d2bd8",
+ "background_color": "#ecebe6",
+ "theme_color": "#111111",
  "icons": [
   {
    "src": "icons/icon-192.png",
