@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<script>(function(){if(window.self===window.top)return;var r=document.documentElement;r.classList.add("embed");try{var t=parent.document.documentElement.getAttribute("data-theme");if(t)r.setAttribute("data-theme",t)}catch(e){}})();</script>
+<title>관세사 계획</title>
+<style>
+/* 계획: 공부방 공통 테마(theme.css)의 색을 그대로 씁니다. 공부방 안에서 열리면 자체 머리줄·탭을 숨기고 공부방 탭을 씁니다. */
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 var(--f-body);overflow-x:clip;padding-bottom:env(safe-area-inset-bottom,0px)}
+button{font:inherit;color:inherit}
+[hidden]{display:none!important}
+.top{background:var(--band);color:var(--band-ink);padding:calc(16px + env(safe-area-inset-top,0px)) max(16px,4vw) 16px}
+.top h1{margin:0;font-size:26px;font-weight:900;line-height:1.1}
+.top p{margin:6px 0 0;opacity:.85;font-size:14px}
+nav{position:sticky;top:0;z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+nav .in{display:flex;overflow-x:auto;padding:0 max(8px,2vw);max-width:800px;margin:0 auto}
+nav a{flex:none;padding:13px 12px;color:var(--muted);text-decoration:none;font-weight:700;font-size:15px;border-bottom:3px solid transparent}
+nav a[aria-current]{color:var(--accent);border-color:var(--accent)}
+.embed .top,.embed nav{display:none}
+main{padding:18px max(16px,4vw) 60px;max-width:800px;margin:0 auto}
+h2{font-size:24px;font-weight:900;margin:0 0 4px;line-height:1.15}
+h3{font-size:17px;margin:22px 0 8px}
+.sub{color:var(--muted);font-size:14px;margin:0 0 14px}
+.daynav{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.daynav h2{flex:1}
+.ib{width:44px;height:44px;border:1px solid var(--line);background:var(--surface);border-radius:10px;font-size:20px;cursor:pointer;flex:none}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.btn{min-height:44px;padding:0 16px;border:1px solid var(--line);background:var(--surface);border-radius:10px;font-weight:700;cursor:pointer}
+.btn.on{background:var(--stamp);border-color:var(--stamp);color:#fff}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.sum{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 16px;align-items:center;margin:16px 0;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.sum .pct{grid-row:span 2;font-size:clamp(34px,9vw,44px);font-weight:900;color:var(--accent);font-variant-numeric:tabular-nums;line-height:1}
+.sum b{font-variant-numeric:tabular-nums}
+.track{height:10px;background:var(--hair);border-radius:5px;overflow:hidden;position:relative}
+.track i{display:block;height:100%;background:var(--accent);border-radius:5px;transition:width .3s}
+.track u{position:absolute;top:-3px;bottom:-3px;width:3px;background:var(--stamp);border-radius:2px}
+.list{border-top:2px solid var(--ink)}
+.row{display:grid;grid-template-columns:70px minmax(0,1fr) auto;gap:4px 14px;align-items:start;padding:14px 4px;border:0;border-bottom:1px solid var(--line);cursor:pointer;background:none;width:100%;text-align:left}
+.row .t{font-size:22px;font-weight:900;font-variant-numeric:tabular-nums;line-height:1.1;white-space:nowrap}
+.row .t small{display:block;font-size:13px;font-weight:500;color:var(--muted)}
+.row .w b{display:block;font-size:17px}
+.row .w span{display:block;color:var(--muted);font-size:14px}
+.row.next{background:var(--accent-soft)}
+.row.next .t{color:var(--accent)}
+.box{width:28px;height:28px;border:2px solid var(--line);border-radius:8px;display:grid;place-items:center;margin-top:2px;background:var(--surface)}
+.row.done .box{background:var(--accent);border-color:var(--accent)}
+.row.done .box::after{content:"";width:10px;height:6px;border:3px solid #fff;border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px)}
+.row.done .w,.row.done .t{opacity:.45}
+.row.done .w b{text-decoration:line-through}
+.note{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:14px;margin:12px 0}
+.note.bad{border-color:var(--stamp);background:var(--stamp-soft)}
+.prog{border-top:2px solid var(--ink)}
+.pr{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 12px;padding:14px 2px;border-bottom:1px solid var(--line)}
+.pr .nm{font-weight:700}
+.pr .st{font-size:14px;color:var(--muted)}
+.pr .st em{font-style:normal;font-weight:700}
+.pr .st em.bad{color:var(--stamp)}
+.pr .st em.good{color:var(--ok)}
+.pr .ctl{display:flex;gap:6px;align-items:center}
+.pr .ctl input{width:72px;height:44px;border:1px solid var(--line);border-radius:10px;background:var(--surface);text-align:center;font:700 16px var(--f-body);color:var(--ink);font-variant-numeric:tabular-nums}
+.pr .track{grid-column:1/-1}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px;background:var(--surface)}
+th,td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font-size:13px;color:var(--muted);white-space:nowrap}
+tr.cur td{background:var(--accent-soft)}
+tr.cur td:first-child{box-shadow:inset 3px 0 var(--accent)}
+.cp{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.cp.now{border-color:var(--accent);box-shadow:inset 4px 0 var(--accent)}
+.cp header{display:flex;justify-content:space-between;gap:10px;align-items:baseline;flex-wrap:wrap}
+.cp header b{font-size:19px;font-weight:900}
+.cp header span{font-weight:900;color:var(--accent);font-variant-numeric:tabular-nums}
+.cp header span.past{color:var(--muted)}
+.cp .cnt{font-size:13px;color:var(--muted)}
+.ck{display:flex;gap:10px;align-items:center;min-height:44px;cursor:pointer}
+.ck input{width:22px;height:22px;accent-color:var(--accent);flex:none}
+.act{font-size:14px;color:var(--stamp);margin-top:6px}
+ol,ul{padding-left:1.3em}
+li{margin:4px 0}
+.set label{display:block;font-size:14px;color:var(--muted);margin:12px 0 4px}
+.set input[type=date],textarea{font:16px var(--f-body);height:44px;padding:0 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink)}
+textarea{width:100%;height:90px;padding:10px}
+@media(max-width:600px){table{font-size:13px}th,td{padding:6px 4px}.row{grid-template-columns:60px minmax(0,1fr) auto}.row .t{font-size:19px}}
+@media(prefers-reduced-motion:reduce){.track i{transition:none}}
+</style>
+<link rel="stylesheet" href="theme.css">
+</head>
+<body>
+<header class="top"><h1>관세사 계획</h1><p id="topline"></p></header>
+<nav><div class="in" id="tabs"><a href="#today">오늘</a><a href="#progress">진도</a><a href="#week">주간표</a><a href="#checkpoints">체크포인트</a><a href="#rules">밀렸을 때</a></div></nav>
+<main>
+<section id="v-today">
+<div class="daynav"><button class="ib" id="prev" aria-label="이전 날">‹</button><h2 id="dtitle"></h2><button class="ib" id="next" aria-label="다음 날">›</button></div>
+<p class="sub" id="dlabel"></p>
+<div class="btns"><button class="btn" id="minBtn" aria-pressed="false">최소 2시간 버전</button><button class="btn" id="todayBtn">오늘로</button></div>
+<div class="sum"><span class="pct" id="dpct">0%</span><b id="dsum"></b><div class="track"><i id="dbar"></i></div></div>
+<div class="list" id="blocks"></div>
+<div class="note" id="dnote"></div>
+</section>
+
+<section id="v-progress" hidden>
+<h2>진도</h2>
+<p class="sub" id="psub"></p>
+<div class="prog" id="prog"></div>
+<p class="sub" style="margin-top:12px">파란 막대는 실제 진도, 빨간 눈금은 오늘까지 계획한 누적치다. 관세율표는 외운 마지막 류 번호, 관세법은 11/20 이후 읽은 쪽수를 적는다.</p>
+</section>
+
+<section id="v-week" hidden>
+<h2>주간 계획표</h2>
+<p class="sub">월~토 7.5시간, 일요일 3시간 버퍼 기준. 괄호는 누적.</p>
+<div class="scroll"><table id="wtable"></table></div>
+<h3>1월 이후 큰 흐름 (공고 후 날짜 확정)</h3>
+<div class="scroll"><table>
+<tr><th>기간</th><th>1차 과목</th><th>2차 과목</th></tr>
+<tr><td>1월</td><td>회계·무역영어·관세법 기출 중심, 내국소비세법 본격 시작</td><td>관세율표 2회전(호 단위), 관세평가·무역실무 주 1회 복습</td></tr>
+<tr><td>2월</td><td>주 2회 실전 모의고사</td><td>관세율표만 매일 유지</td></tr>
+<tr><td>3월 시험까지</td><td>1차에 거의 전부</td><td>관세율표 30분</td></tr>
+<tr><td>1차 후~6월</td><td>—</td><td>4과목 답안 쓰기, 과목당 주 2회 실전 + 관세법 서술 암기</td></tr>
+</table></div>
+</section>
+
+<section id="v-checkpoints" hidden>
+<h2>체크포인트</h2>
+<p class="sub">점검일 일요일 버퍼 시간에 항목을 체크한다. 미달이면 빨간 줄의 대응을 다음 날부터 적용한다.</p>
+<div id="cps"></div>
+</section>
+
+<section id="v-rules" hidden>
+<h2>밀렸을 때의 규칙</h2>
+<p class="sub">회계 진도와 관세율표는 어떤 경우에도 줄이지 않는다.</p>
+<h3>줄이는 순서 (위부터 먼저)</h3>
+<ol>
+<li>내국소비세법: 주 3회 → 주 1회</li>
+<li>무역영어: 25분 → 10분(5문항)</li>
+<li>관세법 회독: 25p → 10p</li>
+<li>관세평가: 마지막 강의를 1월 첫 주로 이월 (최대 5강)</li>
+<li>무역실무: 1.75배속 → 2배속, 완강 날짜는 12/31 유지</li>
+</ol>
+<h3>밀린 기간별 대응</h3>
+<ul>
+<li><b>하루</b>: 그 주 일요일 버퍼로 회수. 줄이는 과목 없음.</li>
+<li><b>이틀</b>: 일요일 버퍼 + 다음 주에 위 순서 1~2번 적용.</li>
+<li><b>사흘 이상</b>: 위 순서 1~4번 적용, 관세평가 이월을 그 주 일요일에 확정하고 주간표 숫자를 고친다.</li>
+</ul>
+<p class="note">최소 2시간 버전(오늘 화면의 버튼)은 '끝까지 안 끊긴 날'을 만드는 용도다. 이런 날이 주 2회를 넘으면 계획이 아니라 하루 시간표 자체를 다시 본다.</p>
+<h3>복습 주기</h3>
+<ul>
+<li>당일: 회계 예제 재풀이, 강의당 개념 3개, 관세율표 백지 복원</li>
+<li>다음 날 아침: 관세율표 복습 15분, 무역영어는 어제 무역실무 주제로</li>
+<li>일요일: 회계 오답 노트 재풀이, 관세율표 주간 12류 백지, 2차 개념 백지</li>
+<li>월말: 오답 노트 중 또 틀린 것만, 관세평가 A4 지도 백지로 다시 그리기</li>
+</ul>
+<h2 style="margin-top:32px">날짜와 백업</h2>
+<div class="set">
+<label for="e1">1차 시험일 (2026년 일정 기준 추정, 공고 후 수정)</label>
+<input type="date" id="e1">
+<label for="e2">2차 시험일</label>
+<input type="date" id="e2">
+<label for="bk">계획 기록 백업 (다른 기기로 옮길 때 복사 → 붙여넣기)</label>
+<textarea id="bk" spellcheck="false"></textarea>
+<div class="btns"><button class="btn" id="copyBk">백업 복사</button><button class="btn" id="loadBk">붙여넣은 백업 불러오기</button><button class="btn" id="reset">계획 기록 초기화</button></div>
+<p class="sub" id="bkmsg" style="margin-top:8px"></p>
+</div>
+</section>
+</main>
+<script src="plan-core.js"></script>
+<script>
+{
+const P=window.PLAN,{key,parse,add,diffDays,fmt}=P;
+const $=id=>document.getElementById(id);
+let S=P.load();
+const save=()=>P.save(S);
+const TODAY=P.today();
+let view=new Date(TODAY);
+const WEEKS=[
+['0주 11/20~22 (2일)','재무 5 (5)','4 (4) 시작','—','25~28류','50p','1회분','20문항'],
+['1주 11/23~29 (6일)','재무 15 (20)','9 (13)','2 (2)','29~40류','150p','3회분','60문항'],
+['2주 11/30~12/6 (6일)','재무 15 (35)','9 (22)','2 (4)','41~52류','150p','3회분','60문항'],
+['3주 12/7~13 (6일)','재무 1 (36) 완강 + 원가 24','9 (31)','2 (6)','53~64류','150p','3회분','60문항'],
+['4주 12/14~20 (6일)','원가 9 (33) 12/15 완강, 이후 기출 40문항','17 (48)','5 (11)','65~76류','150p','3회분','60문항'],
+['5주 12/21~27 (5일)','기출 50문항','20 (68)','4 (15)','77~88류','125p','2.5회분','40문항'],
+['6주 12/28~31 (4일)','기출 1회분 실전 + 30문항','5 (73) 완강','2 (17) 완강','89~97류','100p','2회분','20문항']];
+const WRANGE=[['2026-11-20','2026-11-22'],['2026-11-23','2026-11-29'],['2026-11-30','2026-12-06'],['2026-12-07','2026-12-13'],['2026-12-14','2026-12-20'],['2026-12-21','2026-12-27'],['2026-12-28','2026-12-31']];
+
+function nowMin(){const n=new Date();return n.getHours()*60+n.getMinutes()}
+function renderToday(){
+  const k=key(view),sc=P.sched(view,S),done=S.done[k]||{},off=diffDays(TODAY,view);
+  $('dtitle').textContent=fmt(view)+(off===0?' · 오늘':'');
+  $('dlabel').textContent=sc.label;
+  const mb=$('minBtn');mb.classList.toggle('on',!!S.mode[k]);mb.setAttribute('aria-pressed',String(!!S.mode[k]));
+  mb.hidden=view.getDay()===0||k==='2026-12-25';
+  $('todayBtn').hidden=off===0;
+  let tot=0,dm=0,nextId=null;
+  if(off===0){const nm=nowMin();const nb=sc.b.find(b=>!done[b.id]&&(!b.t||(()=>{const[h,m]=b.t.split(':').map(Number);return h*60+m+b.m>nm})()));nextId=nb&&nb.id}
+  $('blocks').innerHTML=sc.b.map(b=>{tot+=b.m;if(done[b.id])dm+=b.m;
+    return`<button class="row${done[b.id]?' done':''}${b.id===nextId?' next':''}" data-id="${b.id}" aria-pressed="${!!done[b.id]}"><span class="t">${b.t||b.m+'분'}<small>${b.t?'~'+P.end(b.t,b.m)+'<br>'+b.m+'분':''}</small></span><span class="w"><b>${b.title}</b><span>${b.det}</span></span><span class="box"></span></button>`}).join('');
+  const pct=tot?Math.round(dm/tot*100):0;
+  $('dpct').textContent=pct+'%';
+  $('dbar').style.width=pct+'%';
+  $('dsum').textContent=`${Math.floor(dm/60)}시간 ${dm%60}분 / ${Math.floor(tot/60)}시간 ${tot%60}분`;
+  const behind=P.ITEMS.filter(i=>['jm','wg','mu','pg'].includes(i.k)&&S.prog[i.k]<Math.floor(P.expected(i.k,TODAY))-1);
+  const n=$('dnote');n.classList.toggle('bad',behind.length>0);
+  n.innerHTML=behind.length?`<b>밀린 강의: ${behind.map(i=>`${i.n} ${Math.floor(P.expected(i.k,TODAY))-S.prog[i.k]}${i.u}`).join(', ')}</b><br>일요일 버퍼에서 회수하고, 이틀 이상이면 '밀렸을 때' 규칙의 줄이는 순서를 적용한다.`:`연속 수련 ${P.streak(S,TODAY)}일. 강의 진도는 계획대로다. 마감 점검 때 진도 숫자를 고쳐 두면 밀린 것을 여기서 알려준다.`;
+}
+function renderProg(){
+  $('psub').textContent=`${fmt(TODAY)} 기준, 오늘까지 계획한 누적치와 비교`;
+  $('prog').innerHTML=P.ITEMS.map(i=>{
+    const cur=S.prog[i.k],e=P.expected(i.k,TODAY),dlt=Math.round((cur-e)*10)/10;
+    const max=i.max||Math.max(cur,P.expected(i.k,parse('2026-12-31')));
+    const tol=i.st<1?i.st:i.st>=10?i.st:0.5;
+    const st=Math.abs(dlt)<=tol?['계획대로','']:dlt>0?[`+${dlt}${i.u} 앞섬`,'good']:[`${-dlt}${i.u} 밀림`,'bad'];
+    const lo=i.base||0,span=Math.max(1,max-lo);
+    return`<div class="pr"><div><div class="nm">${i.n}</div><div class="st">${cur}${i.max?' / '+i.max:''}${i.u} · 계획 ${Math.round(e*10)/10} · <em class="${st[1]}">${st[0]}</em></div></div>
+    <div class="ctl"><button class="ib" data-k="${i.k}" data-d="-1" aria-label="${i.n} 줄이기">−</button><input id="in-${i.k}" inputmode="decimal" value="${cur}" data-k="${i.k}" aria-label="${i.n} 현재 진도"><button class="ib" data-k="${i.k}" data-d="1" aria-label="${i.n} 늘리기">+</button></div>
+    <div class="track"><i style="width:${Math.min(100,Math.max(0,(cur-lo)/span*100))}%"></i><u style="left:${Math.min(99,Math.max(0,(e-lo)/span*100))}%"></u></div></div>`}).join('');
+}
+function renderWeek(){
+  const tk=key(TODAY);
+  $('wtable').innerHTML='<tr><th>주차</th><th>회계학</th><th>무역실무</th><th>관세평가</th><th>관세율표</th><th>관세법</th><th>무역영어</th><th>내소세</th></tr>'+
+    WEEKS.map((r,i)=>`<tr class="${tk>=WRANGE[i][0]&&tk<=WRANGE[i][1]?'cur':''}">${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('');
+}
+function renderCps(){
+  const nx=P.CPS.find(c=>c.d>=key(TODAY));
+  $('cps').innerHTML=P.CPS.map(c=>{const d=diffDays(TODAY,parse(c.d)),ok=c.g.filter((g,j)=>S.cp[c.id+'-'+j]).length;
+    return`<div class="cp${nx&&nx.id===c.id?' now':''}"><header><b>${fmt(parse(c.d))} · ${c.t}</b><span class="${d<0?'past':''}">${d>0?'D-'+d:d===0?'오늘':'지남'}</span></header><div class="cnt">${ok} / ${c.g.length} 달성</div>
+    ${c.g.map((g,j)=>{const id=c.id+'-'+j;return`<label class="ck"><input type="checkbox" data-cp="${id}" ${S.cp[id]?'checked':''}> ${g}</label>`}).join('')}
+    <div class="act">미달 시: ${c.a}</div></div>`}).join('');
+}
+function renderTop(){
+  $('topline').textContent=`1차 D-${diffDays(TODAY,parse(P.exam1()))} · 2차 D-${diffDays(TODAY,parse(P.exam2()))} · 연속 수련 ${P.streak(S,TODAY)}일`;
+  $('e1').value=P.exam1();$('e2').value=P.exam2();
+}
+function all(){renderTop();renderToday();renderProg();renderWeek();renderCps()}
+const VIEWS=['today','progress','week','checkpoints','rules'];
+function route(){const h=location.hash.slice(1);const v=VIEWS.includes(h)?h:'today';
+  VIEWS.forEach(x=>$('v-'+x).hidden=x!==v);
+  document.querySelectorAll('#tabs a').forEach(a=>{if(a.getAttribute('href')==='#'+v)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')});
+  if(v==='rules')$('bk').value=JSON.stringify(S);
+  window.scrollTo(0,0);}
+window.addEventListener('hashchange',route);
+$('blocks').addEventListener('click',e=>{const r=e.target.closest('.row');if(!r)return;const k=key(view);S.done[k]=S.done[k]||{};S.done[k][r.dataset.id]=!S.done[k][r.dataset.id];save();renderToday();renderTop()});
+$('prev').onclick=()=>{view=add(view,-1);renderToday()};
+$('next').onclick=()=>{view=add(view,1);renderToday()};
+$('todayBtn').onclick=()=>{view=new Date(TODAY);renderToday()};
+$('minBtn').onclick=()=>{const k=key(view);S.mode[k]=!S.mode[k];save();renderToday()};
+const setProg=(k,v)=>{const it=P.ITEMS.find(i=>i.k===k);v=Math.max(0,Math.round(v*10)/10);if(it.max)v=Math.min(it.max,v);S.prog[k]=v;save();renderProg();renderToday()};
+$('prog').addEventListener('click',e=>{const b=e.target.closest('button[data-k]');if(!b)return;const it=P.ITEMS.find(i=>i.k===b.dataset.k);setProg(it.k,S.prog[it.k]+Number(b.dataset.d)*it.st)});
+$('prog').addEventListener('change',e=>{const t=e.target;if(t.dataset.k){const v=parseFloat(t.value);if(!isNaN(v))setProg(t.dataset.k,v);else renderProg()}});
+$('cps').addEventListener('change',e=>{const t=e.target;if(t.dataset.cp){S.cp[t.dataset.cp]=t.checked;save();renderCps()}});
+$('e1').onchange=e=>{if(e.target.value){P.setRaw('hub-exam',e.target.value);renderTop()}};
+$('e2').onchange=e=>{if(e.target.value){P.setRaw('hub-exam2',e.target.value);renderTop()}};
+const msg=t=>$('bkmsg').textContent=t;
+$('copyBk').onclick=()=>{const t=JSON.stringify(S);$('bk').value=t;try{navigator.clipboard.writeText(t).then(()=>msg('복사했다. 다른 기기의 같은 칸에 붙여넣고 불러오기를 누른다.'),()=>msg('자동 복사가 막혔다. 칸의 글자를 길게 눌러 직접 복사한다.'))}catch(e){msg('자동 복사가 막혔다. 칸의 글자를 길게 눌러 직접 복사한다.')}};
+$('loadBk').onclick=()=>{try{const o=JSON.parse($('bk').value);if(!o||typeof o!=='object')throw 0;P.save(o);S=P.load();save();all();msg('불러왔다.')}catch(e){msg('백업 글자가 올바르지 않다. 처음부터 끝까지 다 붙여넣었는지 확인한다.')}};
+let armed=false;
+$('reset').onclick=e=>{if(!armed){armed=true;e.target.textContent='한 번 더 누르면 초기화';setTimeout(()=>{armed=false;e.target.textContent='계획 기록 초기화'},4000);return}P.save({});S=P.load();save();all();armed=false;e.target.textContent='계획 기록 초기화';msg('초기화했다.')};
+window.addEventListener('focus',()=>{S=P.load();all()});
+all();route();
+}
+</script>
+</body>
+</html>
