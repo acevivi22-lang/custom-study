@@ -21,11 +21,10 @@ function subjOf(title){
 }
 
 // ── 동료 6명 (모두 성인 수련생) ─────────────────────────
-// 색은 채도를 낮춘 값만 쓴다. h/H 머리, c/C 옷, a 포인트, e 눈
+// 그림은 chars/ 폴더의 도트 PNG (높이 80px, 배경 투명)
 const CHARS=[
- {id:"seoyul",name:"한서율",subj:"law",hair:"long",age:27,
-  pal:{h:"#34303a",H:"#24212a",c:"#3f4a5b",C:"#2f3846",a:"#8e3a32",e:"#2b2622"},
-  intro:"관세법 담당. 조문 번호로 대화하는 사람. 말수는 적은데 틀린 건 꼭 짚어 준다.",
+ {id:"seoyul",img:"chars/seoyul.png",name:"한서율",subj:"law",age:27,
+  intro:"관세법 담당. 흰 셔츠에 넥타이, 기본서를 늘 끌어안고 다닌다. 조문 번호로 대화하고, 말수는 적은데 틀린 건 꼭 짚어 준다.",
   study:"제38조… 신고납부. 같이 읽자.",wait:"…오늘은 안 오는 거야? 기다릴게.",
   lines:["한서율. 관세법은 내가 맡을게. 첫 장부터 같이 넘기자.",
    "과세물건 확정 시기, 수입신고하는 때. 이건 몸이 기억하게 해.",
@@ -33,9 +32,8 @@ const CHARS=[
    "조문이 문장으로 들리기 시작하면 그때부터가 진짜야.",
    "네가 읽은 페이지 수, 나도 세고 있었어. 꽤 멀리 왔어.",
    "답안 목차가 손에서 먼저 나오지? 이제 시험장에서도 똑같이 하면 돼."]},
- {id:"hana",name:"류하나",subj:"hs",hair:"twin",age:24,
-  pal:{h:"#8a5a3c",H:"#6b432c",c:"#a8925f",C:"#8c784b",a:"#e9e2cf",e:"#3a2a20"},
-  intro:"관세율표 담당. 97류를 전부 노래로 외운 사람. 아침 복습 시간에 제일 시끄럽다.",
+ {id:"hana",img:"chars/hana.png",name:"류하나",subj:"hs",age:24,
+  intro:"관세율표 담당. 별 지팡이로 류 번호를 짚으며 97류를 전부 노래로 외운 사람. 아침 복습 시간에 제일 시끄럽다.",
   study:"1류 산 동물~ 2류 고기~ 따라 해!",wait:"어제 류 복습 안 하면 다 날아간다구~",
   lines:["류하나야! 이름부터 '류'잖아? 관세율표는 나한테 맡겨!",
    "앞글자 노래, 소리 내서 다섯 번. 입이 먼저 외워.",
@@ -43,9 +41,8 @@ const CHARS=[
    "호까지 내려가니까 류 제목이 저절로 나오지? 그게 쌓이는 거야.",
    "백지 복원 틀린 류, 내가 내일 아침에 또 물어볼 거야.",
    "97류 한 바퀴! 이제 2회전은 호 단위로. 같이 부르자!"]},
- {id:"byunhee",name:"차변희",subj:"acc",hair:"bob",glasses:true,age:28,
-  pal:{h:"#4a4038",H:"#362e28",c:"#6c7a68",C:"#57634f",a:"#f2efe8",e:"#2b2622",g:"#8a837a"},
-  intro:"회계학 담당. 이름이 차변이라 대변을 싫어한다는 농담을 싫어한다. 계산기 소리로 기분을 안다.",
+ {id:"byunhee",img:"chars/byunhee.png",name:"차변희",subj:"acc",age:28,
+  intro:"회계학 담당. 품에 안은 작은 로봇이 계산기다. 이름이 차변이라 대변을 싫어한다는 농담을 싫어한다.",
   study:"예제는 해설 덮고 손으로 다시.",wait:"차변 대변 안 맞는 날은 없어. 안 한 날만 있지.",
   lines:["차변희. 회계는 과락이 제일 무서운 과목이야. 그러니까 매일.",
    "강의 듣고 바로 예제 다시 풀었지? 그거 안 하면 다음 날 0이야.",
@@ -53,9 +50,8 @@ const CHARS=[
    "기출 정답률 숫자, 거짓말 안 해. 오답 노트도.",
    "…솔직히 처음엔 네가 회계 버틸 줄 몰랐어. 미안.",
    "55점 넘는 게 당연해졌네. 과락 걱정은 이제 내가 대신 할게."]},
- {id:"elena",name:"엘레나",subj:"trade",hair:"pony",age:26,
-  pal:{h:"#b89b74",H:"#97795a",c:"#4d6e6c",C:"#3d5856",a:"#a8674c",e:"#3a2a20"},
-  intro:"무역영어·무역실무 담당. 파나마 운하 옆 선적 회사 집안 출신. 영어와 스페인어를 섞어 쓴다.",
+ {id:"elena",img:"chars/elena.png",name:"엘레나",subj:"trade",age:26,
+  intro:"무역영어·무역실무 담당. 파나마 운하 옆 부두에서 컨테이너 크레인을 고치며 자랐다. 영어와 스페인어를 섞어 쓴다.",
   study:"FOB면 위험은 본선 적재 때 넘어가. ¿Listo?",wait:"Hola… 오늘 배는 안 뜨는 거야?",
   lines:["¡Hola! 엘레나야. 인코텀즈는 바다에서 배우는 거야.",
    "CISG랑 UCP 600, 헷갈리면 누가 누구한테 약속했는지만 봐.",
@@ -63,9 +59,8 @@ const CHARS=[
    "기출 지문 영어가 이제 그냥 읽히지? ¡Muy bien!",
    "운송·보험·클레임까지. 이제 너도 배 한 척 띄울 수 있겠다.",
    "시험 끝나면 진짜 무역 해 봐. 너 언어 되잖아. ¡Vamos!"]},
- {id:"garam",name:"윤가람",subj:"val",hair:"braid",age:29,
-  pal:{h:"#5a3a3a",H:"#442b2b",c:"#76505a",C:"#5f3f48",a:"#d8c9a8",e:"#2b2622"},
-  intro:"관세평가 담당. 모든 걸 '가산할까 공제할까'로 판단한다. 사례 문제를 좋아한다.",
+ {id:"garam",img:"chars/garam.png",name:"윤가람",subj:"val",age:29,
+  intro:"관세평가 담당. 땋은 머리에 사례집을 안고 다닌다. 모든 걸 '가산할까 공제할까'로 판단한다.",
   study:"수수료, 생산지원비용… 가산 요소부터 체크.",wait:"오늘 안 한 공부는 공제 항목이 아니야.",
   lines:["윤가람이야. 관세평가는 결국 질문 하나야. 가산이냐, 공제냐.",
    "제1방법이 안 되면 왜 안 되는지부터. 순서가 답이야.",
@@ -73,9 +68,8 @@ const CHARS=[
    "강의 끝. 이제부터는 사례 문제로만 가자.",
    "2차 답안 목차, 네 손에서 정리돼서 나오는 거 보기 좋다.",
    "6방법까지 머릿속에 지도가 그려졌지? 시험장에서 그대로 꺼내."]},
- {id:"sera",name:"주세라",subj:"nae",hair:"short",age:25,
-  pal:{h:"#2f3542",H:"#222733",c:"#695c78",C:"#554a63",a:"#c4ad74",e:"#2b2622"},
-  intro:"내국소비세법 담당. 이름 때문에 주세 문제는 무조건 맞힌다. 느긋한데 기출은 꾸준히 한다.",
+ {id:"sera",img:"chars/sera.png",name:"주세라",subj:"nae",age:25,
+  intro:"내국소비세법 담당. 헐렁한 카고 바지에 느긋한 브이. 이름 때문에 주세 문제는 무조건 맞힌다. 느린데 기출은 안 끊는다.",
   study:"부가세는 돈 흐름만 따라가면 돼~",wait:"기출 20문항, 내일 40문항 되기 전에~",
   lines:["주세라. 주세는 내 담당… 이 아니라 내국소비세 전부 내 담당이야.",
    "부가세는 매출세액 빼기 매입세액. 그거면 반은 끝나.",
@@ -146,100 +140,29 @@ function unseen(){
 }
 function markSeen(){put("dorm-seen",Object.keys(get("dorm-ach",{})))}
 
-// ── 도트 스프라이트 (16×22) ──────────────────────────
-// o 외곽선  s 피부  p 볼  m 입  w 흰 깃  c/C 옷  a 포인트  e 눈  l 스타킹  b 신발  h/H 머리  g 안경
-const BODY=[
-"................",
-"................",
-".....oooooo.....",
-"....osssssso....",
-"...osssssssso...",
-"...osssssssso...",
-"...osssssssso...",
-"...osesssseso...",
-"...osesssseso...",
-"...o"+"pssssssp"+"o...",
-"....ossmmsso....",
-".....oossoo.....",
-"....ocwwwwco....",
-"...occwaawcco...",
-"...o"+"cccccccc"+"o...",
-"...oCccccccCo...",
-"..osCccccccCso..",
-"..ooCCCCCCCCoo..",
-"...oCCCCCCCCo...",
-"..oCCCCCCCCCCo..",
-];
-const LEGS={
- idle:[".....ll..ll.....",".....bb..bb....."],
- w1:  ["....ll....ll....","....bb.....bb..."],
- w2:  ["......llll......","......bbbb......"]
-};
-const BANGS=[
-"................",
-".....hhhhhh.....",
-"....hhhhhhhh....",
-"...hhhhhhhhhh...",
-"..hhhhhhhhhhhh..",
-"..hhh.hhhh.hhh..",
-"..hhH......Hhh..",
-"..hh........hh..",
-"..hh........hh..",
-"..hH........Hh..",
-"..H..........H.."
-];
-const HAIR={
- long:{back:[
- "................","................","....hhhhhhhh....","...hhhhhhhhhh...",
- ".hhhhhhhhhhhhhh.",".hhhhhhhhhhhhhh.",".hhhhhhhhhhhhhh.",".hhhhhhhhhhhhhh.",
- ".hhhhhhhhhhhhhh.",".hhhhhhhhhhhhhh.",".hhhhhhhhhhhhhh.",".hhhhhhhhhhhhhh.",
- ".hhhhhhhhhhhhhh.",".hhhhhhhhhhhhhh.",".hhhhhhhhhhhhhh.",".HhhhhhhhhhhhhH.",
- ".HHhhhhhhhhhhHH.","..HH........HH.."],front:BANGS},
- twin:{back:[
- "................","................","................","..a..........a..",
- ".hh..........hh.","hhh..........hhh","hhh..........hhh","hhh..........hhh",
- "hhh..........hhh","hhh..........hhh","hhH..........Hhh","hhH..........Hhh",
- ".hH..........Hh.",".hH..........Hh.",".H............H.",".H............H."],front:BANGS},
- bob:{back:[],front:[
- "................",".....hhhhhh.....","....hhhhhhhh....","...hhhhhhhhhh...",
- "..hhhhhhhhhhhh..","..hhh.hhhh.hhh..","..hhH......Hhh..","..hhh......hhh..",
- "..hhh......hhh..","..hhH......Hhh..","..hhH......Hhh..","..HHH......HHH.."]},
- pony:{back:[
- "................","...........hhh..","...........hhhh.","............ahh.",
- ".............hhh",".............hhh",".............hhh",".............hhh",
- ".............hhH","............hhH.","............hH..","............hH..",
- "............H...","............H..."],front:BANGS},
- braid:{back:[
- "................","................","....hhhhhhhh....","...hhhhhhhhhh...",
- "..hhhhhhhhhhhh..","..hhhhhhhhhhhh..","..hhhhhhhhhhhh..","..hhhhhhhhhhhh..",
- "..hhhhhhhhhhhh..","..hhhhhhhhhhhh.."],front:BANGS.concat([
- "................","..hH............","..Hh............","..hH............",
- "..Hh............","..hH............","...a............","...h............"])},
- short:{back:[],front:[
- "................",".....hhhhhh.....","....hhhhhhhh....","...hhhhhhhhhh...",
- "..hhhhhhhhhaah..","..hhhhhhhhh.hh..","..hhH....hhhhh..","..hh........hh..",
- "..hH........Hh..","..H..........H.."]}
-};
-const GLASSES=["................","................","................","................",
- "................","................","....ggg..ggg....","....g.g..g.g....","....ggg..ggg...."];
-
-const SKIN={o:"#2b2622",s:"#f0dccb",p:"#e3b0a2",m:"#c47f72",w:"#f4f2ec",l:"#3b3836",b:"#2b2622"};
-function colorOf(ch,k){return (ch&&ch.pal[k])||SKIN[k]||null}
-
-// 캐릭터 한 명을 그리기: frame idle|w1|w2, blink, flip(왼쪽 보기), cut(이 줄부터 안 그림)
-function draw(ctx,ch,x,y,o){
-  o=o||{};const F=o.frame||"idle",flip=!!o.flip,cut=o.cut||99,sil=o.sil||null;
-  const px=(c,r,col)=>{if(r>=cut)return;ctx.fillStyle=sil||col;ctx.fillRect(x+(flip?15-c:c),y+r,1,1)};
-  const layer=g=>g.forEach((row,r)=>{for(let c=0;c<16;c++){const k=row[c];if(!k||k===".")continue;const col=colorOf(ch,k);if(col)px(c,r,col)}});
-  const H=HAIR[ch.hair];
-  layer(H.back);
-  BODY.forEach((row,r)=>{for(let c=0;c<16;c++){let k=row[c];if(!k||k===".")continue;
-    if(k==="e"&&o.blink){k=r===8?"o":"s"}
-    px(c,r,colorOf(ch,k))}});
-  LEGS[F].forEach((row,i)=>{for(let c=0;c<16;c++){const k=row[c];if(k&&k!==".")px(c,20+i,colorOf(ch,k))}});
-  layer(H.front);
-  if(ch.glasses)layer(GLASSES);
+// ── 도트 그림 ────────────────────────────────────
+// 각 동료의 PNG를 한 번만 불러 두고, 잠긴 동료용 실루엣도 만들어 둔다.
+const IMG={},SIL={};
+function load(onReady){
+  let n=0;CHARS.forEach(c=>{const im=new Image();im.onload=()=>{IMG[c.id]=im;if(++n===CHARS.length&&onReady)onReady()};im.onerror=()=>{if(++n===CHARS.length&&onReady)onReady()};im.src=c.img});
 }
+function silhouette(c,col){
+  const k=c.id+col;if(SIL[k])return SIL[k];const im=IMG[c.id];if(!im)return null;
+  const cv=document.createElement("canvas");cv.width=im.width;cv.height=im.height;const x=cv.getContext("2d");
+  x.drawImage(im,0,0);x.globalCompositeOperation="source-in";x.fillStyle=col;x.fillRect(0,0,cv.width,cv.height);
+  return SIL[k]=cv;
+}
+// 동료 한 명 그리기: (cx, feet) = 발 가운데 좌표. flip 왼쪽 보기, cut 위에서부터 이 높이까지만, sil 실루엣 색, scale 배율
+function draw(ctx,ch,cx,feet,o){
+  o=o||{};const im=o.sil?silhouette(ch,o.sil):IMG[ch.id];if(!im)return;
+  const sc=o.scale||1,w=im.width,h=Math.min(im.height,o.cut||im.height);
+  const x=Math.round(cx-w*sc/2),y=Math.round(feet-im.height*sc);
+  ctx.save();ctx.imageSmoothingEnabled=false;
+  if(o.flip){ctx.translate(x+w*sc,y);ctx.scale(-1,1);ctx.drawImage(im,0,0,w,h,0,0,w*sc,h*sc)}
+  else ctx.drawImage(im,0,0,w,h,x,y,w*sc,h*sc);
+  ctx.restore();
+}
+const size=ch=>IMG[ch.id]?[IMG[ch.id].width,IMG[ch.id].height]:[30,80];
 
-window.DORM={SUBJ,CHARS,LV,level,ACH,ITEMS,stats,sync,unseen,markSeen,draw,subjOf,get,put};
+window.DORM={SUBJ,CHARS,LV,level,ACH,ITEMS,stats,sync,unseen,markSeen,load,draw,size,silhouette,subjOf,get,put};
 })();

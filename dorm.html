@@ -28,9 +28,10 @@ h2{margin:0 0 4px;padding-top:12px;border-top:2px solid var(--ink);font-size:18p
 h2 span{font-family:var(--f-mono);font-size:12px;font-weight:500;color:var(--muted)}
 .sub{color:var(--muted);font-size:13px;margin:0 0 6px}
 .mate{border-bottom:1px solid var(--line)}
-.mate summary{list-style:none;display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:2px 14px;align-items:center;padding:12px 0;cursor:pointer}
+.mate summary{list-style:none;display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:2px 14px;align-items:center;padding:10px 0;cursor:pointer}
 .mate summary::-webkit-details-marker{display:none}
-.mate canvas{width:48px;height:66px;image-rendering:pixelated;grid-row:span 3}
+.mate .pic{width:48px;height:80px;grid-row:span 3;display:flex;align-items:flex-end;justify-content:center}
+.mate canvas{height:80px;width:auto;image-rendering:pixelated}
 .mate .nm{font-weight:700;font-size:16px}
 .mate .nm small{font-weight:400;color:var(--muted);font-size:13px;margin-left:6px}
 .mate .lv{font-family:var(--f-poster);font-size:22px;grid-row:span 3;font-variant-numeric:tabular-nums}
@@ -62,7 +63,7 @@ h2 span{font-family:var(--f-mono);font-size:12px;font-weight:500;color:var(--mut
 <main>
   <div id="toast" hidden></div>
   <section>
-    <div class="room" id="room"><canvas id="cv" width="160" height="100" aria-label="기숙사 방. 동료를 누르면 말을 건다"></canvas></div>
+    <div class="room" id="room"><canvas id="cv" width="320" height="200" aria-label="기숙사 방. 동료를 누르면 말을 건다"></canvas></div>
     <div class="status"><span id="st1"></span><span id="st2"></span></div>
   </section>
   <section>
@@ -81,38 +82,35 @@ h2 span{font-family:var(--f-mono);font-size:12px;font-weight:500;color:var(--mut
 <script>
 {
 const P=window.PLAN,D=window.DORM,$=s=>document.querySelector(s);
-const cv=$("#cv"),ctx=cv.getContext("2d"),W=160,H=100;
+const cv=$("#cv"),ctx=cv.getContext("2d"),W=320,H=200,FLOOR=126;
+ctx.imageSmoothingEnabled=false;
 let data=null,agents=[],items=new Set(),mode={sit:null,wait:false,night:false};
 
-// ── 방 그리기 ──
+// ── 방 그리기 (160×100 칸을 2배로) ──
 const C={wall:"#e4e1da",wallLine:"#d6d2c9",base:"#b9b3a8",floor:"#cfc9be",plank:"#c2bcb0",frame:"#8d877d",
   glassD:"#d6dde0",glassN:"#2c313a",star:"#e8e5de",shelf:"#8b7d6b",shelfD:"#6f6355",desk:"#8b7d6b",deskD:"#6f6355",
   books:["#6b5d7a","#3f4a5b","#a8925f","#76505a","#4d6e6c","#6c7a68","#2f3542"],paper:"#f4f2ec",red:"#9e1f17"};
-function R(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(x,y,w,h)}
+function R(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(x*2,y*2,w*2,h*2)}
 function room(){
   const n=mode.night;
-  R(0,0,W,62,n?"#cfcac0":C.wall);
-  for(let y=6;y<60;y+=8)R(0,y,W,1,n?"#c6c1b6":C.wallLine);
-  R(0,60,W,3,C.base);R(0,63,W,H-63,n?"#c4beb3":C.floor);
-  for(let y=70;y<H;y+=7)R(0,y,W,1,C.plank);
-  // 창문
+  R(0,0,160,62,n?"#cfcac0":C.wall);
+  for(let y=6;y<60;y+=8)R(0,y,160,.5,n?"#c6c1b6":C.wallLine);
+  R(0,60,160,3,C.base);R(0,63,160,37,n?"#c4beb3":C.floor);
+  for(let y=70;y<100;y+=7)R(0,y,160,.5,C.plank);
   R(12,10,36,30,C.frame);R(14,12,32,26,n?C.glassN:C.glassD);R(29,12,2,26,C.frame);R(14,24,32,2,C.frame);
-  if(n){[[18,15],[24,19],[38,14],[42,21],[35,30],[19,31]].forEach(([x,y])=>R(x,y,1,1,C.star));R(40,28,3,3,"#e8e5de");R(41,28,2,2,C.glassN)}
-  else{R(16,14,6,1,"#e8edef");R(33,15,8,1,"#e8edef")}
+  if(n){[[18,15],[24,19],[38,14],[42,21],[35,30],[19,31]].forEach(([x,y])=>R(x,y,.5,.5,C.star));R(40,28,3,3,"#e8e5de");R(41,28,2,2,C.glassN)}
+  else{R(16,14,6,.5,"#e8edef");R(33,15,8,.5,"#e8edef")}
   R(10,40,40,2,C.frame);
-  // 책장
   R(56,16,22,46,C.shelf);R(58,18,18,42,C.shelfD);
   [20,31,42,53].forEach((y,i)=>{let x=59;for(let b=0;b<5;b++){const w=b%2?3:2,h=7-(b+i)%3;R(x,y+(8-h),w,h,C.books[(b+i*2)%7]);x+=w+1}R(58,y+8,18,2,C.shelf)});
-  // 달력: 시험일 빨간 표시
   R(92,18,14,16,C.paper);R(92,18,14,3,"#3b3836");for(let i=0;i<9;i++)R(94+(i%3)*4,23+Math.floor(i/3)*3,2,2,i===7?C.red:"#cfccc4");
-  // 책상
-  R(108,63,46,4,C.desk);R(110,67,3,22,C.deskD);R(149,67,3,22,C.deskD);R(113,67,36,7,C.desk);R(113,74,36,1,C.deskD);
+  desk();
 }
+function desk(){R(108,63,46,4,C.desk);R(110,67,3,22,C.deskD);R(149,67,3,22,C.deskD);R(113,67,36,7,C.desk);R(113,74,36,.5,C.deskD)}
 function deskTop(){
-  // 책상 위 (앉은 동료 앞에 그림)
-  R(108,63,46,4,C.desk);R(110,67,3,22,C.deskD);R(149,67,3,22,C.deskD);R(113,67,36,7,C.desk);R(113,74,36,1,C.deskD);
-  R(122,60,12,3,C.paper);R(127,60,1,3,"#cfccc4");R(122,62,12,1,"#3f4a5b"); // 펼친 책
-  if(items.has("lamp")){R(141,52,1,11,"#3b3836");R(138,50,7,3,"#3b3836");R(140,62,5,1,"#3b3836");if(mode.night){ctx.fillStyle="rgba(232,223,180,.16)";for(let i=0;i<10;i++)ctx.fillRect(140-i,53+i,3+i*2,1)}}
+  desk();
+  R(122,60,12,3,C.paper);R(127.5,60,.5,3,"#cfccc4");R(122,62.5,12,.5,"#3f4a5b");
+  if(items.has("lamp")){R(141,52,1,11,"#3b3836");R(138,50,7,3,"#3b3836");R(140,62,5,1,"#3b3836");if(mode.night){ctx.fillStyle="rgba(232,223,180,.16)";for(let i=0;i<10;i++)ctx.fillRect((140-i)*2,(53+i)*2,(3+i*2)*2,2)}}
   if(items.has("calc")){R(112,60,6,3,"#5f5d58");R(113,61,1,1,"#cfccc4");R(115,61,1,1,"#cfccc4")}
 }
 function extras(){
@@ -120,32 +118,31 @@ function extras(){
   if(items.has("plant")){R(82,80,8,8,"#a8674c");R(81,79,10,2,"#8c5540");[[84,70,2,9],[80,73,4,2],[88,72,4,2],[86,68,2,4],[79,76,3,2],[89,75,3,2]].forEach(a=>R(a[0],a[1],a[2],a[3],"#5c6858"))}
 }
 const CAT=[".k...k.....",".kk.kk.....",".kkkkk.....",".kekek..k..",".kkkkkkkkk.","kkkkkkkkkkk",".kkkkkkkkk."];
-function cat(x,y){CAT.forEach((r,j)=>{for(let i=0;i<r.length;i++){const k=r[i];if(k===".")continue;R(x+i,y+j,1,1,k==="e"?(blinkCat?"#5f5d58":"#e8dfb4"):"#5f5d58")}})}
 let blinkCat=false;
+function cat(x,y){CAT.forEach((r,j)=>{for(let i=0;i<r.length;i++){const k=r[i];if(k===".")continue;R(x+i,y+j,1,1,k==="e"?(blinkCat?"#5f5d58":"#e8dfb4"):"#5f5d58")}})}
 
-// ── 동료 움직임 ──
-const rnd=(a,b)=>a+Math.random()*(b-a);
-function spawn(ch,i){return{ch,x:Math.round(rnd(8,92)),y:Math.round(rnd(52,72)),tx:0,ty:0,st:"idle",t:Math.round(rnd(5,40)),f:0,flip:Math.random()<.5,blink:0}}
+// ── 동료 움직임: (x, f) = 발 가운데 좌표 ──
+const rnd=(a,b)=>Math.round(a+Math.random()*(b-a));
+const ACHOF={};D.ACH.forEach(a=>{if(a.char)ACHOF[a.char]=a.id});
+function spawn(ch){return{ch,x:rnd(24,196),f:rnd(150,196),tx:0,tf:0,st:"idle",t:rnd(5,40),s:0,flip:Math.random()<.5}}
 function syncAgents(){
   const live=D.CHARS.filter(c=>data.got[ACHOF[c.id]]);
   agents=agents.filter(a=>live.includes(a.ch));
-  live.forEach((c,i)=>{if(!agents.some(a=>a.ch===c))agents.push(spawn(c,i))});
+  live.forEach(c=>{if(!agents.some(a=>a.ch===c))agents.push(spawn(c))});
 }
-const ACHOF={};D.ACH.forEach(a=>{if(a.char)ACHOF[a.char]=a.id});
 function think(a,i){
-  if(mode.sit===a.ch.subj){a.st="sit";a.x=120;a.y=46;return}
-  if(a.st==="sit"){a.st="idle";a.x=96;a.y=60;a.t=10}
-  if(mode.wait){const wx=14+i*7;if(a.st!=="waitIdle"){a.st="walk";a.tx=wx;a.ty=50+(i%2)*3;a.w=true}}
+  if(mode.sit===a.ch.subj){a.st="sit";a.x=258;a.f=172;a.flip=false;return}
+  if(a.st==="sit"){a.st="idle";a.x=196;a.f=160;a.t=10}
+  if(mode.wait){if(a.st!=="waitIdle"&&!a.w){a.st="walk";a.tx=30+i*13;a.tf=150+(i%2)*6;a.w=true}}
   else if(a.st==="waitIdle"){a.st="idle";a.t=5}
-  if(a.st==="idle"&&--a.t<=0){a.st="walk";a.tx=Math.round(rnd(4,98));a.ty=Math.round(rnd(52,74));}
+  if(a.st==="idle"&&--a.t<=0){a.st="walk";a.tx=rnd(20,200);a.tf=rnd(148,196)}
   if(a.st==="walk"){
-    const dx=a.tx-a.x,dy=a.ty-a.y;
-    if(!dx&&!dy){a.st=a.w&&mode.wait?"waitIdle":"idle";a.w=false;a.t=Math.round(rnd(25,80));a.f=0;return}
+    const dx=a.tx-a.x,dy=a.tf-a.f;
+    if(!dx&&!dy){a.st=a.w&&mode.wait?"waitIdle":"idle";a.w=false;a.t=rnd(25,80);a.s=0;return}
     if(dx){a.x+=Math.sign(dx);a.flip=dx<0}
-    if(dy&&(Math.random()<.5||!dx))a.y+=Math.sign(dy);
-    a.f++;
+    if(dy&&(Math.random()<.5||!dx))a.f+=Math.sign(dy);
+    a.s++;
   }
-  if(a.blink>0)a.blink--;else if(Math.random()<.02)a.blink=2;
 }
 let tick=0;
 function frame(){
@@ -154,25 +151,23 @@ function frame(){
   blinkCat=(tick%60)<3;
   room();extras();
   if(items.has("cat"))cat(64,88);
-  const order=agents.slice().sort((a,b)=>a.y-b.y);
-  order.filter(a=>a.st!=="sit").forEach(a=>{
-    const fr=a.st==="walk"?(Math.floor(a.f/2)%2?"w1":"w2"):"idle";
-    D.draw(ctx,a.ch,a.x,a.y,{frame:fr,flip:a.flip,blink:a.blink>0})});
-  const s=agents.find(a=>a.st==="sit");
-  if(s)D.draw(ctx,s.ch,s.x,s.y+(tick%40<20?0:1),{blink:s.blink>0,cut:17});
+  const sitter=agents.find(a=>a.st==="sit");
+  if(sitter)D.draw(ctx,sitter.ch,sitter.x,sitter.f+(tick%40<20?0:1),{cut:36});
   deskTop();
+  agents.filter(a=>a.st!=="sit").sort((a,b)=>a.f-b.f).forEach(a=>{
+    const bob=a.st==="walk"&&Math.floor(a.s/2)%2?1:0;
+    D.draw(ctx,a.ch,a.x,a.f-bob,{flip:a.flip})});
 }
-setInterval(frame,120);
 
 // ── 말풍선 ──
 let bubT=0;
-function say(a,txt){
+function headY(a){return a.st==="sit"?a.f-80:a.f-D.size(a.ch)[1]}
+function say(a,txt,y){
   const old=$(".bub");if(old)old.remove();
   const b=document.createElement("div");b.className="bub";
   b.innerHTML=`<b>${a.ch.name}</b>${txt}`;
-  const ty=a.st==="sit"?a.y+1:a.y;
-  const raw=(a.x+8)/W*100,rw=$("#room").clientWidth,half=Math.min(130,rw*.35)/rw*100,cl=Math.max(half,Math.min(100-half,raw));
-  b.style.left=cl+"%";b.style.top=(ty/H*100)+"%";b.style.setProperty("--ax",((raw-cl)/100*rw)+"px");
+  const raw=a.x/W*100,rw=$("#room").clientWidth,half=Math.min(130,rw*.35)/rw*100,cl=Math.max(half,Math.min(100-half,raw));
+  b.style.left=cl+"%";b.style.top=((y??headY(a))/H*100)+"%";b.style.setProperty("--ax",((raw-cl)/100*rw)+"px");
   $("#room").appendChild(b);clearTimeout(bubT);bubT=setTimeout(()=>b.remove(),3800);
 }
 function lineFor(a){
@@ -182,9 +177,9 @@ function lineFor(a){
 }
 cv.addEventListener("click",e=>{
   const r=cv.getBoundingClientRect(),x=(e.clientX-r.left)/r.width*W,y=(e.clientY-r.top)/r.height*H;
-  const hit=agents.slice().sort((a,b)=>b.y-a.y).find(a=>x>=a.x+1&&x<=a.x+15&&y>=a.y&&y<=a.y+22);
-  if(hit){say(hit,lineFor(hit));if(hit.st!=="sit"){hit.st="idle";hit.t=30;hit.flip=x<hit.x+8?false:hit.flip}}
-  else if(items.has("cat")&&x>=64&&x<=75&&y>=88)say({ch:{name:"고양이"},x:62,y:88,st:""},"냥.");
+  const hit=agents.slice().sort((a,b)=>b.f-a.f).find(a=>{const [w]=D.size(a.ch),top=headY(a),bot=a.st==="sit"?FLOOR:a.f;return x>=a.x-w/2&&x<=a.x+w/2&&y>=top&&y<=bot});
+  if(hit){say(hit,lineFor(hit));if(hit.st!=="sit"){hit.st="idle";hit.t=30}}
+  else if(items.has("cat")&&x>=128&&x<=152&&y>=174)say({ch:{name:"고양이"},x:138,st:""},"냥.",174);
 });
 setInterval(()=>{if(!agents.length||$(".bub"))return;const a=agents[Math.floor(Math.random()*agents.length)];say(a,lineFor(a))},14000);
 
@@ -207,9 +202,10 @@ function nowMode(){
 
 // ── 목록 ──
 function mini(c,lock){
-  const m=document.createElement("canvas");m.width=16;m.height=22;
-  D.draw(m.getContext("2d"),c,0,0,lock?{sil:getComputedStyle(document.body).getPropertyValue("--line").trim()||"#cfccc4"}:{});
-  return m;
+  const [w,h]=D.size(c),m=document.createElement("canvas");m.width=w;m.height=h;
+  const col=getComputedStyle(document.body).getPropertyValue("--line").trim()||"#cfccc4";
+  D.draw(m.getContext("2d"),c,w/2,h,lock?{sil:col}:{});
+  const box=document.createElement("span");box.className="pic";box.appendChild(m);return box;
 }
 function renderLists(){
   const {s,got}=data;
@@ -217,11 +213,11 @@ function renderLists(){
   let live=0;
   D.CHARS.forEach(c=>{
     const a=D.ACH.find(x=>x.char===c.id),on=!!got[a.id];if(on)live++;
-    const min=s.min[c.subj],lv=D.level(min),nx=D.LV[lv],pv=D.LV[lv-1];
+    const min=s.min[c.subj],lv=D.level(min),nx=D.LV[lv],pv=D.LV[lv-1],[pc,pm]=a.p(s);
     const det=document.createElement("details");det.className="mate"+(on?"":" lock");
     det.innerHTML=`<summary><span class="cvs"></span><span class="nm">${on?c.name:"???"}<small>${D.SUBJ[c.subj]}</small></span><span class="lv">${on?"Lv"+lv:"—"}</span>
       <span class="meta">${on?`${(min/60).toFixed(1)}시간${nx?` · 다음 ${(nx/60)}시간`:" · 최대"}`:`입주 조건: ${a.d}`}</span>
-      <div class="bar"><i style="width:${on?(nx?Math.min(100,(min-pv)/(nx-pv)*100):100):Math.min(100,a.p(s)[0]/a.p(s)[1]*100)}%"></i></div></summary>
+      <div class="bar"><i style="width:${on?(nx?Math.min(100,(min-pv)/(nx-pv)*100):100):Math.min(100,pc/pm*100)}%"></i></div></summary>
       <div class="body">${on?`<p class="intro">${c.intro} (${c.age}세)</p><ol>${c.lines.map((l,i)=>i<lv?`<li><i>Lv${i+1}</i><span>${l}</span></li>`:`<li class="off"><i>Lv${i+1}</i><span>${(D.LV[i]/60)}시간에 열림</span></li>`).join("")}</ol>`:`<p class="intro">${D.SUBJ[c.subj]} 담당. 업적 '${a.t}'을 달성하면 입주한다.</p>`}</div>`;
     det.querySelector(".cvs").replaceWith(mini(c,!on));
     box.appendChild(det);
@@ -246,10 +242,13 @@ function refresh(){
   items=new Set(D.ACH.filter(a=>a.item&&data.got[a.id]).map(a=>a.item));
   syncAgents();nowMode();renderLists();
 }
-refresh();toast();
-window.addEventListener("focus",refresh);
-window.addEventListener("storage",refresh);
-setInterval(nowMode,30000);
+D.load(()=>{
+  refresh();toast();
+  setInterval(frame,120);
+  window.addEventListener("focus",refresh);
+  window.addEventListener("storage",refresh);
+  setInterval(nowMode,30000);
+});
 }
 </script>
 </body>
