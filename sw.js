@@ -1,6 +1,6 @@
 // 광야(관세사 수련장) 오프라인 캐시. 파일을 고치면 VERSION 값을 바꿔 주세요.
 // 페이지와 데이터는 설치할 때 미리 받아 두고, 문제 이미지는 처음 열 때 저장해 둡니다.
-const VERSION = "v14-2026-11-21-ui";
+const VERSION = "v15-2026-11-21-first";
 const CORE = ["./","index.html","amgi.html","nk.html","tc.html","gichul.html","lawmap.html","trademap.html","jeongri.html","seyul.html","hsm.html","plan.html","plan-core.js","dorm.html","dorm-core.js","chars/seoyul.png","chars/hana.png","chars/byunhee.png","chars/elena.png","chars/garam.png","chars/sera.png","theme.css","hsm-data.js","jeongri-data.js","gichul-data.js","manifest.webmanifest","icons/icon-192.png","icons/icon-512.png","icons/apple-touch-icon.png","icons/icon-maskable-512.png"];
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(VERSION).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));

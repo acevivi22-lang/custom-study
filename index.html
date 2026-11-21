@@ -14,7 +14,8 @@
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <style>
 /* 광야 — 검은 바탕, 둥근 위젯, 아래 떠 있는 탭 4개(홈·계획·공부·기숙사)
-   홈 맨 위 큰 위젯은 '히어로 슬롯': 지금은 기숙사. 나중에 다른 화면으로 바꾸려면 아래 HERO 한 줄만 고치면 된다.
+   홈 맨 위는 '첫 블록 · 회계학'(회계 69강을 다 들을 때까지). 다 들으면 히어로 슬롯(기숙사)이 돌아온다.
+   히어로 슬롯은 지금 기숙사. 나중에 다른 화면으로 바꾸려면 아래 HERO 한 줄만 고치면 된다.
    연습장 페이지들은 iframe으로 그대로 열리고, 색은 theme.css 다크 값을 쓴다. */
 :root{--sh:#000;--card:#141414;--card2:#1b1b1b;--edge:#262626;--tx:#f2f2f2;--mt:#8a8a8a;--dim:#5a5a5a;--r:24px}
 *{box-sizing:border-box;min-width:0;-webkit-tap-highlight-color:transparent}
@@ -126,6 +127,26 @@ details.w summary::-webkit-details-marker{display:none}
 .tabs button:focus-visible{outline:2px solid var(--tx);outline-offset:-8px;border-radius:24px}
 .badge{position:absolute;top:13px;left:calc(50% + 6px);width:8px;height:8px;border-radius:50%;background:var(--tx)}
 
+/* 첫 블록 · 회계학 (1주 실험) */
+.fbrow{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.fbrow .r{text-align:right}
+.fbact{display:grid;grid-template-columns:56px 1fr;gap:10px}
+.fbb,.fbm{height:56px;border-radius:18px;cursor:pointer;font-size:17px;font-weight:600}
+.fbb{border:0;background:var(--tx);color:#000}
+.fbm{border:1px solid var(--edge);background:var(--card2);color:var(--mt);font-size:22px;font-weight:400}
+.fnote{margin:0;font-size:13.5px;color:var(--tx);line-height:1.45}
+.fnote.q{color:var(--mt)}
+.wk{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;text-align:center;font-size:12px;color:var(--mt)}
+.wk i{display:block;width:10px;height:10px;border-radius:50%;margin:6px auto 0;background:#2c2c2c}
+.wk i.ok{background:#fff}
+.wk i.pt{background:#5a5a5a}
+.wk i.fu{background:transparent;box-shadow:inset 0 0 0 1px #3a3a3a}
+.wk i.td{outline:1.5px solid #fff;outline-offset:2px}
+.wkf{font-size:13px;color:var(--mt)}
+.wkf b{color:var(--tx);font-weight:600;font-variant-numeric:tabular-nums}
+#memoT{width:100%;resize:vertical;min-height:76px;font:15px/1.5 inherit;font-family:inherit;color:var(--tx);background:var(--card2);border:1px solid var(--edge);border-radius:14px;padding:10px 12px}
+#memoT::placeholder{color:var(--dim)}
+
 @media (min-width:900px){.wg{grid-template-columns:repeat(4,1fr)}.w.span{grid-column:span 4}.w.sq{aspect-ratio:auto;min-height:190px;grid-column:span 2}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -141,7 +162,19 @@ details.w summary::-webkit-details-marker{display:none}
 <main>
   <section class="view" id="home">
     <div class="wg">
-      <div class="w span hero">
+      <div class="w span" id="first" hidden>
+        <div class="wh"><b>첫 블록 · 회계학</b><span id="fS"></span></div>
+        <div class="fbrow">
+          <div class="big" id="fBig"></div>
+          <div class="r"><div class="nm" id="fNm"></div><div class="lbl" id="fSub"></div></div>
+        </div>
+        <div class="fbact"><button class="fbm" id="fMinus" type="button" aria-label="1강 취소">−</button><button class="fbb" id="fPlus" type="button">+1강 들음</button></div>
+        <p class="fnote" id="fNote"></p>
+        <div class="wk" id="fWk"></div>
+        <div class="wkf" id="fWkf"></div>
+      </div>
+
+      <div class="w span hero" id="heroW">
         <div class="wh"><b id="heroT"></b><a class="go" id="heroGo" href="#" aria-label="전체 보기"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></a></div>
         <iframe id="heroF" title="히어로 위젯" scrolling="no"></iframe>
       </div>
@@ -167,6 +200,11 @@ details.w summary::-webkit-details-marker{display:none}
       </div>
 
       <a class="w span row" id="resume" href="#gc1"></a>
+
+      <div class="w span" id="memo">
+        <div class="wh"><b>앱 고칠 것</b><span id="memoS"></span></div>
+        <textarea id="memoT" rows="3" placeholder="떠오르면 여기 적고 닫는다. 고치는 건 일요일 30분만."></textarea>
+      </div>
 
       <details class="w span" id="datepanel">
         <summary><b style="font-weight:600">날짜 설정</b><span class="lbl">1차 · 2차 · 광야 시작일</span></summary>
@@ -315,9 +353,92 @@ function wResume(s){
   r.innerHTML=`<div class="l"><b>${last?m.t:"1차 기출"}</b><span class="lbl">${last?"이어서 하기":"처음이라면 여기부터"}</span></div>`+
     (p.n!==undefined?`<div class="val">${p.n}<small> / ${p.max}</small></div>`:`<div class="lbl" style="text-align:right">${p.t}</div>`);
 }
+// ── 첫 블록 · 회계학 ──
+// 규칙: 기상 후 첫 공부 블록은 회계학 강의 N강. N = 남은 회계 강의 ÷ 12/15까지 남은 공부일.
+// 기록은 재무(jm) → 원가(wg) 순으로 계획 진도에 그대로 더해진다. 하루 몫은 그날 처음 연 순간의 진도로 고정.
+const ACC_MAX=69,ACC_DUE="2026-12-15",ACC_DUE2="2027-01-10"; // 12/15 완강, 넘기면 계획의 이월 한도 1/10
+const EXP_S="2026-11-23",EXP_E="2026-11-28",EXP_R="2026-11-29"; // 1주 실험(월~토)과 결과 보는 일요일
+const accCur=S=>S.prog.jm+S.prog.wg;
+const studyLeft=(T,due)=>{let n=0;for(let d=new Date(T);P.key(d)<=due;d=P.add(d,1))if(P.isStudy(d))n++;return n};
+const loadExp=()=>{const e=get("exp-v1",{});["b","l","n","f"].forEach(x=>e[x]=e[x]||{});return e};
+function expTick(S,T){
+  const e=loadExp(),k=P.key(T),cur=accCur(S);
+  if(e.b[k]===undefined){
+    e.b[k]=cur;
+    const due=k<=ACC_DUE?ACC_DUE:ACC_DUE2,left=studyLeft(T,due);
+    e.n[k]=P.isStudy(T)&&cur<ACC_MAX?Math.ceil((ACC_MAX-cur)/Math.max(1,left)):0;
+  }
+  e.l[k]=cur;put("exp-v1",e);return e;
+}
+const did=(e,k)=>e.b[k]===undefined?0:Math.max(0,(e.l[k]??e.b[k])-e.b[k]);
+const missed=(e,k)=>e.b[k]===undefined||did(e,k)<e.n[k];
+const prevStudy=d=>{let x=P.add(d,-1);while(!P.isStudy(x))x=P.add(x,-1);return x};
+const hm=m=>`${P.pad(Math.floor(m/60))}:${P.pad(Math.round(m%60))}`;
+function wFirst(S,T){
+  const cur=accCur(S),on=cur<ACC_MAX;
+  $("#first").hidden=!on;$("#heroW").hidden=on;
+  if(!on)return;
+  const e=expTick(S,T),k=P.key(T),n=e.n[k],dn=did(e,k),study=P.isStudy(T);
+  const due=k<=ACC_DUE?ACC_DUE:ACC_DUE2,left=studyLeft(T,due),rem=ACC_MAX-cur;
+  $("#fS").textContent=`${md(due)}까지 ${rem}강 · 공부일 ${left}일`;
+  if(study){
+    $("#fBig").innerHTML=`${dn}<small>/ ${n}강</small>`;
+    $("#fNm").textContent=dn>=n?"오늘 몫 끝":"오늘 첫 블록";
+    $("#fSub").textContent=e.f[k]?`첫 강의 ${e.f[k]}`:"다른 과목·폰보다 먼저";
+  }else{
+    $("#fBig").innerHTML=`쉼<small>일요일</small>`;
+    $("#fNm").textContent="진도 없음";
+    $("#fSub").textContent="회계 오답 60분 · 앱 고치기 30분";
+  }
+  // 놓친 날 규칙 → 아니면 오늘 비웠을 때 늘어나는 하루 몫
+  let note="",quiet=false;
+  if(study&&dn<n){
+    const p1=prevStudy(T),p2=prevStudy(p1),k1=P.key(p1),k2=P.key(p2);
+    const m1=k1>=EXP_S&&missed(e,k1),m2=m1&&k2>=EXP_S&&missed(e,k2);
+    if(m2){const sh=[k1,k2].reduce((a,x)=>a+Math.max(0,(e.n[x]||0)-did(e,x)),0);note=`이틀 비었다. 밀린 ${sh}강은 배속을 올려 이번 주 안에 메운다.`}
+    else if(m1)note="어제 비었다. 오늘은 다른 무엇보다 먼저 1강만이라도.";
+    else{
+      const base=ACC_MAX-e.b[k],f1=x=>(Math.round(x*10)/10).toFixed(1);
+      note=left>1?`오늘 비우면 남은 날 하루 평균 ${f1(base/left)}강 → ${f1(base/(left-1))}강.`:"오늘이 마감일이다.";quiet=true;
+    }
+  }else if(study){note="남은 블록은 계획대로.";quiet=true}
+  const fn=$("#fNote");fn.textContent=note;fn.className="fnote"+(quiet?" q":"");fn.hidden=!note;
+  // 실험 1주: 11/23(월)~11/28(토)
+  const days=[];for(let d=P.parse(EXP_S);P.key(d)<=EXP_E;d=P.add(d,1))days.push(d);
+  let ok=0,ft=[];
+  $("#fWk").innerHTML=days.map(d=>{
+    const x=P.key(d);let c="";
+    if(x>k)c="fu";else if(e.b[x]!==undefined&&e.n[x]&&did(e,x)>=e.n[x]){c="ok";ok++}else if(did(e,x)>0)c="pt";
+    if(e.f[x]){const[h,mi]=e.f[x].split(":").map(Number);ft.push(h*60+mi)}
+    return`<div>${P.WD[d.getDay()]}<i class="${c}${x===k?" td":""}"></i></div>`}).join("");
+  const avg=ft.length?hm(ft.reduce((a,b)=>a+b,0)/ft.length):"";
+  const wf=$("#fWkf");
+  if(k<EXP_S)wf.innerHTML=`실험 1주 · ${md(EXP_S)}(월) 시작`;
+  else if(k<=EXP_E)wf.innerHTML=`실험 1주 · 6일 중 <b>${ok}</b>일 채움${avg?` · 첫 강의 평균 <b>${avg}</b>`:""}`;
+  else wf.innerHTML=`실험 결과 · 6일 중 <b>${ok}</b>일${avg?` · 첫 강의 평균 <b>${avg}</b>`:""}${k===EXP_R?" · 오늘 다음 주 규칙을 정한다":""}`;
+}
+function addAcc(dir){
+  const S=P.load(),T=P.today(),k=P.key(T),e=expTick(S,T);
+  if(dir>0){if(S.prog.jm<36)S.prog.jm++;else if(S.prog.wg<33)S.prog.wg++;else return;
+    if(!e.f[k]){const n=new Date();e.f[k]=`${P.pad(n.getHours())}:${P.pad(n.getMinutes())}`}}
+  else{if(S.prog.wg>0&&S.prog.jm>=36)S.prog.wg--;else if(S.prog.jm>0)S.prog.jm--;else return;
+    if(accCur(S)<=e.b[k])delete e.f[k]}
+  P.save(S);e.l[k]=accCur(S);put("exp-v1",e);renderHome();
+}
+$("#fPlus").onclick=()=>addAcc(1);
+$("#fMinus").onclick=()=>addAcc(-1);
+
+// ── 앱 고칠 것: 적어만 두고 일요일 30분에 고친다 ──
+function wMemo(T){
+  const d=(7-T.getDay())%7;
+  $("#memoS").textContent=d===0?"오늘 30분만":`일요일 ${md(P.key(P.add(T,d)))}에 30분`;
+}
+$("#memoT").value=raw("app-todo")||"";
+$("#memoT").addEventListener("input",e=>setRaw("app-todo",e.target.value));
+
 function renderHome(){
   const s=stats(),S=P.load(),T=P.today();
-  wDday(T);wToday(S,T);wDots(S,T);wRace(S,T);wResume(s);
+  wFirst(S,T);wDday(T);wToday(S,T);wDots(S,T);wRace(S,T);wResume(s);wMemo(T);
 }
 function fitHero(){const f=$("#heroF");if(f.clientWidth)f.style.height=Math.round(f.clientWidth*HERO.ratio+HERO.extra)+"px"}
 

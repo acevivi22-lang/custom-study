@@ -240,7 +240,8 @@ function route(){const h=location.hash.slice(1);const v=VIEWS.includes(h)?h:'tod
   document.querySelectorAll('#tabs a').forEach(a=>{if(a.getAttribute('href')==='#'+v)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')});
   if(v==='rules')$('bk').value=JSON.stringify(S);
   window.scrollTo(0,0);}
-window.addEventListener('hashchange',route);
+window.addEventListener('hashchange',()=>{S=P.load();all();route()});
+window.addEventListener('storage',()=>{S=P.load();all()}); // 홈의 '+1강'이 진도를 바꾸면 바로 반영
 $('blocks').addEventListener('click',e=>{const r=e.target.closest('.row');if(!r)return;const k=key(view);S.done[k]=S.done[k]||{};S.done[k][r.dataset.id]=!S.done[k][r.dataset.id];save();renderToday();renderTop()});
 $('prev').onclick=()=>{view=add(view,-1);renderToday()};
 $('next').onclick=()=>{view=add(view,1);renderToday()};
