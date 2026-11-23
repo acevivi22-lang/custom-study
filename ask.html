@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="ko" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>광야 · 질문</title>
+<style>
+/* 질문: 모르는 부분을 찍으면 AI가 설명하고, 그 질문과 약점을 기록한다.
+   사진은 이 기기의 IndexedDB에, 기록·약점은 localStorage("ask-v1")에 저장된다. 홈 약점 위젯도 같은 키를 읽는다. */
+:root{--bg:#0b0b0b;--surface:#141414;--ink:#e8e5de;--muted:#8e8a82;--line:#2b2b2b;--bad:#d0453b;--r:20px}
+*{box-sizing:border-box;min-width:0;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html,body{margin:0;background:var(--bg);color:var(--ink)}
+body{font:15px/1.6 "Noto Sans KR","Apple SD Gothic Neo",-apple-system,sans-serif}
+button,input,select,textarea{font:inherit;color:inherit}
+.wrap{max-width:720px;margin:0 auto;padding:4px 20px 40px;display:flex;flex-direction:column;gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:12px}
+.h{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.h b{font-size:16px;font-weight:600}
+.lbl,.h span{color:var(--muted);font-size:13px}
+.btn{height:52px;border-radius:16px;border:1px solid var(--line);background:#1b1b1b;cursor:pointer;font-size:16px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 16px}
+.btn.pri{background:var(--ink);color:#000;border-color:var(--ink)}
+.btn.sm{height:38px;border-radius:12px;font-size:14px;font-weight:500;padding:0 12px}
+.btn:disabled{opacity:.45;cursor:default}
+.btn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.file{position:relative;overflow:hidden}
+.file input{position:absolute;inset:0;opacity:0;cursor:pointer}
+select,input[type=text],input[type=password],textarea{width:100%;border:1px solid var(--line);background:#1b1b1b;border-radius:12px;padding:10px 12px;min-height:44px;font-size:16px}
+textarea{resize:vertical;min-height:72px;line-height:1.5}
+::placeholder{color:#5a5a5a}
+.prev{width:100%;max-height:340px;object-fit:contain;border-radius:14px;background:#000;border:1px solid var(--line)}
+.err{color:var(--bad);font-size:14px;margin:0}
+.note{color:#5a5a5a;font-size:12px;margin:0}
+.chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chips button{flex:none;border:1px solid var(--line);background:var(--surface);color:var(--muted);font-size:13px;padding:6px 12px;border-radius:16px;cursor:pointer}
+.chips button[aria-pressed=true]{background:var(--ink);color:#000;border-color:var(--ink);font-weight:600}
+.tag{display:inline-block;font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:10px;padding:1px 8px;margin-right:6px}
+.weakline{border-left:2px solid var(--ink);padding:2px 0 2px 10px;font-size:14px}
+
+/* 답변 */
+.md{font-size:15px;line-height:1.7;word-break:keep-all;overflow-wrap:anywhere}
+.md p{margin:0 0 10px}.md p:last-child{margin:0}
+.md h4{margin:14px 0 6px;font-size:15px;font-weight:700}
+.md ul,.md ol{margin:0 0 10px;padding-left:20px}
+.md li{margin:2px 0}
+.md code{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:13px;background:#232323;padding:1px 5px;border-radius:5px}
+.md strong{font-weight:700}
+.msg{display:flex;flex-direction:column;gap:4px}
+.msg.u{align-self:flex-end;max-width:85%;background:#232323;border-radius:14px;padding:8px 12px;font-size:14px}
+.msg.a{border-top:1px solid var(--line);padding-top:12px}
+.thread{display:flex;flex-direction:column;gap:12px}
+.ask2{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end}
+.ask2 textarea{min-height:44px}
+.spin{display:inline-block;width:16px;height:16px;border:2px solid #444;border-top-color:var(--ink);border-radius:50%;animation:sp 0.8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* 목록 */
+.list{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.it{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:2px 12px;align-items:center;padding:12px 14px;border-top:1px solid var(--line);cursor:pointer;width:100%;text-align:left;background:none;border-left:0;border-right:0;border-bottom:0}
+.it:first-child{border-top:0}
+.it:active{background:#1b1b1b}
+.it .th{grid-row:span 2;width:52px;height:52px;border-radius:10px;background:#1b1b1b;border:1px solid var(--line);object-fit:cover;display:grid;place-items:center;font-size:13px;color:var(--muted)}
+.it b{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.it span{font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.it .n{grid-row:span 2;font-size:20px;font-weight:600;font-variant-numeric:tabular-nums;text-align:right}
+.it .n small{font-size:12px;color:var(--muted);font-weight:400}
+.it.done b{color:var(--muted);text-decoration:line-through}
+.grp h2{margin:6px 0 8px 4px;font-size:13px;font-weight:500;color:var(--muted)}
+.empty{color:var(--muted);text-align:center;padding:30px 10px;font-size:14px}
+
+/* 상세 시트 */
+.sheet{position:fixed;inset:0;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;z-index:10}
+.sheet .bar{position:sticky;top:0;background:var(--bg);display:flex;align-items:center;gap:10px;padding:12px 20px;border-bottom:1px solid var(--line);z-index:1}
+.sheet .bar b{flex:1;font-size:17px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.x{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:#1b1b1b;display:grid;place-items:center;cursor:pointer;padding:0}
+.x svg{width:18px;height:18px;stroke:var(--ink);fill:none;stroke-width:1.8;stroke-linecap:round}
+.ox{display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--line);padding-top:10px}
+.ox .q{font-size:15px}
+.ox .bt{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ox .res{font-size:14px;color:var(--muted)}
+.ox .res b{color:var(--ink)}
+.ox .res b.bad{color:var(--bad)}
+details summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center}
+details summary::-webkit-details-marker{display:none}
+.form{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.form label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted)}
+</style>
+<link rel="stylesheet" href="theme.css">
+</head>
+<body>
+
+<!-- ── 찍어서 묻기 ── -->
+<section id="v-snap" class="wrap" hidden>
+  <div class="card" id="keyCard" hidden>
+    <div class="h"><b>처음 한 번: API 키</b></div>
+    <p class="lbl" style="margin:0">사진 설명은 Claude API로 받아요. console.anthropic.com에서 만든 키를 넣으면 이 기기 브라우저에만 저장됩니다.</p>
+    <input type="password" id="keyIn0" placeholder="sk-ant-..." autocomplete="off">
+    <button class="btn pri" id="keySave0" type="button">저장</button>
+  </div>
+
+  <div class="card">
+    <div class="two">
+      <label class="btn pri file"><svg viewBox="0 0 24 24"><path d="M4 8h3l1.5-2h7L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>사진 찍기<input type="file" accept="image/*" capture="environment" id="cam"></label>
+      <label class="btn file"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2"/><path d="M4 16l5-5 4 4 2-2 5 5"/></svg>앨범에서<input type="file" accept="image/*" id="alb"></label>
+    </div>
+    <img class="prev" id="prev" alt="찍은 사진" hidden>
+    <select id="subj" aria-label="과목"></select>
+    <textarea id="q" rows="2" placeholder="어디가 모르겠어? (비워 두면 사진에서 표시한 부분이나 핵심을 설명)"></textarea>
+    <button class="btn pri" id="go" type="button" disabled>물어보기</button>
+    <p class="err" id="err" hidden></p>
+  </div>
+
+  <div class="card" id="ans" hidden></div>
+
+  <details class="card" id="setCard">
+    <summary><b style="font-weight:600">설정</b><span class="lbl">API 키 · 모델</span></summary>
+    <div class="form">
+      <label>API 키<input type="password" id="keyIn" placeholder="sk-ant-..." autocomplete="off"></label>
+      <label>모델<select id="model">
+        <option value="claude-sonnet-5-5">Sonnet 5.5 (기본 · 빠르고 저렴)</option>
+        <option value="claude-opus-5-5">Opus 5.5 (어려운 회계·평가 문제)</option>
+        <option value="claude-haiku-5-5">Haiku 5.5 (가장 저렴)</option>
+      </select></label>
+      <button class="btn sm" id="keySave" type="button">저장</button>
+      <p class="note">키는 이 기기에만 저장되고 사진은 Anthropic API로만 보내집니다. 사용량만큼 API 요금이 나와요(사진 한 장 질문에 대략 수십 원).</p>
+    </div>
+  </details>
+</section>
+
+<!-- ── 질문 기록 ── -->
+<section id="v-log" class="wrap" hidden>
+  <div class="chips" id="logF"></div>
+  <div id="logL"></div>
+</section>
+
+<!-- ── 내 약점 ── -->
+<section id="v-weak" class="wrap" hidden>
+  <div class="chips" id="weakF"></div>
+  <div id="weakL"></div>
+  <details class="card" id="addW">
+    <summary><b style="font-weight:600">+ 약점 직접 적기</b><span class="lbl">찍지 않고 적어 두기</span></summary>
+    <div class="form">
+      <label>과목<select id="wSubj"></select></label>
+      <label>주제<input type="text" id="wTopic" placeholder="예: 제척기간 기산일"></label>
+      <label>무엇이 헷갈리나<textarea id="wNote" rows="2" placeholder="예: 부과고지 기산일과 신고납부 기산일을 섞음"></textarea></label>
+      <button class="btn sm" id="wAdd" type="button">추가</button>
+    </div>
+  </details>
+</section>
+
+<!-- ── 상세 시트 ── -->
+<div class="sheet" id="sheet" hidden>
+  <div class="bar"><b id="shT"></b><button class="x" id="shX" type="button" aria-label="닫기"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <div class="wrap" id="shB" style="padding-top:14px"></div>
+</div>
+
+<script>
+{
+const $=s=>document.querySelector(s);
+const SUBJ=["관세법","내국소비세법","회계학","무역영어","관세율표","관세평가","무역실무","기타"];
+const K="ask-v1";
+const get=(k,d)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}};
+const put=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+const raw=k=>{try{return localStorage.getItem(k)||""}catch(e){return ""}};
+const setRaw=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+const load=()=>{const d=get(K,{});d.recs=d.recs||[];d.weaks=d.weaks||{};return d};
+const save=d=>put(K,d);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fd=t=>{const d=new Date(t);return`${d.getMonth()+1}/${d.getDate()}`};
+const wkey=(s,t)=>s+"|"+String(t).replace(/\s+/g,"").toLowerCase();
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+
+// ── 사진 저장(IndexedDB) ──
+let _db;
+const db=()=>_db||(_db=new Promise((res,rej)=>{const r=indexedDB.open("kwangya-ask",1);
+  r.onupgradeneeded=()=>{r.result.createObjectStore("img");r.result.createObjectStore("thumb")};
+  r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}));
+const idb=(st,mode,fn)=>db().then(d=>new Promise((res,rej)=>{const tx=d.transaction(st,mode),q=fn(tx.objectStore(st));tx.oncomplete=()=>res(q&&q.result);tx.onerror=()=>rej(tx.error)}));
+const iPut=(st,k,v)=>idb(st,"readwrite",s=>s.put(v,k)).catch(()=>{});
+const iGet=(st,k)=>idb(st,"readonly",s=>s.get(k)).catch(()=>null);
+const iDel=(st,k)=>idb(st,"readwrite",s=>s.delete(k)).catch(()=>{});
+
+function shrink(src,max,q){return new Promise((res,rej)=>{
+  const im=new Image();im.onload=()=>{const sc=Math.min(1,max/Math.max(im.naturalWidth,im.naturalHeight));
+    const c=document.createElement("canvas");c.width=Math.round(im.naturalWidth*sc);c.height=Math.round(im.naturalHeight*sc);
+    c.getContext("2d").drawImage(im,0,0,c.width,c.height);res(c.toDataURL("image/jpeg",q))};
+  im.onerror=()=>rej(new Error("사진을 열 수 없어요"));im.src=src})}
+
+// ── 간단 마크다운 ──
+function md(t){
+  const inl=s=>esc(s).replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>").replace(/`([^`]+)`/g,"<code>$1</code>");
+  const out=[];let list=null,para=[];
+  const flushP=()=>{if(para.length){out.push(`<p>${para.map(inl).join("<br>")}</p>`);para=[]}};
+  const flushL=()=>{if(list){out.push(`<${list.t}>${list.i.map(x=>`<li>${inl(x)}</li>`).join("")}</${list.t}>`);list=null}};
+  String(t||"").split("\n").forEach(l=>{
+    const s=l.trim();let m;
+    if(!s){flushP();flushL();return}
+    if(m=s.match(/^#{1,6}\s+(.*)/)){flushP();flushL();out.push(`<h4>${inl(m[1])}</h4>`);return}
+    if(m=s.match(/^[-*•]\s+(.*)/)){flushP();if(!list||list.t!=="ul"){flushL();list={t:"ul",i:[]}}list.i.push(m[1]);return}
+    if(m=s.match(/^\d+[.)]\s+(.*)/)){flushP();if(!list||list.t!=="ol"){flushL();list={t:"ol",i:[]}}list.i.push(m[1]);return}
+    flushL();para.push(s);
+  });
+  flushP();flushL();return out.join("");
+}
+
+// ── Claude API ──
+const key=()=>raw("ask-key").trim();
+const model=()=>raw("ask-model")||"claude-sonnet-5-5";
+const SYS=`너는 한국 관세사 시험(1차: 관세법·내국소비세법·회계학·무역영어 / 2차: 관세법·관세율표·관세평가·무역실무) 전문 튜터다.
+수험생이 교재·기출·필기 사진을 찍어 모르는 부분을 묻는다. 한국어로, 시험 대비에 맞춰 설명한다.
+- 맨 앞에 핵심을 한두 문장으로. 그다음 풀이(계산 문제는 단계별 계산), 시험에서 노리는 함정, 헷갈리기 쉬운 비슷한 개념 순서.
+- 사진 속에 밑줄·형광펜·체크·물음표가 있으면 그 부분이 질문이라고 보고 거기에 집중한다.
+- 조문 번호·세율·금액·기간은 확실할 때만 쓰고, 개정 가능성이 있으면 최신 법령으로 확인하라고 짧게 적는다.
+- 사진이 흐리거나 잘려서 읽을 수 없으면 추측하지 말고 어느 부분이 안 보이는지 말한다.
+- 형식은 짧은 문단과 목록, **굵게** 정도만. 표는 쓰지 않는다.`;
+const TOOL={name:"answer",description:"설명과 함께 이 질문을 약점 노트에 기록한다.",
+  input_schema:{type:"object",properties:{
+    subject:{type:"string",enum:SUBJ,description:"과목"},
+    topic:{type:"string",description:"약점 노트에 묶일 개념 이름. 15자 이내 명사구. 이미 있는 주제와 같은 개념이면 그 이름을 그대로."},
+    weakness:{type:"string",description:"수험생이 무엇을 모르거나 헷갈리는지 한 문장으로. 예: '부과고지 제척기간 기산일을 신고납부와 혼동함'"},
+    explanation:{type:"string",description:"수험생에게 보여 줄 설명 전체(마크다운)"}},
+    required:["subject","topic","weakness","explanation"]}};
+
+async function api(body){
+  if(!key())throw new Error("설정에서 API 키를 먼저 넣어 주세요.");
+  if(!navigator.onLine)throw new Error("인터넷이 연결돼 있지 않아요.");
+  let r;
+  try{r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"content-type":"application/json","x-api-key":key(),"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:model(),...body})})}
+  catch(e){throw new Error("API에 연결하지 못했어요. 인터넷을 확인해 주세요.")}
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok){
+    const m=j.error&&j.error.message||"";
+    if(r.status===401)throw new Error("API 키가 맞지 않아요. 설정에서 다시 넣어 주세요.");
+    if(r.status===429)throw new Error("요청이 많아요. 잠시 뒤 다시 해 주세요.");
+    if(r.status===529||r.status>=500)throw new Error("API 서버가 바빠요. 잠시 뒤 다시 해 주세요.");
+    if(/credit|billing/i.test(m))throw new Error("API 크레딧이 부족해요. console.anthropic.com에서 충전해 주세요.");
+    if(/model/i.test(m))throw new Error("이 모델을 쓸 수 없어요. 설정에서 다른 모델을 골라 보세요.");
+    throw new Error("오류: "+(m||r.status));
+  }
+  return j;
+}
+function firstMsg(rec,img){
+  const c=[];
+  if(img)c.push({type:"image",source:{type:"base64",media_type:"image/jpeg",data:img.split(",")[1]}});
+  c.push({type:"text",text:rec.prompt});
+  return {role:"user",content:c};
+}
+
+// ── 약점 묶기 ──
+function addWeak(d,subj,topic,note,recId){
+  const k=wkey(subj,topic),now=Date.now();
+  const w=d.weaks[k]||(d.weaks[k]={subj,topic,notes:[],n:0,first:now,last:now,status:"open",recs:[],quiz:{ok:0,n:0}});
+  w.n++;w.last=now;w.status="open";
+  if(note&&!w.notes.includes(note))w.notes.unshift(note);
+  w.notes=w.notes.slice(0,8);
+  if(recId)w.recs.unshift(recId);
+  return k;
+}
+function topicHint(d){
+  return Object.values(d.weaks).sort((a,b)=>b.last-a.last).slice(0,80).map(w=>`- ${w.subj}: ${w.topic}`).join("\n")||"(아직 없음)";
+}
+
+// ── 찍어서 묻기 ──
+let shot=null;
+const fillSubj=(el,auto)=>{el.innerHTML=(auto?`<option value="">과목: 사진 보고 자동</option>`:"")+SUBJ.map(s=>`<option>${s}</option>`).join("")};
+fillSubj($("#subj"),true);fillSubj($("#wSubj"),false);
+$("#subj").value=raw("ask-subj");
+$("#subj").onchange=e=>setRaw("ask-subj",e.target.value);
+async function pick(e){
+  const f=e.target.files&&e.target.files[0];e.target.value="";if(!f)return;
+  const url=URL.createObjectURL(f);
+  try{shot=await shrink(url,1400,.82)}catch(er){showErr(er.message);return}finally{URL.revokeObjectURL(url)}
+  $("#prev").src=shot;$("#prev").hidden=false;$("#go").disabled=false;$("#err").hidden=true;$("#ans").hidden=true;
+}
+$("#cam").onchange=pick;$("#alb").onchange=pick;
+const showErr=m=>{const e=$("#err");e.textContent=m;e.hidden=!m};
+
+$("#go").onclick=async()=>{
+  if(!shot)return;
+  if(!key()){showErr("설정에서 API 키를 먼저 넣어 주세요.");$("#setCard").open=true;return}
+  const subj=$("#subj").value,q=$("#q").value.trim(),d=load();
+  const prompt=`과목: ${subj||"사진을 보고 판단"}
+모르는 부분: ${q||"(따로 적지 않음. 사진에 표시된 부분이 있으면 그것을, 없으면 핵심 개념을 설명)"}
+
+이미 기록된 약점 주제(같은 개념이면 이 이름을 그대로 써):
+${topicHint(d)}`;
+  const go=$("#go");go.disabled=true;go.innerHTML='<span class="spin"></span>설명 받는 중';showErr("");
+  try{
+    const j=await api({max_tokens:3000,system:SYS,tools:[TOOL],tool_choice:{type:"tool",name:"answer"},
+      messages:[firstMsg({prompt},shot)]});
+    const tu=(j.content||[]).find(c=>c.type==="tool_use");
+    const a=tu&&tu.input||{};
+    const text=a.explanation||(j.content||[]).filter(c=>c.type==="text").map(c=>c.text).join("\n")||"(답이 비어 있어요)";
+    const s=SUBJ.includes(a.subject)?a.subject:(subj||"기타");
+    const id=uid(),rec={id,t:Date.now(),subj:s,topic:(a.topic||"분류 안 됨").slice(0,30),weak:a.weakness||"",q,prompt,
+      thread:[{r:"u",x:q||"(사진만 보냄)"},{r:"a",x:text}]};
+    const d2=load();d2.recs.unshift(rec);rec.wk=addWeak(d2,s,rec.topic,rec.weak,id);save(d2);
+    await iPut("img",id,shot);
+    shrink(shot,160,.7).then(t=>iPut("thumb",id,t));
+    $("#q").value="";
+    const box=$("#ans");box.hidden=false;renderRec(box,id,false);
+    box.scrollIntoView({behavior:"smooth",block:"start"});
+  }catch(er){showErr(er.message)}
+  finally{go.disabled=!shot;go.textContent="물어보기"}
+};
+
+// 키 설정
+function keyUI(){$("#keyCard").hidden=!!key();$("#keyIn").value=key();$("#model").value=model()}
+$("#keySave").onclick=()=>{setRaw("ask-key",$("#keyIn").value.trim());setRaw("ask-model",$("#model").value);keyUI();$("#setCard").open=false};
+$("#keySave0").onclick=()=>{setRaw("ask-key",$("#keyIn0").value.trim());keyUI()};
+$("#model").onchange=e=>setRaw("ask-model",e.target.value);
+
+// ── 기록 하나 보여 주기 (찍은 직후 카드와 상세 시트가 같이 씀) ──
+async function renderRec(box,id,full){
+  const d=load(),rec=d.recs.find(r=>r.id===id);if(!rec){box.innerHTML='<p class="empty">지워진 기록이에요.</p>';return}
+  const w=d.weaks[rec.wk];
+  box.innerHTML=`
+    ${full?`<img class="prev" id="rImg" alt="질문한 사진" hidden>`:""}
+    <div><span class="tag">${esc(rec.subj)}</span><span class="tag">${esc(rec.topic)}</span><span class="lbl">${fd(rec.t)}</span></div>
+    ${rec.weak?`<div class="weakline">${esc(rec.weak)}</div>`:""}
+    <div class="thread">${rec.thread.map((m,i)=>m.r==="u"?(i===0&&!rec.q?"":`<div class="msg u">${esc(m.x)}</div>`):`<div class="msg a md">${md(m.x)}</div>`).join("")}</div>
+    <div class="ask2"><textarea rows="1" placeholder="더 물어보기"></textarea><button class="btn sm pri" type="button">보내기</button></div>
+    <p class="err" hidden></p>
+    ${w?`<button class="btn sm" type="button" data-w="${esc(rec.wk)}">약점 '${esc(w.topic)}' · ${w.n}번째</button>`:""}
+    ${full?`<button class="btn sm" type="button" data-del>이 기록 지우기</button>`:""}`;
+  if(full){const im=await iGet("img",id);if(im){const e=box.querySelector("#rImg");e.src=im;e.hidden=false}}
+  const ta=box.querySelector(".ask2 textarea"),bt=box.querySelector(".ask2 button"),er=box.querySelector(".err");
+  bt.onclick=async()=>{
+    const x=ta.value.trim();if(!x)return;
+    bt.disabled=true;bt.innerHTML='<span class="spin"></span>';er.hidden=true;
+    try{
+      const img=await iGet("img",id),r=load().recs.find(z=>z.id===id);
+      const msgs=[firstMsg(r,img)];
+      r.thread.slice(1).forEach(m=>msgs.push({role:m.r==="u"?"user":"assistant",content:m.x}));
+      msgs.push({role:"user",content:x});
+      const j=await api({max_tokens:2000,system:SYS,messages:msgs});
+      const t=(j.content||[]).filter(c=>c.type==="text").map(c=>c.text).join("\n");
+      const d2=load(),r2=d2.recs.find(z=>z.id===id);r2.thread.push({r:"u",x},{r:"a",x:t});save(d2);
+      renderRec(box,id,full);
+    }catch(e){er.textContent=e.message;er.hidden=false;bt.disabled=false;bt.textContent="보내기"}
+  };
+  const wb=box.querySelector("[data-w]");if(wb)wb.onclick=()=>openWeak(rec.wk);
+  const db_=box.querySelector("[data-del]");if(db_)db_.onclick=()=>{if(confirm("이 질문 기록을 지울까요?")){delRec(id);closeSheet()}};
+}
+function delRec(id){
+  const d=load(),i=d.recs.findIndex(r=>r.id===id);if(i<0)return;
+  const r=d.recs[i];d.recs.splice(i,1);
+  const w=d.weaks[r.wk];
+  if(w){w.recs=w.recs.filter(x=>x!==id);w.n=Math.max(0,w.n-1);if(w.n===0&&!w.manual)delete d.weaks[r.wk]}
+  save(d);iDel("img",id);iDel("thumb",id);
+}
+
+// ── 질문 기록 ──
+let logF="",weakF="open";
+function chipsHTML(opts,cur){return opts.map(([v,t])=>`<button type="button" data-v="${esc(v)}" aria-pressed="${v===cur}">${esc(t)}</button>`).join("")}
+function renderLog(){
+  const d=load(),used=SUBJ.filter(s=>d.recs.some(r=>r.subj===s));
+  $("#logF").innerHTML=chipsHTML([["","전체 "+d.recs.length],...used.map(s=>[s,s])],logF);
+  const rs=d.recs.filter(r=>!logF||r.subj===logF);
+  $("#logL").innerHTML=rs.length?`<div class="list">${rs.map(r=>`<button class="it" type="button" data-id="${r.id}"><img class="th" alt="" data-th="${r.id}"><b>${esc(r.topic)}</b><span class="n" style="font-size:13px;color:var(--muted)">${fd(r.t)}</span><span>${esc(r.subj)} · ${esc(r.q||r.weak||"")}</span></button>`).join("")}</div>`
+    :`<p class="empty">아직 질문이 없어요.<br>모르는 부분을 찍어서 물어보면 여기 쌓여요.</p>`;
+  $("#logL").querySelectorAll("[data-th]").forEach(async im=>{const t=await iGet("thumb",im.dataset.th);if(t)im.src=t;else im.removeAttribute("src")});
+}
+$("#logF").onclick=e=>{const b=e.target.closest("[data-v]");if(b){logF=b.dataset.v;renderLog()}};
+$("#logL").onclick=e=>{const b=e.target.closest("[data-id]");if(b)openRec(b.dataset.id)};
+
+// ── 내 약점 ──
+function renderWeak(){
+  const d=load(),all=Object.entries(d.weaks);
+  const cnt=s=>all.filter(([,w])=>s==="all"||w.status===s).length;
+  $("#weakF").innerHTML=chipsHTML([["open","남은 약점 "+cnt("open")],["done","해결 "+cnt("done")],["all","전체 "+all.length]],weakF);
+  const ws=all.filter(([,w])=>weakF==="all"||w.status===weakF);
+  if(!ws.length){$("#weakL").innerHTML=`<p class="empty">${weakF==="done"?"아직 해결한 약점이 없어요.":"기록된 약점이 없어요.<br>사진으로 물어보면 AI가 무엇을 헷갈렸는지 적어 둬요."}</p>`;return}
+  $("#weakL").innerHTML=SUBJ.map(s=>{
+    const g=ws.filter(([,w])=>w.subj===s).sort((a,b)=>b[1].n-a[1].n||b[1].last-a[1].last);
+    if(!g.length)return"";
+    return`<div class="grp"><h2>${s} · ${g.length}</h2><div class="list">${g.map(([k,w])=>`<button class="it${w.status==="done"?" done":""}" type="button" data-k="${esc(k)}" style="grid-template-columns:minmax(0,1fr) auto"><b>${esc(w.topic)}</b><span class="n">${w.n}<small>번</small></span><span>${esc(w.notes[0]||"")}${w.quiz.n?` · 확인 ${w.quiz.ok}/${w.quiz.n}`:""}</span></button>`).join("")}</div></div>`}).join("");
+}
+$("#weakF").onclick=e=>{const b=e.target.closest("[data-v]");if(b){weakF=b.dataset.v;renderWeak()}};
+$("#weakL").onclick=e=>{const b=e.target.closest("[data-k]");if(b)openWeak(b.dataset.k)};
+$("#wAdd").onclick=()=>{
+  const s=$("#wSubj").value,t=$("#wTopic").value.trim(),n=$("#wNote").value.trim();if(!t)return;
+  const d=load(),k=addWeak(d,s,t,n,null);d.weaks[k].manual=true;save(d);
+  $("#wTopic").value="";$("#wNote").value="";$("#addW").open=false;weakF="open";renderWeak();
+};
+
+// ── 시트 ──
+function openSheet(t){$("#shT").textContent=t;$("#sheet").hidden=false;$("#sheet").scrollTop=0}
+function closeSheet(){$("#sheet").hidden=true;refresh()}
+$("#shX").onclick=closeSheet;
+function openRec(id){const r=load().recs.find(x=>x.id===id);if(!r)return;openSheet(r.topic);renderRec($("#shB"),id,true)}
+function openWeak(k){
+  const d=load(),w=d.weaks[k];if(!w)return;
+  openSheet(w.topic);
+  const recs=w.recs.map(id=>d.recs.find(r=>r.id===id)).filter(Boolean);
+  const B=$("#shB");
+  B.innerHTML=`
+    <div class="card">
+      <div><span class="tag">${esc(w.subj)}</span><span class="lbl">${w.n}번 막힘 · 처음 ${fd(w.first)} · 마지막 ${fd(w.last)}</span></div>
+      ${w.notes.map(n=>`<div class="weakline">${esc(n)}</div>`).join("")||'<p class="lbl" style="margin:0">적힌 메모 없음</p>'}
+      <div class="two"><button class="btn sm" type="button" id="wSt">${w.status==="done"?"다시 약점으로":"해결로 표시"}</button><button class="btn sm pri" type="button" id="wQz">확인 문제 3개</button></div>
+      <div id="qz"></div>
+    </div>
+    ${recs.length?`<div class="grp"><h2>이 약점으로 물어본 것 · ${recs.length}</h2><div class="list">${recs.map(r=>`<button class="it" type="button" data-id="${r.id}"><img class="th" alt="" data-th="${r.id}"><b>${esc(r.q||r.weak||r.topic)}</b><span></span><span>${fd(r.t)}</span></button>`).join("")}</div></div>`:""}
+    <button class="btn sm" type="button" id="wDel">이 약점 지우기</button>`;
+  B.querySelectorAll("[data-th]").forEach(async im=>{const t=await iGet("thumb",im.dataset.th);if(t)im.src=t});
+  B.querySelectorAll("[data-id]").forEach(b=>b.onclick=()=>openRec(b.dataset.id));
+  $("#wSt").onclick=()=>{const d2=load(),x=d2.weaks[k];x.status=x.status==="done"?"open":"done";save(d2);openWeak(k)};
+  $("#wDel").onclick=()=>{if(!confirm("이 약점을 지울까요? (질문 기록은 남아요)"))return;const d2=load();delete d2.weaks[k];d2.recs.forEach(r=>{if(r.wk===k)r.wk=""});save(d2);closeSheet()};
+  $("#wQz").onclick=()=>quiz(k);
+}
+async function quiz(k){
+  const box=$("#qz"),bt=$("#wQz"),w=load().weaks[k];
+  bt.disabled=true;bt.innerHTML='<span class="spin"></span>만드는 중';box.innerHTML="";
+  const QT={name:"ox",description:"OX 문제 3개",input_schema:{type:"object",properties:{items:{type:"array",minItems:3,maxItems:3,items:{type:"object",properties:{
+    q:{type:"string",description:"시험 지문처럼 쓴 한 문장"},a:{type:"boolean",description:"맞는 문장이면 true"},why:{type:"string",description:"짧은 해설"}},required:["q","a","why"]}}},required:["items"]}};
+  try{
+    const j=await api({max_tokens:1500,system:SYS,tools:[QT],tool_choice:{type:"tool",name:"ox"},messages:[{role:"user",content:
+      `과목: ${w.subj}\n약점 주제: ${w.topic}\n헷갈린 점:\n${w.notes.map(n=>"- "+n).join("\n")||"(없음)"}\n\n이 약점을 확인하는 관세사 시험식 OX 문제 3개를 만들어. 헷갈린 점을 정확히 찌르는 함정 지문을 섞어.`}]});
+    const items=((j.content||[]).find(c=>c.type==="tool_use")||{}).input?.items||[];
+    if(!items.length)throw new Error("문제를 만들지 못했어요. 다시 눌러 주세요.");
+    box.innerHTML=items.map((it,i)=>`<div class="ox" data-i="${i}"><div class="q">${i+1}. ${esc(it.q)}</div><div class="bt"><button class="btn sm" data-a="1">O</button><button class="btn sm" data-a="0">X</button></div><div class="res" hidden></div></div>`).join("");
+    box.querySelectorAll(".ox").forEach(el=>el.querySelectorAll("[data-a]").forEach(b=>b.onclick=()=>{
+      const it=items[+el.dataset.i],ok=(b.dataset.a==="1")===!!it.a;
+      el.querySelectorAll("[data-a]").forEach(x=>x.disabled=true);
+      const r=el.querySelector(".res");r.hidden=false;
+      r.innerHTML=`<b class="${ok?"":"bad"}">${ok?"맞음":"틀림"}</b> · 정답 ${it.a?"O":"X"} — ${esc(it.why)}`;
+      const d2=load(),x=d2.weaks[k];if(x){x.quiz.n++;if(ok)x.quiz.ok++;else{x.status="open";x.last=Date.now()}save(d2)}
+    }));
+  }catch(e){box.innerHTML=`<p class="err">${esc(e.message)}</p>`}
+  finally{bt.disabled=false;bt.textContent="확인 문제 3개"}
+}
+
+// ── 화면 전환(#snap · #log · #weak) ──
+function view(){const h=location.hash.slice(1);return["snap","log","weak"].includes(h)?h:"snap"}
+function refresh(){const v=view();if(v==="log")renderLog();if(v==="weak")renderWeak()}
+function route(){
+  const v=view();["snap","log","weak"].forEach(x=>$("#v-"+x).hidden=x!==v);
+  $("#sheet").hidden=true;
+  if(v==="snap")keyUI();
+  refresh();
+}
+window.addEventListener("hashchange",route);
+window.addEventListener("storage",refresh);
+route();
+}
+</script>
+</body>
+</html>

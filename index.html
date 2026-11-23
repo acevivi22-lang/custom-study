@@ -13,9 +13,8 @@
 <link rel="icon" type="image/png" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <style>
-/* 광야 — 검은 바탕, 둥근 위젯, 아래 떠 있는 탭 4개(홈·계획·공부·기숙사)
-   홈 맨 위는 '첫 블록 · 회계학'(회계 69강을 다 들을 때까지). 다 들으면 히어로 슬롯(기숙사)이 돌아온다.
-   히어로 슬롯은 지금 기숙사. 나중에 다른 화면으로 바꾸려면 아래 HERO 한 줄만 고치면 된다.
+/* 광야 — 검은 바탕, 둥근 위젯, 아래 떠 있는 탭 4개(홈·계획·공부·질문)
+   홈 맨 위는 '첫 블록 · 회계학'(회계 69강을 다 들을 때까지), 그 아래 '내 약점' 위젯(ask.html 기록을 읽음).
    연습장 페이지들은 iframe으로 그대로 열리고, 색은 theme.css 다크 값을 쓴다. */
 :root{--sh:#000;--card:#141414;--card2:#1b1b1b;--edge:#262626;--tx:#f2f2f2;--mt:#8a8a8a;--dim:#5a5a5a;--r:24px}
 *{box-sizing:border-box;min-width:0;-webkit-tap-highlight-color:transparent}
@@ -63,9 +62,13 @@ iframe.page{border:0;width:100%;height:100%;display:block;background:var(--sh)}
 .ring{width:64px;height:64px;position:relative}
 .ring svg{width:100%;height:100%;transform:rotate(-90deg)}
 .ring span{position:absolute;inset:0;display:grid;place-items:center;font-size:17px;font-weight:600;font-variant-numeric:tabular-nums}
-.hero{padding:14px}
-.hero .wh{padding:2px 4px 0}
-.hero iframe{border:0;width:100%;display:block;border-radius:16px;background:transparent}
+.wk2{display:flex;flex-direction:column;gap:8px}
+.wk2 a{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;text-decoration:none;color:var(--tx);font-size:14px}
+.wk2 a span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wk2 a em{font-style:normal;color:var(--mt);font-variant-numeric:tabular-nums}
+.wkb{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.wkb a{height:48px;border-radius:16px;display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:15px;font-weight:600;border:1px solid var(--edge);background:var(--card2);color:var(--tx)}
+.wkb a.pri{background:var(--tx);color:#000;border-color:var(--tx)}
 
 /* 수련 기록 점 */
 .months{display:grid;font-size:12px;color:var(--mt);height:16px}
@@ -174,9 +177,10 @@ details.w summary::-webkit-details-marker{display:none}
         <div class="wkf" id="fWkf"></div>
       </div>
 
-      <div class="w span hero" id="heroW">
-        <div class="wh"><b id="heroT"></b><a class="go" id="heroGo" href="#" aria-label="전체 보기"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></a></div>
-        <iframe id="heroF" title="히어로 위젯" scrolling="no"></iframe>
+      <div class="w span" id="weakW">
+        <div class="wh"><b>내 약점</b><span id="wkS"></span></div>
+        <div class="wk2" id="wkL"></div>
+        <div class="wkb"><a class="pri" href="#ask">찍어서 묻기</a><a href="#weak">약점 보기</a></div>
       </div>
 
       <a class="w sq" id="wToday" href="#pt">
@@ -223,12 +227,9 @@ details.w summary::-webkit-details-marker{display:none}
 <footer class="tabs"><nav id="tabs" aria-label="탭"></nav></footer>
 
 <script src="plan-core.js"></script>
-<script src="dorm-core.js"></script>
 <script>
 {
 const P=window.PLAN;
-// ── 히어로 슬롯: 홈 맨 위 큰 위젯. 다른 걸 넣고 싶으면 이 한 줄만 바꾼다 ──
-const HERO={t:"기숙사",src:"dorm.html#mini",open:"dorm",ratio:200/320,extra:40};
 
 const MODS=[
  {id:"pt",g:"p",t:"오늘 계획",ic:"今",src:"plan.html#today",d:"오늘 시간표와 체크"},
@@ -251,17 +252,19 @@ const MODS=[
  {id:"val",g:2,t:"관세평가",ic:"價",src:"amgi.html#val",d:"제1~6방법, 가산·공제 요소 사례 문제"},
  {id:"jr",g:3,t:"정리노트",ic:"抄",src:"jeongri.html",d:"위원회·날짜·금액, 부가세 숫자, 무역규범 숫자, 회계 공식. 숫자 가리기"},
  {id:"wrong",g:3,t:"오답노트",ic:"×",src:"amgi.html#wrong",d:"관세법·관세평가·무역영어·관세율표에서 틀린 문제만 다시"},
- {id:"dorm",g:"d",t:"기숙사",ic:"舍",src:"dorm.html",d:"동료와 업적"}
+ {id:"ask",g:"a",t:"찍어서 묻기",ic:"問",src:"ask.html#snap",d:"모르는 부분을 찍으면 AI가 설명"},
+ {id:"asklog",g:"a",t:"질문 기록",ic:"記",src:"ask.html#log",d:"찍어서 물어본 것 모음"},
+ {id:"weak",g:"a",t:"내 약점",ic:"弱",src:"ask.html#weak",d:"헷갈린 개념, 막힌 횟수, 확인 문제"}
 ];
 const GNAME={0:"기출 · 실제 시험 문제",1:"1차 · 관세법 · 내소세 · 무역영어",2:"2차 · 관세율표 · 관세평가",3:"복습 · 정리노트 · 틀린 문제"};
-// 탭: 홈 · 계획 · 공부(기출·1차·2차·복습) · 기숙사
+// 탭: 홈 · 계획 · 공부(기출·1차·2차·복습) · 질문
 const TABS=[
  {k:"h",t:"홈",svg:'<rect x="4" y="4" width="6.5" height="6.5" rx="2"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="2"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="2"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="2"/>'},
  {k:"p",t:"계획",svg:'<rect x="3.5" y="5" width="17" height="15" rx="3.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/><path d="M9 14.5l2 2 4-4"/>'},
  {k:"s",t:"공부",svg:'<path d="M4 5.5c2.7-1.3 5.3-1.3 8 0v14c-2.7-1.3-5.3-1.3-8 0z"/><path d="M12 5.5c2.7-1.3 5.3-1.3 8 0v14c-2.7-1.3-5.3-1.3-8 0z"/>'},
- {k:"d",t:"기숙사",svg:'<circle cx="9" cy="8.5" r="3"/><path d="M3.5 19.5c.6-3.3 2.8-5.3 5.5-5.3s4.9 2 5.5 5.3"/><circle cx="16.5" cy="9.5" r="2.4"/><path d="M15.5 14.4c2.6-.4 4.5 1.4 5 4.6"/>'}
+ {k:"a",t:"질문",svg:'<path d="M4 8h3l1.5-2h7L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>'}
 ];
-const tabOf=g=>g==="p"?"p":g==="d"?"d":"s";
+const tabOf=g=>g==="p"?"p":g==="a"?"a":"s";
 const $=s=>document.querySelector(s);
 const get=(k,d)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}};
 const put=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
@@ -278,7 +281,7 @@ function stats(){
     per:{law:pre("law-"),trade:pre("inco-"),hs:pre("hs-"),val:pre("val-")}};
 }
 function prog(m,s){
-  if(m.g==="p"||m.g==="d")return {t:m.d};
+  if(m.g==="p"||m.g==="a")return {t:m.d};
   switch(m.id){
     case "gc1":return {t:`${s.gDone} / 1,120 · 맞힘 ${s.gOk}`,n:s.gDone,max:"1,120"};
     case "gox":{const r=get("gox-v1",{}),k=Object.keys(r);return {t:k.length?`${k.length} / 1,819문장 · 맞힘 ${k.filter(x=>r[x]===1).length}`:"1,819문장",n:k.length,max:"1,819"}}
@@ -348,7 +351,7 @@ function wRace(S,T){
     return`<a class="rr" href="#pp"><span class="n">${r.n}</span><div class="trk"><i style="width:${Math.min(100,cur/r.max*100)}%"></i><u style="left:${Math.min(99,e/r.max*100)}%"></u></div><span class="v${dl<-.5?" bad":""}"><b>${cur}</b>/${r.max}${st}</span></a>`}).join("");
 }
 function wResume(s){
-  const lastId=raw("hub-last"),last=MODS.find(m=>m.id===lastId&&m.g!=="p"&&m.g!=="d");
+  const lastId=raw("hub-last"),last=MODS.find(m=>m.id===lastId&&m.g!=="p"&&m.g!=="a");
   const m=last||MODS.find(x=>x.id==="gc1"),p=prog(m,s),r=$("#resume");r.href="#"+m.id;
   r.innerHTML=`<div class="l"><b>${last?m.t:"1차 기출"}</b><span class="lbl">${last?"이어서 하기":"처음이라면 여기부터"}</span></div>`+
     (p.n!==undefined?`<div class="val">${p.n}<small> / ${p.max}</small></div>`:`<div class="lbl" style="text-align:right">${p.t}</div>`);
@@ -376,7 +379,7 @@ const prevStudy=d=>{let x=P.add(d,-1);while(!P.isStudy(x))x=P.add(x,-1);return x
 const hm=m=>`${P.pad(Math.floor(m/60))}:${P.pad(Math.round(m%60))}`;
 function wFirst(S,T){
   const cur=accCur(S),on=cur<ACC_MAX;
-  $("#first").hidden=!on;$("#heroW").hidden=on;
+  $("#first").hidden=!on;
   if(!on)return;
   const e=expTick(S,T),k=P.key(T),n=e.n[k],dn=did(e,k),study=P.isStudy(T);
   const due=k<=ACC_DUE?ACC_DUE:ACC_DUE2,left=studyLeft(T,due),rem=ACC_MAX-cur;
@@ -436,11 +439,19 @@ function wMemo(T){
 $("#memoT").value=raw("app-todo")||"";
 $("#memoT").addEventListener("input",e=>setRaw("app-todo",e.target.value));
 
+// ── 내 약점: ask.html이 쓰는 ask-v1을 읽는다 ──
+function wWeak(){
+  const a=get("ask-v1",{}),ws=Object.values(a.weaks||{}).filter(w=>w.status!=="done").sort((x,y)=>y.n-x.n||y.last-x.last);
+  const nq=(a.recs||[]).length;
+  $("#wkS").textContent=nq||ws.length?`남은 약점 ${ws.length} · 질문 ${nq}`:"";
+  const esc=x=>String(x).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+  $("#wkL").innerHTML=ws.length?ws.slice(0,3).map(w=>`<a href="#weak"><span>${esc(w.subj)} · ${esc(w.topic)}</span><em>${w.n}번</em></a>`).join("")
+    :`<p class="note" style="margin:0">모르는 부분을 찍어서 물어보면 헷갈린 개념이 여기 모여요.</p>`;
+}
 function renderHome(){
   const s=stats(),S=P.load(),T=P.today();
-  wFirst(S,T);wDday(T);wToday(S,T);wDots(S,T);wRace(S,T);wResume(s);wMemo(T);
+  wFirst(S,T);wWeak();wDday(T);wToday(S,T);wDots(S,T);wRace(S,T);wResume(s);wMemo(T);
 }
-function fitHero(){const f=$("#heroF");if(f.clientWidth)f.style.height=Math.round(f.clientWidth*HERO.ratio+HERO.extra)+"px"}
 
 // ── 공부 목록 ──
 const CHEV='<svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>';
@@ -454,8 +465,8 @@ function renderLib(){
 function current(){const h=location.hash.slice(1);return h==="study"||MODS.some(m=>m.id===h)?h:"home"}
 function tabNow(){const id=current();return id==="home"?"h":id==="study"?"s":tabOf(MODS.find(m=>m.id===id).g)}
 function renderTabs(){
-  const active=tabNow(),nu=window.DORM?DORM.unseen().length:0;
-  $("#tabs").innerHTML=TABS.map(t=>`<button type="button" data-tab="${t.k}" aria-label="${t.t}" ${t.k===active?'aria-current="page"':""}><svg viewBox="0 0 24 24" aria-hidden="true">${t.svg}</svg>${t.k==="d"&&nu?'<span class="badge"></span>':""}</button>`).join("");
+  const active=tabNow();
+  $("#tabs").innerHTML=TABS.map(t=>`<button type="button" data-tab="${t.k}" aria-label="${t.t}" ${t.k===active?'aria-current="page"':""}><svg viewBox="0 0 24 24" aria-hidden="true">${t.svg}</svg></button>`).join("");
 }
 let loadedPage="";
 function route(){
@@ -464,7 +475,7 @@ function route(){
   if(id==="home"||id==="study"){
     $("#"+id).hidden=false;top.classList.remove("mod");$("#back").hidden=true;chips.hidden=true;
     $("#title").textContent=id==="home"?"광야":"공부";
-    if(id==="home"){renderHome();fitHero()}else renderLib();
+    if(id==="home")renderHome();else renderLib();
     renderTabs();wDday(P.today());return;
   }
   const m=MODS.find(x=>x.id===id),page=m.src.split("#")[0];
@@ -473,13 +484,13 @@ function route(){
   else{loadedPage=page;f.src=m.src}
   const tab=tabOf(m.g);
   top.classList.toggle("mod",tab==="s");$("#back").hidden=tab!=="s";
-  $("#title").textContent=tab==="p"?"계획":tab==="d"?"기숙사":m.t;
+  $("#title").textContent=tab==="p"?"계획":tab==="a"?"질문":m.t;
   const sib=MODS.filter(x=>x.g===m.g);
   chips.hidden=sib.length<2;
   chips.innerHTML=sib.map(x=>`<a href="#${x.id}" ${x.id===id?'aria-current="page"':""}>${x.t}</a>`).join("");
   const cur=chips.querySelector("[aria-current]");if(cur)cur.scrollIntoView({block:"nearest",inline:"center"});
-  if(m.g!=="d"&&m.g!=="p")setRaw("hub-last",id);
-  if(tab==="p"){const lg=get("hub-lastg",{});lg.p=id;put("hub-lastg",lg)}
+  if(m.g!=="a"&&m.g!=="p")setRaw("hub-last",id);
+  if(tab==="p"||tab==="a"){const lg=get("hub-lastg",{});lg[tab]=id;put("hub-lastg",lg)}
   renderTabs();wDday(P.today());
 }
 document.addEventListener("click",e=>{
@@ -487,7 +498,7 @@ document.addEventListener("click",e=>{
   const k=b.dataset.tab,lg=get("hub-lastg",{});
   if(k==="h"){location.hash="home";return}
   if(k==="s"){location.hash="study";return}
-  if(k==="d"){location.hash="dorm";return}
+  if(k==="a"){location.hash=lg.a&&MODS.some(m=>m.id===lg.a&&m.g==="a")?lg.a:"ask";return}
   location.hash=lg.p&&MODS.some(m=>m.id===lg.p&&m.g==="p")?lg.p:"pt";
 });
 $("#back").onclick=()=>{location.hash="study"};
@@ -496,14 +507,9 @@ $("#ddaybtn").onclick=openDates;$("#wDday").onclick=openDates;
 const onDate=(id,k)=>$(id).addEventListener("change",e=>{if(e.target.value){setRaw(k,e.target.value)}renderHome()});
 onDate("#examdate","hub-exam");onDate("#examdate2","hub-exam2");onDate("#wilddate","hub-wild");
 
-// 히어로 슬롯
-$("#heroT").textContent=HERO.t;$("#heroGo").href="#"+HERO.open;$("#heroF").src=HERO.src;
-window.addEventListener("resize",fitHero);
-
 // 모든 연습장은 다크로
 function syncTheme(fr){try{fr.contentDocument.documentElement.setAttribute("data-theme","dark")}catch(e){}}
 $("#frame").addEventListener("load",()=>syncTheme($("#frame")));
-$("#heroF").addEventListener("load",()=>syncTheme($("#heroF")));
 window.addEventListener("hashchange",route);
 window.addEventListener("focus",()=>{if(current()==="home")renderHome();renderTabs()});
 window.addEventListener("storage",()=>{const id=current();if(id==="home")renderHome();if(id==="study")renderLib();renderTabs()});
